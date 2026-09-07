@@ -1,0 +1,51 @@
+{
+    "model_name": "actis_phishing_rf",
+    "model_version": "1.0.0",
+    "created_at": "2026-09-08T00:53:26.167184",
+    "algorithm": "RandomForestClassifier",
+    "dataset_name": "web-page-phishing.csv",
+    "dataset_samples": 100077,
+    "features": [
+        "url_length",
+        "n_dots",
+        "n_hypens",
+        "n_underline",
+        "n_slash",
+        "n_questionmark",
+        "n_equal",
+        "n_at",
+        "n_and",
+        "n_exclamation",
+        "n_space",
+        "n_tilde",
+        "n_comma",
+        "n_plus",
+        "n_asterisk",
+        "n_hastag",
+        "n_dollar",
+        "n_percent",
+        "n_redirection"
+    ],
+    "feature_count": 19,
+    "target_mapping": {
+        "0": "legitimate",
+        "1": "phishing"
+    },
+    "metrics": {
+        "accuracy": 0.8878,
+        "precision": 0.8273,
+        "recall": 0.8735,
+        "f1_score": 0.8498,
+        "roc_auc": 0.9535,
+        "confusion_matrix": [
+            [
+                11417,
+                1326
+            ],
+            [
+                920,
+                6353
+            ]
+        ]
+    }
+}
