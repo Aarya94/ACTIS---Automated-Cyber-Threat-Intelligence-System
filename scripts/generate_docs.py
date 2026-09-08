@@ -8,6 +8,7 @@ in docs/generated/.
 """
 
 import argparse
+import ast
 import os
 import subprocess
 import sys
@@ -149,6 +150,82 @@ class GitAnalyzer:
         }
 
 
+class CodebaseAnalyzer:
+    """Uses Python AST to statically inspect modules, classes, functions, and docstrings."""
+
+    def __init__(self, root_dir: Path):
+        self.root = root_dir
+
+    def inspect_file(self, file_path: Path) -> Dict[str, Any]:
+        """Parses a single Python file with AST and extracts structural metadata."""
+        try:
+            content = file_path.read_text(encoding="utf-8", errors="ignore")
+            tree = ast.parse(content, filename=str(file_path))
+        except Exception as e:
+            return {
+                "file": str(file_path.relative_to(self.root)),
+                "parse_error": str(e),
+                "classes": [],
+                "functions": [],
+                "docstring": None,
+                "node_count": 0,
+            }
+
+        docstring = ast.get_docstring(tree)
+        classes = [node.name for node in tree.body if isinstance(node, ast.ClassDef)]
+        functions = [node.name for node in tree.body if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))]
+        total_nodes = len(list(ast.walk(tree)))
+
+        return {
+            "file": str(file_path.relative_to(self.root)),
+            "parse_error": None,
+            "classes": classes,
+            "functions": functions,
+            "docstring": docstring.strip() if docstring else None,
+            "node_count": total_nodes,
+        }
+
+    def inspect_package(self, package_name: str) -> Dict[str, Any]:
+        """Inspects all Python files inside a package directory."""
+        pkg_dir = self.root / package_name
+        if not pkg_dir.is_dir():
+            return {
+                "package": package_name,
+                "exists": False,
+                "files": [],
+                "total_classes": 0,
+                "total_functions": 0,
+                "total_nodes": 0,
+                "status": "PLANNED",
+            }
+
+        py_files = [f for f in pkg_dir.glob("*.py") if f.is_file()]
+        file_audits = [self.inspect_file(f) for f in py_files]
+        total_classes = sum(len(fa["classes"]) for fa in file_audits)
+        total_functions = sum(len(fa["functions"]) for fa in file_audits)
+        total_nodes = sum(fa["node_count"] for fa in file_audits)
+
+        # Implementation maturity classification
+        if not file_audits:
+            status = "PLANNED"
+        elif total_nodes < 20 and total_classes == 0 and total_functions == 0:
+            status = "PLACEHOLDER"
+        elif package_name in ["config", "tests"]:
+            status = "IMPLEMENTED"
+        else:
+            status = "PARTIALLY IMPLEMENTED"
+
+        return {
+            "package": package_name,
+            "exists": True,
+            "files": file_audits,
+            "total_classes": total_classes,
+            "total_functions": total_functions,
+            "total_nodes": total_nodes,
+            "status": status,
+        }
+
+
 def parse_arguments() -> argparse.Namespace:
     """Parses command-line arguments for documentation generator."""
     parser = argparse.ArgumentParser(
@@ -179,6 +256,7 @@ def main() -> int:
     args = parse_arguments()
     inspector = RepoInspector(PROJECT_ROOT)
     git_analyzer = GitAnalyzer(PROJECT_ROOT)
+    code_analyzer = CodebaseAnalyzer(PROJECT_ROOT)
 
     dirs = inspector.audit_directories()
     root_files = inspector.get_root_files()
@@ -186,18 +264,21 @@ def main() -> int:
     recent_commits = git_analyzer.get_recent_commits(10)
     tree_status = git_analyzer.get_working_tree_status()
 
+    package_audits = {}
+    for pkg in inspector.core_packages:
+        package_audits[pkg] = code_analyzer.inspect_package(pkg)
+
     if args.verbose or args.check:
         print("=== ACTIS Repository Audit ===")
         print(f"Project Root: {PROJECT_ROOT}")
         print(f"Target Output: {args.output_dir}")
         print(f"Git Branch: {git_info['branch']} (HEAD: {git_info['head']})")
-        print(f"Remote URL: {git_info['remote']}")
         print(f"Working Tree Clean: {tree_status['is_clean']}")
-        print(f"Recent Commits Count: {len(recent_commits)}")
-        for k, v in root_files.items():
-            print(f"  Root File {k}: {'Present' if v else 'Missing'}")
+        print("\n=== Subsystem AST Analysis ===")
+        for pkg, pa in package_audits.items():
+            print(f"  {pkg:20s}: {pa['status']:22s} ({len(pa['files'])} files, {pa['total_classes']} classes, {pa['total_functions']} functions)")
 
-    print("ACTIS Documentation Generator: Git analyzer integrated successfully.")
+    print("ACTIS Documentation Generator: AST Codebase analyzer integrated successfully.")
     return 0
 
 
