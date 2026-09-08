@@ -12,9 +12,9 @@ Milestone Scope: Architecture planning, configuration management, logging infras
 
 ---
 
-### 2026-09-08 — Week 1 Day 2: Configuration Management
+### 2026-09-08 — Week 1 Day 2: Configuration & Documentation Governance Framework
 
-Centralized, type-annotated, validated configuration management foundation for ACTIS. Decoupled operational settings, project paths, and threat intelligence credentials from detection engines with strict secret protection and full backward compatibility.
+Established the authoritative ACTIS documentation framework (`docs/architecture/`, `docs/roadmap/`, `docs/generated/`) and centralized configuration management foundation. Decoupled operational settings, paths, and credentials with strict secret protection and full backward compatibility.
 
 #### Commits
 
@@ -31,6 +31,24 @@ Centralized, type-annotated, validated configuration management foundation for A
 | `8951436` | test | Add configuration validation tests (weights, thresholds, strict mode) | `tests/test_config_validation.py` | Passed (35 tests) |
 | `6345d10` | docs | Document ACTIS configuration usage (architecture guide & reference) | `docs/configuration.md` | Passed (35 tests) |
 | `6b58e0e` | chore | Wire centralized configuration into config entrypoint | `config/config.py`, `config/__init__.py` | Passed (35 tests) |
+| `4b45465` | docs | Initialize ACTIS changelog with Week 1 Day 2 record | `docs/CHANGELOG.md` | Passed (35 tests) |
+| `bba3b6d` | docs | Define architecture source of truth and AI rules | `docs/architecture/README.md` | Passed (35 tests) |
+| `dd71ba0` | docs | Document system architecture | `docs/architecture/system-architecture.md` | Passed (35 tests) |
+| `c57a297` | docs | Document module architecture | `docs/architecture/module-architecture.md` | Passed (35 tests) |
+| `5282b7f` | docs | Document project structure | `docs/architecture/project-structure.md` | Passed (35 tests) |
+| `277263b` | docs | Document detection workflow | `docs/architecture/detection-workflow.md` | Passed (35 tests) |
+| `b29297a` | docs | Document data flow and privacy boundaries | `docs/architecture/data-flow.md` | Passed (35 tests) |
+| `1839ad5` | docs | Document threat intelligence workflow | `docs/architecture/threat-intelligence-workflow.md` | Passed (35 tests) |
+| `5daaced` | docs | Document ML workflow and model contracts | `docs/architecture/ml-workflow.md` | Passed (35 tests) |
+| `dd0a25d` | docs | Document scanning workflow and safety controls | `docs/architecture/scanning-workflow.md` | Passed (35 tests) |
+| `0766636` | docs | Define ACTIS security boundaries | `docs/architecture/security-boundaries.md` | Passed (35 tests) |
+| `6cec39f` | docs | Establish four-month roadmap overview | `docs/roadmap/README.md` | Passed (35 tests) |
+| `f62f777` | docs | Define day-by-day roadmap for month 1 foundation | `docs/roadmap/month-1.md` | Passed (35 tests) |
+| `e0af4ec` | docs | Define day-by-day roadmap for month 2 scanners and detection | `docs/roadmap/month-2.md` | Passed (35 tests) |
+| `dbee27d` | docs | Define day-by-day roadmap for month 3 real-time and threat intel | `docs/roadmap/month-3.md` | Passed (35 tests) |
+| `4f35035` | docs | Define day-by-day roadmap for month 4 productization and release | `docs/roadmap/month-4.md` | Passed (35 tests) |
+| `3f12abd` | docs | Establish current-state generated documentation framework | `docs/generated/*.md` | Passed (35 tests) |
+| `9735199` | docs | Add database ML test references and changelog to generated documentation | `docs/generated/*.md` | Passed (35 tests) |
 
 ---
 
