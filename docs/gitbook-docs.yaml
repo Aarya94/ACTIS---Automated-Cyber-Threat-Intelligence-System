@@ -1,0 +1,11 @@
+$schema: https://api.gitbook.com/gitbook-docs.yaml
+site:
+  title: ACTIS Documentation
+  structure:
+    - type: space
+      key: actis-docs
+      title: ACTIS Documentation
+      path: docs
+      default: true
+      content:
+        directory: ./

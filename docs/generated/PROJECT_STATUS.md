@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-09-08 18:33:07 UTC  
+**Generated:** 2026-09-08 18:39:09 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`bf4df82`)  
+**Current Git Branch:** `main` (`ed2fcf3`)  
 
 ---
 
@@ -117,13 +117,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `bf4df82`
-- **Working Tree:** 4 untracked/unstaged changes
+- **HEAD Commit:** `ed2fcf3`
+- **Working Tree:** 2 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `ed2fcf3` | ACTIS Bot | 2026-09-09 | feat: configure GitBook documentation structure with table of contents and quickstart guide |
 | `bf4df82` | ACTIS Bot | 2026-09-08 | chore: reconcile remote main and preserve ACTIS documentation |
 | `9112035` | ACTIS Bot | 2026-09-08 | chore: reconcile main repository history |
 | `14036e1` | Aaryan Suman | 2026-09-08 | Delete README.md |
@@ -133,7 +134,6 @@
 | `d54e1ea` | ACTIS Bot | 2026-09-08 | docs: update main changelog with documentation progress system records |
 | `2e3152b` | ACTIS Bot | 2026-09-08 | chore: execute documentation generator to synchronize generated documentation |
 | `963163d` | ACTIS Bot | 2026-09-08 | test: add automated unit tests for documentation generator |
-| `bd64d60` | ACTIS Bot | 2026-09-08 | feat: add markdown report writers for database, ML, and test references |
 
 ## Known Issues
 
