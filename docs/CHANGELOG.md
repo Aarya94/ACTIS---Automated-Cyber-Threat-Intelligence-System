@@ -49,6 +49,19 @@ Established the authoritative ACTIS documentation framework (`docs/architecture/
 | `4f35035` | docs | Define day-by-day roadmap for month 4 productization and release | `docs/roadmap/month-4.md` | Passed (35 tests) |
 | `3f12abd` | docs | Establish current-state generated documentation framework | `docs/generated/*.md` | Passed (35 tests) |
 | `9735199` | docs | Add database ML test references and changelog to generated documentation | `docs/generated/*.md` | Passed (35 tests) |
+| `cad6618` | docs | Synchronize changelogs with complete documentation framework history | `docs/CHANGELOG.md`, `docs/generated/CHANGELOG.md` | Passed (35 tests) |
+| `82e7b4c` | feat | Create documentation generator core repository inspector | `scripts/generate_docs.py` | Passed (35 tests) |
+| `4b23a40` | feat | Add Git history and working tree analyzer to documentation generator | `scripts/generate_docs.py` | Passed (35 tests) |
+| `41b928d` | feat | Add Python AST module inspector to documentation generator | `scripts/generate_docs.py` | Passed (35 tests) |
+| `cef2cbc` | feat | Add ML models and dataset analyzer to documentation generator | `scripts/generate_docs.py` | Passed (35 tests) |
+| `bedf771` | feat | Add database schema analyzer to documentation generator | `scripts/generate_docs.py` | Passed (35 tests) |
+| `23c7d4c` | feat | Add test suite inventory analyzer to documentation generator | `scripts/generate_docs.py` | Passed (35 tests) |
+| `263a383` | feat | Add reproducible roadmap progress calculator to documentation generator | `scripts/generate_docs.py` | Passed (35 tests) |
+| `831c017` | feat | Add markdown report writers for project and module status | `scripts/generate_docs.py` | Passed (35 tests) |
+| `bd64d60` | feat | Add markdown report writers for database, ML, and test references | `scripts/generate_docs.py` | Passed (35 tests) |
+| `963163d` | test | Add automated unit tests for documentation generator | `scripts/generate_docs.py`, `tests/test_doc_generator.py` | Passed (55 tests) |
+| `2e3152b` | chore | Execute documentation generator to synchronize generated documentation | `docs/generated/*.md` | Passed (55 tests) |
+| `PENDING` | docs | Update main changelog with documentation progress system records | `docs/CHANGELOG.md` | Passed (55 tests) |
 
 ---
 
