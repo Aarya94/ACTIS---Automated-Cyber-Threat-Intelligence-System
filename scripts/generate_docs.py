@@ -11,6 +11,7 @@ import argparse
 import ast
 import json
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -295,12 +296,55 @@ class MlModelAnalyzer:
                     "size_mb": round(size_bytes / (1024 * 1024), 2),
                     "row_count": max(0, line_count - 1),
                     "column_count": len(header),
-                    "columns": header[:10],  # Sample first 10 columns
+                    "columns": header[:10],
                 }
             except Exception as e:
                 datasets[cf.name] = {"error": str(e)}
 
         return datasets
+
+
+class DatabaseAnalyzer:
+    """Extracts SQLite table schemas, columns, indices, and database file states."""
+
+    def __init__(self, root_dir: Path):
+        self.root = root_dir
+        self.threat_db_file = root_dir / "reports" / "threat_database.py"
+
+    def audit_schema(self) -> Dict[str, Any]:
+        """Parses DDL statements from threat_database.py without executing SQLite queries."""
+        tables = {}
+        if self.threat_db_file.is_file():
+            content = self.threat_db_file.read_text(encoding="utf-8")
+            matches = re.findall(r"CREATE TABLE IF NOT EXISTS\s+(\w+)\s*\((.*?)\);", content, re.DOTALL)
+            for tbl_name, tbl_body in matches:
+                cols = []
+                for line in tbl_body.strip().splitlines():
+                    line = line.strip().rstrip(",")
+                    if line and not line.startswith("FOREIGN KEY") and not line.startswith("PRIMARY KEY"):
+                        parts = line.split()
+                        if parts:
+                            c_name = parts[0]
+                            c_type = parts[1] if len(parts) > 1 else "TEXT"
+                            cols.append({"name": c_name, "type": c_type})
+                tables[tbl_name] = {
+                    "table_name": tbl_name,
+                    "columns": cols,
+                    "column_count": len(cols),
+                }
+
+        data_db = self.root / "data" / "threat_intelligence.db"
+        backend_db = self.root / "backend" / "central_threat_intel.db"
+
+        return {
+            "schema_source": "reports/threat_database.py",
+            "tables": tables,
+            "table_count": len(tables),
+            "data_db_present": data_db.is_file(),
+            "data_db_size_bytes": data_db.stat().st_size if data_db.is_file() else 0,
+            "backend_db_present": backend_db.is_file(),
+            "backend_db_size_bytes": backend_db.stat().st_size if backend_db.is_file() else 0,
+        }
 
 
 def parse_arguments() -> argparse.Namespace:
@@ -335,6 +379,7 @@ def main() -> int:
     git_analyzer = GitAnalyzer(PROJECT_ROOT)
     code_analyzer = CodebaseAnalyzer(PROJECT_ROOT)
     ml_analyzer = MlModelAnalyzer(PROJECT_ROOT)
+    db_analyzer = DatabaseAnalyzer(PROJECT_ROOT)
 
     dirs = inspector.audit_directories()
     root_files = inspector.get_root_files()
@@ -348,20 +393,19 @@ def main() -> int:
 
     models = ml_analyzer.audit_models()
     datasets = ml_analyzer.audit_datasets()
+    db_info = db_analyzer.audit_schema()
 
     if args.verbose or args.check:
         print("=== ACTIS Repository Audit ===")
         print(f"Project Root: {PROJECT_ROOT}")
         print(f"Target Output: {args.output_dir}")
         print(f"Git Branch: {git_info['branch']} (HEAD: {git_info['head']})")
-        print(f"Working Tree Clean: {tree_status['is_clean']}")
-        print("\n=== Machine Learning Audits ===")
-        for m_name, m_data in models.items():
-            print(f"  Model: {m_name} (features: {m_data.get('feature_count')}, binary present: {m_data.get('binary_present')})")
-        for d_name, d_data in datasets.items():
-            print(f"  Dataset: {d_name} ({d_data.get('row_count')} rows, {d_data.get('size_mb')} MB)")
+        print("\n=== Database Schema Analysis ===")
+        print(f"Schema Source: {db_info['schema_source']} ({db_info['table_count']} tables defined)")
+        for t_name, t_data in db_info["tables"].items():
+            print(f"  Table {t_name:15s}: {t_data['column_count']} columns")
 
-    print("ACTIS Documentation Generator: ML & Dataset analyzer integrated successfully.")
+    print("ACTIS Documentation Generator: Database analyzer integrated successfully.")
     return 0
 
 
