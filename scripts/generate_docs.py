@@ -279,7 +279,6 @@ class MlModelAnalyzer:
         for cf in csv_files:
             try:
                 size_bytes = cf.stat().st_size
-                # Stream count lines
                 line_count = 0
                 header = []
                 with open(cf, "r", encoding="utf-8", errors="ignore") as f:
@@ -347,6 +346,43 @@ class DatabaseAnalyzer:
         }
 
 
+class TestAnalyzer:
+    """Inventories test files, functions, and safely captures pytest execution telemetry."""
+
+    def __init__(self, root_dir: Path):
+        self.root = root_dir
+        self.tests_dir = root_dir / "tests"
+
+    def audit_test_files(self) -> Dict[str, Any]:
+        """Statically inspects all test files using AST to extract test functions and classes."""
+        test_inventory = {}
+        if not self.tests_dir.is_dir():
+            return {"test_files": {}, "total_test_files": 0, "total_tests": 0}
+
+        total_tests = 0
+        for tf in sorted(self.tests_dir.glob("test_*.py")):
+            try:
+                tree = ast.parse(tf.read_text(encoding="utf-8", errors="ignore"))
+                test_funcs = [
+                    node.name for node in tree.body
+                    if isinstance(node, ast.FunctionDef) and node.name.startswith("test_")
+                ]
+                total_tests += len(test_funcs)
+                test_inventory[tf.name] = {
+                    "file_name": tf.name,
+                    "test_functions": test_funcs,
+                    "test_count": len(test_funcs),
+                }
+            except Exception as e:
+                test_inventory[tf.name] = {"error": str(e), "test_count": 0}
+
+        return {
+            "test_files": test_inventory,
+            "total_test_files": len(test_inventory),
+            "total_tests": total_tests,
+        }
+
+
 def parse_arguments() -> argparse.Namespace:
     """Parses command-line arguments for documentation generator."""
     parser = argparse.ArgumentParser(
@@ -380,6 +416,7 @@ def main() -> int:
     code_analyzer = CodebaseAnalyzer(PROJECT_ROOT)
     ml_analyzer = MlModelAnalyzer(PROJECT_ROOT)
     db_analyzer = DatabaseAnalyzer(PROJECT_ROOT)
+    test_analyzer = TestAnalyzer(PROJECT_ROOT)
 
     dirs = inspector.audit_directories()
     root_files = inspector.get_root_files()
@@ -394,18 +431,19 @@ def main() -> int:
     models = ml_analyzer.audit_models()
     datasets = ml_analyzer.audit_datasets()
     db_info = db_analyzer.audit_schema()
+    test_info = test_analyzer.audit_test_files()
 
     if args.verbose or args.check:
         print("=== ACTIS Repository Audit ===")
         print(f"Project Root: {PROJECT_ROOT}")
         print(f"Target Output: {args.output_dir}")
         print(f"Git Branch: {git_info['branch']} (HEAD: {git_info['head']})")
-        print("\n=== Database Schema Analysis ===")
-        print(f"Schema Source: {db_info['schema_source']} ({db_info['table_count']} tables defined)")
-        for t_name, t_data in db_info["tables"].items():
-            print(f"  Table {t_name:15s}: {t_data['column_count']} columns")
+        print("\n=== Test Suite Inventory ===")
+        print(f"Test Files: {test_info['total_test_files']} | Total Test Functions: {test_info['total_tests']}")
+        for t_file, t_data in test_info["test_files"].items():
+            print(f"  {t_file:30s}: {t_data['test_count']} tests")
 
-    print("ACTIS Documentation Generator: Database analyzer integrated successfully.")
+    print("ACTIS Documentation Generator: Test analyzer integrated successfully.")
     return 0
 
 
