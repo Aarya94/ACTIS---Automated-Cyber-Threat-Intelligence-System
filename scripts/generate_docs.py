@@ -9,6 +9,7 @@ in docs/generated/.
 
 import argparse
 import ast
+import json
 import os
 import subprocess
 import sys
@@ -226,6 +227,82 @@ class CodebaseAnalyzer:
         }
 
 
+class MlModelAnalyzer:
+    """Audits machine learning models, metadata JSON contracts, and dataset CSV files."""
+
+    def __init__(self, root_dir: Path):
+        self.root = root_dir
+        self.models_dir = root_dir / "models"
+        self.data_dir = root_dir / "data"
+
+    def audit_models(self) -> Dict[str, Any]:
+        """Inspects model metadata files and checks corresponding binary existence."""
+        models = {}
+        if not self.models_dir.is_dir():
+            return models
+
+        meta_files = list(self.models_dir.glob("*_metadata.json"))
+        for mf in meta_files:
+            try:
+                data = json.loads(mf.read_text(encoding="utf-8"))
+                model_name = data.get("model_name", mf.stem)
+                bin_name = mf.stem.replace("_metadata", "") + ".pkl"
+                bin_path = self.models_dir / bin_name
+                bin_exists = bin_path.is_file()
+                bin_size = bin_path.stat().st_size if bin_exists else 0
+
+                models[model_name] = {
+                    "metadata_file": mf.name,
+                    "model_version": data.get("model_version", "1.0.0"),
+                    "algorithm": data.get("algorithm", "UNKNOWN"),
+                    "dataset_name": data.get("dataset_name", "UNKNOWN"),
+                    "dataset_samples": data.get("dataset_samples", 0),
+                    "feature_count": len(data.get("features", [])),
+                    "features": data.get("features", []),
+                    "binary_present": bin_exists,
+                    "binary_size_bytes": bin_size,
+                    "binary_path": str(bin_path.relative_to(self.root)) if bin_exists else None,
+                }
+            except Exception as e:
+                models[mf.stem] = {"error": str(e)}
+
+        return models
+
+    def audit_datasets(self) -> Dict[str, Any]:
+        """Audits datasets in data/ directory, streaming line counts without loading into memory."""
+        datasets = {}
+        if not self.data_dir.is_dir():
+            return datasets
+
+        csv_files = list(self.data_dir.glob("*.csv"))
+        for cf in csv_files:
+            try:
+                size_bytes = cf.stat().st_size
+                # Stream count lines
+                line_count = 0
+                header = []
+                with open(cf, "r", encoding="utf-8", errors="ignore") as f:
+                    first_line = f.readline()
+                    if first_line:
+                        line_count = 1
+                        header = [c.strip() for c in first_line.strip().split(",")]
+                    for _ in f:
+                        line_count += 1
+
+                datasets[cf.name] = {
+                    "file_name": cf.name,
+                    "size_bytes": size_bytes,
+                    "size_mb": round(size_bytes / (1024 * 1024), 2),
+                    "row_count": max(0, line_count - 1),
+                    "column_count": len(header),
+                    "columns": header[:10],  # Sample first 10 columns
+                }
+            except Exception as e:
+                datasets[cf.name] = {"error": str(e)}
+
+        return datasets
+
+
 def parse_arguments() -> argparse.Namespace:
     """Parses command-line arguments for documentation generator."""
     parser = argparse.ArgumentParser(
@@ -257,6 +334,7 @@ def main() -> int:
     inspector = RepoInspector(PROJECT_ROOT)
     git_analyzer = GitAnalyzer(PROJECT_ROOT)
     code_analyzer = CodebaseAnalyzer(PROJECT_ROOT)
+    ml_analyzer = MlModelAnalyzer(PROJECT_ROOT)
 
     dirs = inspector.audit_directories()
     root_files = inspector.get_root_files()
@@ -268,17 +346,22 @@ def main() -> int:
     for pkg in inspector.core_packages:
         package_audits[pkg] = code_analyzer.inspect_package(pkg)
 
+    models = ml_analyzer.audit_models()
+    datasets = ml_analyzer.audit_datasets()
+
     if args.verbose or args.check:
         print("=== ACTIS Repository Audit ===")
         print(f"Project Root: {PROJECT_ROOT}")
         print(f"Target Output: {args.output_dir}")
         print(f"Git Branch: {git_info['branch']} (HEAD: {git_info['head']})")
         print(f"Working Tree Clean: {tree_status['is_clean']}")
-        print("\n=== Subsystem AST Analysis ===")
-        for pkg, pa in package_audits.items():
-            print(f"  {pkg:20s}: {pa['status']:22s} ({len(pa['files'])} files, {pa['total_classes']} classes, {pa['total_functions']} functions)")
+        print("\n=== Machine Learning Audits ===")
+        for m_name, m_data in models.items():
+            print(f"  Model: {m_name} (features: {m_data.get('feature_count')}, binary present: {m_data.get('binary_present')})")
+        for d_name, d_data in datasets.items():
+            print(f"  Dataset: {d_name} ({d_data.get('row_count')} rows, {d_data.get('size_mb')} MB)")
 
-    print("ACTIS Documentation Generator: AST Codebase analyzer integrated successfully.")
+    print("ACTIS Documentation Generator: ML & Dataset analyzer integrated successfully.")
     return 0
 
 
