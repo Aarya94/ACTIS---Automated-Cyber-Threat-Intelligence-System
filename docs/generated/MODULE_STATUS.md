@@ -1,6 +1,6 @@
 # ACTIS Module Implementation Status
 
-**Generated:** 2026-09-08 17:44:58 UTC  
+**Generated:** 2026-09-08 18:02:02 UTC  
 **Source of Truth:** Codebase AST Analysis (`scripts/generate_docs.py`)  
 
 This document provides a transparent, verifiable status of every major ACTIS module.
