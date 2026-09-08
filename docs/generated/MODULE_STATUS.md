@@ -1,30 +1,78 @@
-# ACTIS Module Status (Empirical Audit)
+# ACTIS Module Implementation Status
 
-This document provides a factual classification of every major module in the repository, evaluating whether each component contains working code, prototypes, or planned interfaces.
+**Generated:** 2026-09-08 17:14:50 UTC  
+**Source of Truth:** Codebase AST Analysis (`scripts/generate_docs.py`)  
+
+This document provides a transparent, verifiable status of every major ACTIS module.
+Statuses are determined deterministically from AST structure and actual codebase contents:
+- `IMPLEMENTED`: Fully functional with substantive classes, functions, and active test coverage.
+- `PARTIALLY IMPLEMENTED`: Functional components exist but additional integration or models remain planned.
+- `PLANNED`: Architectural design approved in `docs/architecture/` but implementation not yet begun.
+- `MISSING`: Required component neither implemented nor formally planned.
+- `NOT VERIFIED`: Implementation status cannot be definitively confirmed without dynamic execution.
 
 ---
 
-## Subsystem Classification
+## Module Status Overview
 
-| Subsystem / Module | Empirical Status | Verification Evidence | Notes / Remaining Work |
+| Module | Status | Files / LOC | Notes |
 |---|---|---|---|
-| **`config/`** | `IMPLEMENTED` | Tested via `tests/test_config_*.py` (11 passing tests) | Fully realized Week 1 Day 2 foundation. |
-| **`models/`** | `IMPLEMENTED` | Artifacts on disk; metadata JSON contracts verified | Phishing RF (19 feats) & Malware RF (15 feats) models operational. |
-| **`scanners/`** | `PARTIALLY IMPLEMENTED` | Prototype code in all 6 scanner files; tested via `test_url_scanner.py`, `test_text_analyzer.py`, `test_static_pe.py` | Full multi-scanner unified orchestrator scheduled for Month 2. |
-| **`detection_engine/`** | `PARTIALLY IMPLEMENTED` | `risk_engine.py`, `rule_engine.py`, `model_manager.py` tested in `test_risk_engine.py` | Multi-engine pipeline integration scheduled across Months 1–2. |
-| **`threat_intelligence/`** | `PARTIALLY IMPLEMENTED` | `threat_lookup.py`, `api_clients.py`, `sync_manager.py` implemented | Full external provider suite and standalone `indicator_manager.py` scheduled for Month 3. |
-| **`reports/`** | `PARTIALLY IMPLEMENTED` | `threat_database.py`, `scan_database.py`, `report_generator.py` tested in `test_threat_database.py` | Formal schema migration and constraints scheduled for Week 1 Day 4. |
-| **`notifications/`** | `PARTIALLY IMPLEMENTED` | `notifier.py` formatting logic implemented | Native Windows desktop toast alerts scheduled for Month 4 Week 14. |
-| **`dashboard/`** | `PARTIALLY IMPLEMENTED` | `app.py` Streamlit UI operational with 13 functional sections | Polish and security hardening scheduled for Month 4 Week 13. |
-| **`assistant/`** | `PARTIALLY IMPLEMENTED` | `security_assistant.py` queries local SQLite DB | Advanced conversational grounding scheduled for Month 4 Week 14. |
-| **`backend/`** | `PARTIALLY IMPLEMENTED` | FastAPI endpoints tested via `tests/test_backend_api.py` (4 passing tests) | Peer synchronization testing scheduled for Month 3 Week 12. |
-| **`tests/`** | `IMPLEMENTED` | 35 passing tests across 8 test suites | Expands continuously with each development day. |
+| `config/` | `IMPLEMENTED` | 7 files / 650 LOC | Settings, defaults, paths, env_loader, validator, 11 tests |
+| `reports/` | `PARTIALLY IMPLEMENTED` | 4 files / 446 LOC | SQLite persistence, threat tables, scan database |
+| `models/` | `IMPLEMENTED` | 2 models / 2 metadata | Phishing & Malware models with JSON contracts |
+| `scanners/` | `PARTIALLY IMPLEMENTED` | 8 files / 907 LOC | URL, text, file, device, watcher, clipboard (scaffolded) |
+| `detection_engine/` | `PARTIALLY IMPLEMENTED` | 5 files / 674 LOC | Hybrid detector, risk engine, rule engine (scaffolded) |
+| `threat_intelligence/` | `PARTIALLY IMPLEMENTED` | 4 files / 281 LOC | API clients, sync manager, threat lookup (scaffolded) |
+| `notifications/` | `PARTIALLY IMPLEMENTED` | 2 files / 59 LOC | Desktop alerts and notifier (scaffolded) |
+| `dashboard/` | `PARTIALLY IMPLEMENTED` | 2 files / 719 LOC | Desktop UI application interface (scaffolded) |
+| `assistant/` | `PARTIALLY IMPLEMENTED` | 2 files / 159 LOC | Read-only AI security explanation assistant (scaffolded) |
+| `backend/` | `PARTIALLY IMPLEMENTED` | 4 files / 311 LOC | Central threat sharing FastAPI service (scaffolded) |
+| `tests/` | `IMPLEMENTED` | 12 files / 727 LOC | Unit and integration tests running under pytest |
+| `docs/architecture/` | `IMPLEMENTED` | 10 documents | Complete architectural source of truth |
+| `docs/roadmap/` | `IMPLEMENTED` | 5 documents | Complete 16-week / 112-day development plan |
+| `docs/generated/` | `IMPLEMENTED` | 7 documents | Automated status, references, changelog |
+| `scripts/` | `IMPLEMENTED` | 1 script | Automated documentation generator |
 
 ---
 
-## Status Classification Key
+## Detailed Module Breakdown
 
-- **`IMPLEMENTED`**: Production-ready, type-safe, validated by automated unit tests.
-- **`PARTIALLY IMPLEMENTED`**: Functional prototypes active in repository, but formal roadmap integration/refinement is scheduled for later weeks.
-- **`PLANNED`**: Defined in architectural source-of-truth documents, awaiting roadmap realization.
-- **`MISSING`**: Required by architecture but completely absent from source tree.
+### 1. Configuration Subsystem (`config/`)
+- **Status:** `IMPLEMENTED`
+- **Core Components:** `config/settings.py`, `config/paths.py`, `config/env_loader.py`, `config/validator.py`
+- **Capabilities:** Typed dataclasses (`AppConfig`, `DatabaseConfig`, `ModelConfig`, `RiskEngineConfig`, `ScannerConfig`, `ServerConfig`, `PathConfig`), environment variable substitution (`ACTIS_*`), range & boundary validation.
+- **Tests:** `tests/test_config_loading.py`, `tests/test_config_validation.py` (11 unit tests).
+
+### 2. Threat Intelligence Persistence (`reports/threat_database.py`)
+- **Status:** `PARTIALLY IMPLEMENTED`
+- **Core Components:** `reports/threat_database.py` (`ThreatDatabase`)
+- **Capabilities:** SQLite initialization, WAL mode, tables (`threats`, `indicators`, `scans`, `detections`, `scan_items`), indexed queries.
+- **Tests:** `tests/test_threat_database.py` (unit tests verifying schema, CRUD, and index performance).
+
+### 3. Machine Learning Models & Inference (`models/`)
+- **Status:** `IMPLEMENTED`
+- **Core Components:** `models/phishing_model.pkl` + `models/phishing_model_metadata.json`, `models/malware_model.pkl` + `models/malware_model_metadata.json`
+- **Capabilities:** Trained Random Forest classifiers with verified metadata contracts, feature schema, and evaluation metrics.
+- **Tests:** `tests/test_url_scanner.py`, `tests/test_static_pe.py`.
+
+### 4. Scanners Subsystem (`scanners/`)
+- **Status:** `PARTIALLY IMPLEMENTED`
+- **Scaffolded Modules:** `url_scanner.py`, `text_analyzer.py`, `file_scanner.py`, `device_scanner.py`, `file_watcher.py`, `clipboard_scanner.py`, `file_feature_extractor.py`.
+- **Target Milestones:** Month 1 Weeks 2-3, Month 2 Week 8, Month 3 Weeks 9-10.
+
+### 5. Detection Engine (`detection_engine/`)
+- **Status:** `PARTIALLY IMPLEMENTED`
+- **Scaffolded Modules:** `threat_detector.py`, `rule_engine.py`, `risk_engine.py`, `model_manager.py`.
+- **Target Milestones:** Month 1 Week 3 (Rules & Risk Engine), Month 2 Week 6 (Hybrid Integration).
+
+### 6. Threat Intelligence Subsystem (`threat_intelligence/`)
+- **Status:** `PARTIALLY IMPLEMENTED`
+- **Scaffolded Modules:** `api_clients.py`, `sync_manager.py`, `threat_lookup.py`.
+- **Target Milestones:** Month 3 Weeks 11-12.
+
+### 7. User Interface & Notifications (`dashboard/`, `notifications/`, `assistant/`)
+- **Status:** `PARTIALLY IMPLEMENTED`
+- **Target Milestones:** Month 4 Weeks 13-14.
+
+---
+*Report automatically generated by `scripts/generate_docs.py`.*

@@ -1,99 +1,122 @@
-# ACTIS Local Threat Database Reference (SQLite Schema)
+# ACTIS Database Reference
 
-This document describes the active SQLite schema implemented in `reports/threat_database.py`.
+**Generated:** 2026-09-08 17:14:50 UTC  
+**Source of Truth:** DDL Schema Analysis (`reports/threat_database.py`)  
+
+This document describes the relational database persistence subsystem for ACTIS.
+ACTIS uses an embedded SQLite database configured for high concurrency and resilience.
 
 ---
 
-## Active Schema Tables
+## Database Architecture
 
-### 1. `threats`
-Represents high-level classified threat entities.
+- **Engine:** SQLite 3
+- **Target Database Path:** `data/threat_intelligence.db`
+- **DDL Source Code:** `reports\threat_database.py`
+- **Journal Mode:** Write-Ahead Logging (`PRAGMA journal_mode=WAL;`) for concurrent read/write
+- **Integrity Constraints:** Foreign Keys enabled (`PRAGMA foreign_keys=ON;`)
+- **Schema Status:** `IMPLEMENTED`
 
-```sql
-CREATE TABLE IF NOT EXISTS threats (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    threat_type TEXT NOT NULL,      -- 'malware', 'phishing', 'ransomware', 'suspicious_link'
-    name TEXT NOT NULL,             -- Human-readable identifier or campaign name
-    risk_level TEXT NOT NULL,       -- 'CRITICAL', 'HIGH', 'MEDIUM', 'LOW'
-    status TEXT NOT NULL,           -- 'CONFIRMED', 'SUSPICIOUS', 'CANDIDATE', 'REPORTED', 'FALSE_POSITIVE'
-    description TEXT,               -- Contextual threat summary
-    first_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    verified_by TEXT DEFAULT 'system'
-);
-```
+---
 
-### 2. `indicators`
-Canonical atomic indicators of compromise (IoCs) tied to threat entities.
+## Table Definitions
 
-```sql
-CREATE TABLE IF NOT EXISTS indicators (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    threat_id INTEGER,
-    indicator_type TEXT NOT NULL,   -- 'sha256', 'md5', 'url', 'domain', 'ip'
-    indicator_value TEXT NOT NULL UNIQUE,
-    source TEXT NOT NULL,           -- 'local_scan', 'virustotal', 'urlhaus', 'abuseipdb'
-    confidence REAL DEFAULT 0.5,    -- 0.0 to 1.0 confidence score
-    status TEXT NOT NULL,           -- 'CONFIRMED', 'SUSPICIOUS', 'CANDIDATE', 'REPORTED', 'FALSE_POSITIVE'
-    first_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY(threat_id) REFERENCES threats(id) ON DELETE SET NULL
-);
-CREATE INDEX IF NOT EXISTS idx_indicators_value ON indicators(indicator_value);
-```
+### Table: `threats`
 
-### 3. `scans`
-Scan session metadata recording targets, runtimes, and telemetry.
+| Column Name | Data Type | Constraints / Purpose |
+|---|---|---|
+| `id` | `INTEGER` | PRIMARY KEY AUTOINCREMENT |
+| `threat_type` | `TEXT` | NOT NULL |
+| `name` | `TEXT` | NOT NULL |
+| `risk_level` | `TEXT` | NOT NULL |
+| `status` | `TEXT` | NOT NULL DEFAULT 'SUSPICIOUS' |
+| `description` | `TEXT` | None |
+| `first_seen` | `TEXT` | NOT NULL |
+| `last_seen` | `TEXT` | NOT NULL |
+| `verified_by` | `TEXT` | DEFAULT 'local_detection' |
 
-```sql
-CREATE TABLE IF NOT EXISTS scans (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    scan_type TEXT NOT NULL,        -- 'file', 'url', 'text', 'device_quick', 'device_full'
-    target TEXT NOT NULL,           -- Filepath, URL string, or directory root
-    started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    completed_at TIMESTAMP,
-    status TEXT DEFAULT 'running',  -- 'running', 'completed', 'failed', 'cancelled'
-    files_scanned INTEGER DEFAULT 0,
-    threats_found INTEGER DEFAULT 0,
-    error_count INTEGER DEFAULT 0
-);
-```
+### Table: `indicators`
 
-### 4. `detections`
-Specific detection events associating a scan session with an indicator or target.
+| Column Name | Data Type | Constraints / Purpose |
+|---|---|---|
+| `id` | `INTEGER` | PRIMARY KEY AUTOINCREMENT |
+| `threat_id` | `INTEGER` | REFERENCES threats(id) ON DELETE SET NULL |
+| `indicator_type` | `TEXT` | NOT NULL |
+| `indicator_value` | `TEXT` | NOT NULL |
+| `source` | `TEXT` | NOT NULL |
+| `confidence` | `REAL` | NOT NULL DEFAULT 0.8 |
+| `status` | `TEXT` | NOT NULL DEFAULT 'SUSPICIOUS' |
+| `first_seen` | `TEXT` | NOT NULL |
+| `last_seen` | `TEXT` | NOT NULL |
 
-```sql
-CREATE TABLE IF NOT EXISTS detections (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    scan_id INTEGER,
-    indicator_id INTEGER,
-    target TEXT NOT NULL,
-    target_type TEXT NOT NULL,      -- 'file', 'url', 'message'
-    model_name TEXT,
-    model_score REAL,
-    rule_score REAL,
-    intel_score REAL,
-    final_score REAL,               -- Composite 0 - 100 risk score
-    risk_level TEXT,                -- 'CRITICAL', 'HIGH', 'MEDIUM', 'LOW'
-    explanation_json TEXT,          -- JSON-serialized evidence breakdown
-    detected_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY(scan_id) REFERENCES scans(id) ON DELETE CASCADE,
-    FOREIGN KEY(indicator_id) REFERENCES indicators(id) ON DELETE SET NULL
-);
-```
+### Table: `scans`
 
-### 5. `scan_items`
-Individual items processed during multi-file or directory scan sessions.
+| Column Name | Data Type | Constraints / Purpose |
+|---|---|---|
+| `id` | `INTEGER` | PRIMARY KEY AUTOINCREMENT |
+| `scan_type` | `TEXT` | NOT NULL |
+| `target` | `TEXT` | NOT NULL |
+| `started_at` | `TEXT` | NOT NULL |
+| `completed_at` | `TEXT` | None |
+| `status` | `TEXT` | NOT NULL DEFAULT 'running' |
+| `files_scanned` | `INTEGER` | DEFAULT 0 |
+| `threats_found` | `INTEGER` | DEFAULT 0 |
+| `error_count` | `INTEGER` | DEFAULT 0 |
 
-```sql
-CREATE TABLE IF NOT EXISTS scan_items (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    scan_id INTEGER NOT NULL,
-    path_or_target TEXT NOT NULL,
-    sha256 TEXT,
-    status TEXT NOT NULL,           -- 'clean', 'suspicious', 'malicious', 'error'
-    risk_score REAL DEFAULT 0.0,
-    scanned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY(scan_id) REFERENCES scans(id) ON DELETE CASCADE
-);
-```
+### Table: `detections`
+
+| Column Name | Data Type | Constraints / Purpose |
+|---|---|---|
+| `id` | `INTEGER` | PRIMARY KEY AUTOINCREMENT |
+| `scan_id` | `INTEGER` | REFERENCES scans(id) ON DELETE CASCADE |
+| `indicator_id` | `INTEGER` | REFERENCES indicators(id) ON DELETE SET NULL |
+| `target` | `TEXT` | NOT NULL |
+| `target_type` | `TEXT` | NOT NULL |
+| `model_name` | `TEXT` | None |
+| `model_score` | `REAL` | DEFAULT 0.0 |
+| `rule_score` | `REAL` | DEFAULT 0.0 |
+| `intel_score` | `REAL` | DEFAULT 0.0 |
+| `final_score` | `REAL` | NOT NULL |
+| `risk_level` | `TEXT` | NOT NULL |
+| `explanation_json` | `TEXT` | None |
+| `detected_at` | `TEXT` | NOT NULL |
+
+### Table: `scan_items`
+
+| Column Name | Data Type | Constraints / Purpose |
+|---|---|---|
+| `id` | `INTEGER` | PRIMARY KEY AUTOINCREMENT |
+| `scan_id` | `INTEGER` | NOT NULL REFERENCES scans(id) ON DELETE CASCADE |
+| `path_or_target` | `TEXT` | NOT NULL |
+| `sha256` | `TEXT` | None |
+| `status` | `TEXT` | NOT NULL |
+| `risk_score` | `REAL` | DEFAULT 0.0 |
+| `scanned_at` | `TEXT` | NOT NULL |
+
+---
+
+## Indices & Performance Optimizations
+
+| Index Name | Table | Indexed Column(s) | Optimization Goal |
+|---|---|---|---|
+| `idx_indicators_type_val` | `indicators` | `indicator_type, indicator_value` | Sub-millisecond B-tree lookup |
+| `idx_detections_target` | `detections` | `target` | Sub-millisecond B-tree lookup |
+| `idx_detections_time` | `detections` | `detected_at` | Sub-millisecond B-tree lookup |
+| `idx_scans_time` | `scans` | `started_at` | Sub-millisecond B-tree lookup |
+
+---
+
+## Programmatic Interface (`ThreatDatabase`)
+
+The `ThreatDatabase` class in `reports/threat_database.py` manages all database lifecycle:
+
+- `ThreatDatabase(db_path: Path)`: Initializes database directory, connects with WAL mode, and verifies schema tables.
+- `add_threat(...)`: Records confirmed or suspicious threats.
+- `add_indicator(...)`: Indexes threat indicator value with indicator type and confidence.
+- `lookup_indicator(indicator_type, indicator_value) -> Optional[Dict]`: Fast indexed indicator query.
+- `record_scan(...)`: Logs scanner execution audit trail.
+- `record_detection(...)`: Logs detection incidents with risk score.
+- `close()`: Safely closes connection pool.
+
+---
+*Reference automatically generated by `scripts/generate_docs.py`.*

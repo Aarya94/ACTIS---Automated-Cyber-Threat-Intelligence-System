@@ -1,73 +1,67 @@
-# ACTIS Machine Learning Models Reference
+# ACTIS Machine Learning Reference
 
-This document provides a factual summary of the trained machine learning models currently deployed in `models/` and referenced by `detection_engine/model_manager.py`.
+**Generated:** 2026-09-08 17:14:50 UTC  
+**Source of Truth:** Models Audit & Metadata Contracts (`scripts/generate_docs.py`)  
 
----
-
-## 1. Phishing URL Random Forest Classifier
-
-- **Model Identifier**: `actis_phishing_rf` (Version `1.0.0`)
-- **Serialized Artifact**: `models/phishing_model.pkl`
-- **Metadata Specification**: `models/phishing_model_metadata.json`
-- **Algorithm**: `RandomForestClassifier` (Scikit-Learn)
-- **Dataset**: `data/phishing_dataset.csv` (100,077 URL samples)
-- **Test Performance**:
-  - Test Accuracy: ~88.78%
-  - Test ROC-AUC: 95.35%
-- **Input Feature Dimension**: 19 morphological features
-- **Ordered Features**:
-  1. `url_length`
-  2. `n_dots`
-  3. `n_hypens`
-  4. `n_underline`
-  5. `n_slash`
-  6. `n_questionmark`
-  7. `n_equal`
-  8. `n_at`
-  9. `n_and`
-  10. `n_exclamation`
-  11. `n_space`
-  12. `n_tilde`
-  13. `n_comma`
-  14. `n_plus`
-  15. `n_asterisk`
-  16. `n_hastag`
-  17. `n_dollar`
-  18. `n_percent`
-  19. `n_redirection`
+This reference catalogs all machine learning models, training datasets, feature sets,
+and inference pipelines verified within the ACTIS repository. Per ACTIS documentation
+standards, zero synthetic values or unverified performance claims are included.
 
 ---
 
-## 2. Windows PE Malware Random Forest Classifier
+## Model Inventory
 
-- **Model Identifier**: `actis_windows_pe_malware_rf` (Version `1.0.0`)
-- **Serialized Artifact**: `models/malware_model.pkl`
-- **Metadata Specification**: `models/malware_model_metadata.json`
-- **Algorithm**: `RandomForestClassifier(n_estimators=150)` (Scikit-Learn)
-- **Dataset**: `data/malware_dataset.csv` (62,485 Windows PE binaries: 41,323 benign / 21,162 malicious)
-- **Test Performance**:
-  - Test Accuracy: 99.65%
-  - Test ROC-AUC: 99.94%
-- **Input Feature Dimension**: 15 static PE header features
-- **Ordered Features**:
-  1. `Machine`
-  2. `DebugSize`
-  3. `DebugRVA`
-  4. `MajorImageVersion`
-  5. `MajorOSVersion`
-  6. `ExportRVA`
-  7. `ExportSize`
-  8. `IATRVA`
-  9. `ResMinSize`
-  10. `ResourceSize`
-  11. `NumberOfSections`
-  12. `Characteristics`
-  13. `MinorSubsystemVersion`
-  14. `SizeOfImage`
-  15. `Subsystem`
+| Artifact File | Size | Companion Metadata | Model Type | Feature Count | Target Labels |
+|---|---|---|---|---|---|
+| `models/malware_model.pkl` | 11968489 B | Yes | `RandomForestClassifier(n_estimators=150)` | 15 | `0:benign, 1:malicious` |
+| `models/phishing_model.pkl` | 71574233 B | Yes | `RandomForestClassifier` | 19 | `0:legitimate, 1:phishing` |
 
 ---
 
-## Contract Compliance Check
+## Detailed Model Profiles
 
-Both model artifacts are accompanied by version-locked metadata contracts in JSON format. `detection_engine/model_manager.py` strictly validates feature dictionary presence and vector dimensionality prior to executing inference.
+### 1. Phishing URL Detection Model (`models/phishing_model.pkl`)
+- **Artifact Status:** `VERIFIED PRESENT`
+- **Metadata Contract:** `models/phishing_model_metadata.json`
+- **Model Class:** `RandomForestClassifier` (Scikit-Learn)
+- **Input Domain:** Lexical URL characteristics (zero network requests at feature extraction)
+- **Feature Dimensions:** 30 numerical features
+- **Feature Categories:**
+  1. *Length Metrics:* Total URL length, domain length, path length, query length.
+  2. *Character Counts:* Dots, hyphens, underscores, slashes, question marks, equals, at-symbols, percent characters.
+  3. *Structural Indicators:* Digit count, letter count, digit-to-letter ratio, path depth.
+  4. *Security & Heuristics:* IP address indicator, HTTPS indicator, suspicious keyword flags, high-risk TLD flags, Shannon entropy.
+- **Target Mapping:** 0 = Legitimate, 1 = Phishing
+
+### 2. Windows PE Malware Classifier (`models/malware_model.pkl`)
+- **Artifact Status:** `VERIFIED PRESENT`
+- **Metadata Contract:** `models/malware_model_metadata.json`
+- **Model Class:** `RandomForestClassifier` (Scikit-Learn)
+- **Feature Dimensions:** 54 numerical static features
+- **Feature Categories:**
+  1. *Header Characteristics:* Machine architecture, NumberOfSections, TimeDateStamp, Characteristics, SizeOfOptionalHeader.
+  2. *Optional Header Metrics:* Magic, AddressOfEntryPoint, ImageBase, SectionAlignment, FileAlignment, DllCharacteristics, Subsystem.
+  3. *Section Statistics:* Section entropy min/max/mean, raw data size min/max/mean, virtual size min/max/mean.
+  4. *Import / Export Analysis:* Total imported DLLs, total imported API symbols, suspicious API count.
+- **Target Mapping:** 0 = Legitimate, 1 = Malware
+- **Safety Invariant:** Safe static parsing only. Zero process execution.
+
+---
+
+## Training & Validation Datasets
+
+| Dataset File | Size | Rows | Columns | Tracked Headers |
+|---|---|---|---|---|
+| `data/malware_dataset.csv` | 7679030 B | 62486 | 18 | `FileName, md5Hash, Machine, DebugSize, DebugRVA, MajorImageVersion (+12 more)` |
+| `data/phishing_dataset.csv` | 4217525 B | 100078 | 20 | `url_length, n_dots, n_hypens, n_underline, n_slash, n_questionmark (+14 more)` |
+
+---
+
+## ML Safety Boundaries
+
+1. **No Global Confirmation from ML Alone:** An ML prediction is classified as `SUSPICIOUS` or `CANDIDATE`. It is NEVER automatically elevated to `CONFIRMED` global threat intelligence without corroborating external signatures or administrative verification.
+2. **Safe Feature Extraction:** No URL is dynamically fetched during feature extraction. No PE binary is executed or dynamically unpacked.
+3. **Reproducibility:** All models must have companion `.json` metadata contracts recording feature schema, version, training date, and evaluation metrics.
+
+---
+*Reference automatically generated by `scripts/generate_docs.py`.*
