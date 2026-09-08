@@ -9,6 +9,7 @@ in docs/generated/.
 
 import argparse
 import os
+import subprocess
 import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
@@ -81,6 +82,73 @@ class RepoInspector:
         return {f: (self.root / f).is_file() for f in key_files}
 
 
+class GitAnalyzer:
+    """Analyzes Git repository status, branch, remotes, and commit history."""
+
+    def __init__(self, root_dir: Path):
+        self.root = root_dir
+
+    def _run_git(self, args: List[str]) -> Optional[str]:
+        """Executes a git command safely and returns standard output."""
+        try:
+            res = subprocess.run(
+                ["git"] + args,
+                cwd=str(self.root),
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                check=False,
+            )
+            if res.returncode == 0:
+                return res.stdout.strip()
+        except Exception:
+            pass
+        return None
+
+    def get_branch_info(self) -> Dict[str, str]:
+        """Returns current branch name, HEAD short hash, and origin remote URL."""
+        branch = self._run_git(["rev-parse", "--abbrev-ref", "HEAD"]) or "NOT VERIFIED"
+        head_hash = self._run_git(["rev-parse", "--short", "HEAD"]) or "NOT VERIFIED"
+        remote = self._run_git(["config", "--get", "remote.origin.url"]) or "NOT VERIFIED"
+        return {
+            "branch": branch,
+            "head": head_hash,
+            "remote": remote,
+        }
+
+    def get_recent_commits(self, count: int = 30) -> List[Dict[str, str]]:
+        """Extracts structured list of recent commits with hash, date, message, and type."""
+        raw = self._run_git(["log", f"-n{count}", "--format=%h|%ad|%s", "--date=short"])
+        if not raw:
+            return []
+        commits = []
+        for line in raw.splitlines():
+            parts = line.split("|", 2)
+            if len(parts) == 3:
+                h, d, msg = parts
+                c_type = msg.split(":", 1)[0].strip() if ":" in msg else "other"
+                commits.append({
+                    "hash": h,
+                    "date": d,
+                    "message": msg,
+                    "type": c_type,
+                })
+        return commits
+
+    def get_working_tree_status(self) -> Dict[str, Any]:
+        """Checks status of current working tree."""
+        status_raw = self._run_git(["status", "--short", "--branch"]) or ""
+        lines = status_raw.splitlines()
+        branch_line = lines[0] if lines else "## UNKNOWN"
+        file_changes = lines[1:] if len(lines) > 1 else []
+        return {
+            "branch_line": branch_line,
+            "is_clean": len(file_changes) == 0,
+            "changed_files_count": len(file_changes),
+            "changes": file_changes[:10],
+        }
+
+
 def parse_arguments() -> argparse.Namespace:
     """Parses command-line arguments for documentation generator."""
     parser = argparse.ArgumentParser(
@@ -110,20 +178,26 @@ def parse_arguments() -> argparse.Namespace:
 def main() -> int:
     args = parse_arguments()
     inspector = RepoInspector(PROJECT_ROOT)
+    git_analyzer = GitAnalyzer(PROJECT_ROOT)
+
     dirs = inspector.audit_directories()
     root_files = inspector.get_root_files()
+    git_info = git_analyzer.get_branch_info()
+    recent_commits = git_analyzer.get_recent_commits(10)
+    tree_status = git_analyzer.get_working_tree_status()
 
     if args.verbose or args.check:
         print("=== ACTIS Repository Audit ===")
         print(f"Project Root: {PROJECT_ROOT}")
         print(f"Target Output: {args.output_dir}")
+        print(f"Git Branch: {git_info['branch']} (HEAD: {git_info['head']})")
+        print(f"Remote URL: {git_info['remote']}")
+        print(f"Working Tree Clean: {tree_status['is_clean']}")
+        print(f"Recent Commits Count: {len(recent_commits)}")
         for k, v in root_files.items():
             print(f"  Root File {k}: {'Present' if v else 'Missing'}")
-        for pkg, data in dirs.items():
-            status = f"Present ({data['file_count']} files, {data['total_lines']} lines)" if data['exists'] else "MISSING"
-            print(f"  Package {pkg}: {status}")
 
-    print("ACTIS Documentation Generator initialized successfully.")
+    print("ACTIS Documentation Generator: Git analyzer integrated successfully.")
     return 0
 
 
