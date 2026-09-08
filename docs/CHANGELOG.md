@@ -61,7 +61,7 @@ Established the authoritative ACTIS documentation framework (`docs/architecture/
 | `bd64d60` | feat | Add markdown report writers for database, ML, and test references | `scripts/generate_docs.py` | Passed (35 tests) |
 | `963163d` | test | Add automated unit tests for documentation generator | `scripts/generate_docs.py`, `tests/test_doc_generator.py` | Passed (55 tests) |
 | `2e3152b` | chore | Execute documentation generator to synchronize generated documentation | `docs/generated/*.md` | Passed (55 tests) |
-| `PENDING` | docs | Update main changelog with documentation progress system records | `docs/CHANGELOG.md` | Passed (55 tests) |
+| `d54e1ea` | docs | Update main changelog with documentation progress system records | `docs/CHANGELOG.md` | Passed (55 tests) |
 
 ---
 
