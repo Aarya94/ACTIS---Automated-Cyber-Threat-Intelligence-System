@@ -28,9 +28,20 @@ wheels/
 venv/
 env/
 ENV/
+.venv/
 
-# Environment variables
+# Environment variables and secrets (NEVER commit secrets)
 .env
+.env.*
+!.env.example
+!config/.env.example
+*.pem
+*.key
+*.crt
+*.pfx
+credentials.json
+client_secrets.json
+secrets/
 
 # Logs and databases
 logs/*.log
@@ -41,6 +52,14 @@ backend/*.db
 .vscode/
 .idea/
 *.swp
+*.swo
 
 # Ignore trained model binaries
 models/*.pkl
+
+# OS artifacts
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
