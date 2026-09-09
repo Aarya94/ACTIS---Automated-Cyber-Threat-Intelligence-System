@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-09-09 14:43:07 UTC  
+**Generated:** 2026-09-09 14:44:11 UTC  
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)  
 
 This document inventories all automated test files, test classes, and test functions
@@ -12,7 +12,7 @@ recorded only after confirmed execution.
 ## Test Suite Summary
 
 - **Total Test Files:** `11`
-- **Total Discovered Test Cases:** `84`
+- **Total Discovered Test Cases:** `91`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -26,7 +26,7 @@ recorded only after confirmed execution.
 | `tests/test_config_loading.py` | 11 tests | `PASSING` |
 | `tests/test_config_validation.py` | 11 tests | `PASSING` |
 | `tests/test_doc_generator.py` | 20 tests | `PASSING` |
-| `tests/test_malware_dataset.py` | 18 tests | `PASSING` |
+| `tests/test_malware_dataset.py` | 25 tests | `PASSING` |
 | `tests/test_risk_engine.py` | 3 tests | `PASSING` |
 | `tests/test_static_pe.py` | 3 tests | `PASSING` |
 | `tests/test_text_analyzer.py` | 3 tests | `PASSING` |
@@ -116,7 +116,7 @@ recorded only after confirmed execution.
 **Class `TestGeneratorCli`:**
 - `test_cli_check_mode()`
 
-### `tests/test_malware_dataset.py` (18 tests)
+### `tests/test_malware_dataset.py` (25 tests)
 
 **Class `TestMalwareDatasetSchemaContracts`:**
 - `test_schema_feature_columns_count()`
@@ -141,6 +141,15 @@ recorded only after confirmed execution.
 - `test_validate_dataset_schema_missing_feature()`
 - `test_validate_dataset_schema_missing_label()`
 - `test_validate_dataset_schema_invalid_label_values()`
+
+**Class `TestMalwareDatasetPreparationAndDiagnostics`:**
+- `test_prepare_features_and_labels_shape_and_types()`
+- `test_prepare_features_and_labels_inversion_logic()`
+- `test_inspect_dataset_quality_clean()`
+- `test_inspect_dataset_quality_with_nulls_and_duplicates()`
+- `test_get_class_distribution_raw_labels()`
+- `test_get_class_distribution_normalized_target()`
+- `test_get_class_distribution_empty_dataframe()`
 
 ### `tests/test_risk_engine.py` (3 tests)
 
