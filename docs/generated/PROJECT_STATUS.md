@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-09-09 14:45:34 UTC  
+**Generated:** 2026-09-09 14:46:40 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`4177478`)  
+**Current Git Branch:** `main` (`54ec9c9`)  
 
 ---
 
@@ -117,13 +117,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `4177478`
-- **Working Tree:** 2 untracked/unstaged changes
+- **HEAD Commit:** `54ec9c9`
+- **Working Tree:** 7 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `54ec9c9` | Aaryan Suman | 2026-09-09 | docs: document Windows PE malware dataset and data preparation foundation |
 | `4177478` | Aaryan Suman | 2026-09-09 | test: add unit tests for feature preparation, quality inspection, and class balance |
 | `92362fe` | Aaryan Suman | 2026-09-09 | test: add unit tests for schema validation and edge case errors |
 | `6e5b5b0` | Aaryan Suman | 2026-09-09 | test: add unit tests for dataset loading and identifier isolation |
@@ -133,7 +134,6 @@
 | `26d4b3d` | Aaryan Suman | 2026-09-09 | feat: implement feature matrix extraction and label binarization |
 | `39db203` | Aaryan Suman | 2026-09-09 | feat: implement dataset schema validation and integrity verification |
 | `0afd272` | Aaryan Suman | 2026-09-09 | feat: implement raw malware dataset loading with identifier isolation |
-| `1d0f2d6` | Aaryan Suman | 2026-09-09 | feat: define Windows PE malware dataset schema contract |
 
 ## Known Issues
 

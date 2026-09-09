@@ -12,6 +12,28 @@ Milestone Scope: Architecture planning, configuration management, logging infras
 
 ---
 
+### 2026-09-09 — Week 1 Day 3: Windows PE Malware Dataset Inspection & Data Preparation Foundation
+
+Established the authentic data ingestion, schema validation, metadata identifier isolation, quality audit, and label normalization foundation for the Windows PE malware dataset (`data/malware_dataset.csv`, 62,485 samples, 15 PE structural features, 2 metadata identifiers, 1 label). Enforced zero data leakage, target binarization (`is_malware`), and added 25 automated unit tests (91 total suite tests).
+
+#### Commits
+
+| Commit | Type | Description | Files | Verification |
+|--------|------|-------------|-------|--------------|
+| `1d0f2d6` | feat | Define Windows PE malware dataset schema contract | `detection_engine/malware_dataset_schema.py` | Passed (66 tests) |
+| `0afd272` | feat | Implement raw malware dataset loading with identifier isolation | `detection_engine/malware_dataset_loader.py` | Passed (66 tests) |
+| `39db203` | feat | Implement dataset schema validation and integrity verification | `detection_engine/malware_dataset_loader.py` | Passed (66 tests) |
+| `26d4b3d` | feat | Implement feature matrix extraction and label binarization | `detection_engine/malware_dataset_loader.py` | Passed (66 tests) |
+| `a2ec5b3` | feat | Implement dataset quality inspection and diagnostic reporting | `detection_engine/malware_dataset_loader.py` | Passed (66 tests) |
+| `ef9c7ac` | feat | Implement class distribution and balance analysis | `detection_engine/malware_dataset_loader.py` | Passed (66 tests) |
+| `ffda49d` | test | Add unit tests for malware dataset schema contracts | `tests/test_malware_dataset.py` | Passed (74 tests) |
+| `6e5b5b0` | test | Add unit tests for dataset loading and identifier isolation | `tests/test_malware_dataset.py`, `detection_engine/malware_dataset_loader.py` | Passed (80 tests) |
+| `92362fe` | test | Add unit tests for schema validation and edge case errors | `tests/test_malware_dataset.py` | Passed (84 tests) |
+| `4177478` | test | Add unit tests for feature preparation, quality inspection, and class balance | `tests/test_malware_dataset.py` | Passed (91 tests) |
+| `54ec9c9` | docs | Document Windows PE malware dataset and data preparation foundation | `docs/ml_malware_dataset.md`, `SUMMARY.md` | Passed (91 tests) |
+
+---
+
 ### 2026-09-08 — Week 1 Day 2: Configuration & Documentation Governance Framework
 
 Established the authoritative ACTIS documentation framework (`docs/architecture/`, `docs/roadmap/`, `docs/generated/`) and centralized configuration management foundation. Decoupled operational settings, paths, and credentials with strict secret protection and full backward compatibility.
