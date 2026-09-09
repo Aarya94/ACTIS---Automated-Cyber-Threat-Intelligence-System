@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-09-09 14:42:26 UTC  
+**Generated:** 2026-09-09 14:43:07 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`ffda49d`)  
+**Current Git Branch:** `main` (`6e5b5b0`)  
 
 ---
 
@@ -111,19 +111,20 @@
 ## Test Status
 
 - **Total Test Files:** `11`
-- **Total Discovered Test Functions:** `80`
+- **Total Discovered Test Functions:** `84`
 - **Coverage Areas:** Configuration validation, SQLite database schema & CRUD, Phishing/Malware model contracts, PE feature extraction, API backend.
 
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `ffda49d`
-- **Working Tree:** 8 untracked/unstaged changes
+- **HEAD Commit:** `6e5b5b0`
+- **Working Tree:** 1 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `6e5b5b0` | Aaryan Suman | 2026-09-09 | test: add unit tests for dataset loading and identifier isolation |
 | `ffda49d` | Aaryan Suman | 2026-09-09 | test: add unit tests for malware dataset schema contracts |
 | `ef9c7ac` | Aaryan Suman | 2026-09-09 | feat: implement class distribution and balance analysis |
 | `a2ec5b3` | Aaryan Suman | 2026-09-09 | feat: implement dataset quality inspection and diagnostic reporting |
@@ -133,7 +134,6 @@
 | `1d0f2d6` | Aaryan Suman | 2026-09-09 | feat: define Windows PE malware dataset schema contract |
 | `e49d42b` | ACTIS Bot | 2026-09-09 | docs: record Day 2 development changelog and synchronize generated docs |
 | `38bd80a` | ACTIS Bot | 2026-09-09 | docs: update configuration guide and .env.example documentation |
-| `0d64bdb` | ACTIS Bot | 2026-09-09 | test: add unit tests for safe dictionary serialization and secret masking |
 
 ## Known Issues
 
