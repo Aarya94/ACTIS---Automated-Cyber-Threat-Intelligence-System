@@ -7,12 +7,14 @@ baseline configuration models for development, testing, and production environme
 """
 
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Tuple
 
 from config.paths import (
     ACTIS_ROOT,
     DATABASE_PATH,
     CENTRAL_BACKEND_DB,
+    TEST_DATABASE_PATH,
+    TEST_CENTRAL_BACKEND_DB,
     PHISHING_MODEL_PATH,
     PHISHING_METADATA_PATH,
     MALWARE_MODEL_PATH,
@@ -33,6 +35,7 @@ from config.settings import (
 # Application Baseline
 APP_NAME = "ACTIS"
 DEFAULT_ENVIRONMENT = "development"
+VALID_ENVIRONMENTS: Tuple[str, ...] = ("development", "testing", "staging", "production")
 DEFAULT_LOG_LEVEL = "INFO"
 
 # Server & Backend Defaults
@@ -67,9 +70,23 @@ DEFAULT_API_TIMEOUT = 10.0
 
 def create_default_config(environment: str = DEFAULT_ENVIRONMENT) -> AppConfig:
     """Creates a fully configured AppConfig instance populated with standard defaults."""
+    # Environment-specific path and logging profiles
+    if environment == "testing":
+        active_db_path = TEST_DATABASE_PATH
+        active_backend_db = TEST_CENTRAL_BACKEND_DB
+        log_level = "WARNING"
+    elif environment == "production":
+        active_db_path = DATABASE_PATH
+        active_backend_db = CENTRAL_BACKEND_DB
+        log_level = "INFO"
+    else:  # development, staging, or custom default
+        active_db_path = DATABASE_PATH
+        active_backend_db = CENTRAL_BACKEND_DB
+        log_level = "DEBUG" if environment == "development" else "INFO"
+
     db_config = DatabaseConfig(
-        db_path=DATABASE_PATH,
-        backend_db_path=CENTRAL_BACKEND_DB,
+        db_path=active_db_path,
+        backend_db_path=active_backend_db,
         timeout_seconds=DEFAULT_DB_TIMEOUT_SECONDS,
         enable_wal_mode=DEFAULT_ENABLE_WAL,
     )
@@ -113,10 +130,6 @@ def create_default_config(environment: str = DEFAULT_ENVIRONMENT) -> AppConfig:
         host=DEFAULT_HOST,
         port=DEFAULT_PORT,
     )
-
-    log_level = "DEBUG" if environment == "development" else "INFO"
-    if environment == "testing":
-        log_level = "WARNING"
 
     return AppConfig(
         app_name=APP_NAME,

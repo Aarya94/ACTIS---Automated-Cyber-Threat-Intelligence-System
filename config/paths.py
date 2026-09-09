@@ -27,6 +27,9 @@ TESTS_DIR = ACTIS_ROOT / "tests"
 # SQLite databases
 DATABASE_PATH = DATA_DIR / "threat_intelligence.db"
 CENTRAL_BACKEND_DB = BACKEND_DIR / "central_threat_intel.db"
+TEST_DATABASE_PATH = DATA_DIR / "test_threat_intelligence.db"
+TEST_CENTRAL_BACKEND_DB = BACKEND_DIR / "test_central_threat_intel.db"
+TEST_LOGS_DIR = LOGS_DIR / "test"
 
 # Model artifacts and contracts
 PHISHING_MODEL_PATH = MODELS_DIR / "phishing_model.pkl"
@@ -56,6 +59,9 @@ class PathConfig:
     backend_dir: Path = BACKEND_DIR
     database_path: Path = DATABASE_PATH
     central_backend_db: Path = CENTRAL_BACKEND_DB
+    test_database_path: Path = TEST_DATABASE_PATH
+    test_central_backend_db: Path = TEST_CENTRAL_BACKEND_DB
+    test_logs_dir: Path = TEST_LOGS_DIR
     phishing_model_path: Path = PHISHING_MODEL_PATH
     phishing_metadata_path: Path = PHISHING_METADATA_PATH
     malware_model_path: Path = MALWARE_MODEL_PATH

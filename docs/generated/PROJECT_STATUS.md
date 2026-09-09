@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-09-08 18:39:09 UTC  
+**Generated:** 2026-09-09 12:23:19 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`ed2fcf3`)  
+**Current Git Branch:** `main` (`5ff89e0`)  
 
 ---
 
@@ -117,13 +117,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `ed2fcf3`
+- **HEAD Commit:** `5ff89e0`
 - **Working Tree:** 2 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `5ff89e0` | ACTIS Bot | 2026-09-09 | feat: add gitbook-docs.yaml for GitBook Site Git Sync |
 | `ed2fcf3` | ACTIS Bot | 2026-09-09 | feat: configure GitBook documentation structure with table of contents and quickstart guide |
 | `bf4df82` | ACTIS Bot | 2026-09-08 | chore: reconcile remote main and preserve ACTIS documentation |
 | `9112035` | ACTIS Bot | 2026-09-08 | chore: reconcile main repository history |
@@ -133,7 +134,6 @@
 | `a0f03b5` | ACTIS Bot | 2026-09-08 | docs: record commit hash and regenerate final progress documentation |
 | `d54e1ea` | ACTIS Bot | 2026-09-08 | docs: update main changelog with documentation progress system records |
 | `2e3152b` | ACTIS Bot | 2026-09-08 | chore: execute documentation generator to synchronize generated documentation |
-| `963163d` | ACTIS Bot | 2026-09-08 | test: add automated unit tests for documentation generator |
 
 ## Known Issues
 
