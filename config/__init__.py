@@ -5,6 +5,8 @@ Automated Cyber Threat Intelligence System — Week 1 Day 2
 
 from config.config import (
     config,
+    get_config,
+    load_app_config,
     get_logger,
     ACTIS_ROOT,
     CONFIG_DIR,
@@ -34,6 +36,8 @@ from config.validator import ConfigurationError, validate_config
 
 __all__ = [
     "config",
+    "get_config",
+    "load_app_config",
     "get_logger",
     "ACTIS_ROOT",
     "CONFIG_DIR",
