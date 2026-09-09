@@ -10,7 +10,7 @@ import math
 from typing import List, Optional
 from urllib.parse import urlparse
 
-from config.settings import AppConfig, DatabaseConfig, RiskEngineConfig, ScannerConfig, ServerConfig
+from config.settings import AppConfig, DatabaseConfig, ExternalApiConfig, RiskEngineConfig, ScannerConfig, ServerConfig
 
 
 class ConfigurationError(ValueError):
@@ -119,6 +119,29 @@ def validate_database_settings(db_config: DatabaseConfig) -> List[str]:
     return errors
 
 
+
+def validate_app_name(app_name: str) -> List[str]:
+    """Validates that application name is non-empty."""
+    errors = []
+    if not app_name or not app_name.strip():
+        errors.append("app_name must be a non-empty string")
+    return errors
+
+
+def validate_api_settings(api_config: ExternalApiConfig) -> List[str]:
+    """Validates external threat intelligence API network limits."""
+    errors = []
+    if api_config.request_timeout <= 0.0:
+        errors.append(
+            f"request_timeout must be > 0 (got {api_config.request_timeout})"
+        )
+    elif api_config.request_timeout > 120.0:
+        errors.append(
+            f"request_timeout cannot exceed 120s (got {api_config.request_timeout})"
+        )
+    return errors
+
+
 def validate_config(config: AppConfig, strict: bool = True) -> List[str]:
     """
     Validates complete ACTIS AppConfig. Returns list of error messages.
@@ -128,6 +151,10 @@ def validate_config(config: AppConfig, strict: bool = True) -> List[str]:
 
     errors.extend(validate_log_level(config.log_level))
     errors.extend(validate_environment(config.environment))
+    errors.extend(validate_app_name(config.app_name))
+
+    if config.apis:
+        errors.extend(validate_api_settings(config.apis))
 
     if config.database:
         errors.extend(validate_database_settings(config.database))
