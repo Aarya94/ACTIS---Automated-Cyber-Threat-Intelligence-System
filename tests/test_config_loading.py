@@ -39,6 +39,9 @@ from config.env_loader import (
     get_float,
     get_bool,
     get_list,
+    get_int_bounded,
+    get_float_bounded,
+    get_path,
     load_environment,
 )
 
@@ -149,4 +152,37 @@ def test_dynamic_get_config_reload():
     # Reset back to default development
     reset_cfg = get_config(reload=True, environment="development")
     assert reset_cfg.environment == "development"
+
+def test_bounded_int_and_float_loader(monkeypatch):
+    """Verifies bounded numeric environment loaders enforce min/max constraints."""
+    monkeypatch.setenv("TEST_BOUND_INT_VALID", "50")
+    monkeypatch.setenv("TEST_BOUND_INT_LOW", "5")
+    monkeypatch.setenv("TEST_BOUND_INT_HIGH", "150")
+
+    assert get_int_bounded("TEST_BOUND_INT_VALID", default=10, min_val=10, max_val=100) == 50
+    assert get_int_bounded("TEST_BOUND_INT_LOW", default=20, min_val=10, max_val=100) == 20
+    assert get_int_bounded("TEST_BOUND_INT_HIGH", default=20, min_val=10, max_val=100) == 20
+    assert get_int_bounded("TEST_UNSET", default=30, min_val=10, max_val=100) == 30
+
+    monkeypatch.setenv("TEST_BOUND_FLOAT_VALID", "12.5")
+    monkeypatch.setenv("TEST_BOUND_FLOAT_LOW", "-1.0")
+    monkeypatch.setenv("TEST_BOUND_FLOAT_HIGH", "99.9")
+
+    assert get_float_bounded("TEST_BOUND_FLOAT_VALID", default=5.0, min_val=0.0, max_val=30.0) == 12.5
+    assert get_float_bounded("TEST_BOUND_FLOAT_LOW", default=5.0, min_val=0.0, max_val=30.0) == 5.0
+    assert get_float_bounded("TEST_BOUND_FLOAT_HIGH", default=5.0, min_val=0.0, max_val=30.0) == 5.0
+
+
+def test_path_env_loader(monkeypatch, tmp_path):
+    """Verifies get_path parses, resolves, and verifies optional path existence."""
+    sample_file = tmp_path / "sample.txt"
+    sample_file.write_text("actis", encoding="utf-8")
+
+    monkeypatch.setenv("TEST_PATH_EXISTS", str(sample_file))
+    monkeypatch.setenv("TEST_PATH_MISSING", str(tmp_path / "nonexistent.bin"))
+
+    assert get_path("TEST_PATH_EXISTS", must_exist=True) == sample_file.resolve()
+    assert get_path("TEST_PATH_MISSING", default=Path("/default"), must_exist=True) == Path("/default")
+    assert get_path("TEST_PATH_MISSING", must_exist=False) == (tmp_path / "nonexistent.bin").resolve()
+    assert get_path("TEST_PATH_UNSET", default=None) is None
 

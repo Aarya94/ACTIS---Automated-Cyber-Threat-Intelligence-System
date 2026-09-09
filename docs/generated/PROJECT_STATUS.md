@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-09-09 12:31:20 UTC  
+**Generated:** 2026-09-09 12:31:51 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`5bee8ca`)  
+**Current Git Branch:** `main` (`c38f632`)  
 
 ---
 
@@ -111,19 +111,20 @@
 ## Test Status
 
 - **Total Test Files:** `10`
-- **Total Discovered Test Functions:** `58`
+- **Total Discovered Test Functions:** `60`
 - **Coverage Areas:** Configuration validation, SQLite database schema & CRUD, Phishing/Malware model contracts, PE feature extraction, API backend.
 
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `5bee8ca`
+- **HEAD Commit:** `c38f632`
 - **Working Tree:** 1 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `c38f632` | ACTIS Bot | 2026-09-09 | test: add unit tests for environment profile path isolation |
 | `5bee8ca` | ACTIS Bot | 2026-09-09 | feat: implement dynamic get_config accessor with reload capability |
 | `4545417` | ACTIS Bot | 2026-09-09 | feat: implement safe serialization with secret masking in AppConfig |
 | `566fc2c` | ACTIS Bot | 2026-09-09 | feat: add external API timeout and app name validation rules |
@@ -133,7 +134,6 @@
 | `5ff89e0` | ACTIS Bot | 2026-09-09 | feat: add gitbook-docs.yaml for GitBook Site Git Sync |
 | `ed2fcf3` | ACTIS Bot | 2026-09-09 | feat: configure GitBook documentation structure with table of contents and quickstart guide |
 | `bf4df82` | ACTIS Bot | 2026-09-08 | chore: reconcile remote main and preserve ACTIS documentation |
-| `9112035` | ACTIS Bot | 2026-09-08 | chore: reconcile main repository history |
 
 ## Known Issues
 
