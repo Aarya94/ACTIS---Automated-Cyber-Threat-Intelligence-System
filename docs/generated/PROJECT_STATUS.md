@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-09-09 12:33:56 UTC  
+**Generated:** 2026-09-09 12:34:35 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`0d64bdb`)  
+**Current Git Branch:** `main` (`38bd80a`)  
 
 ---
 
@@ -117,13 +117,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `0d64bdb`
-- **Working Tree:** 3 untracked/unstaged changes
+- **HEAD Commit:** `38bd80a`
+- **Working Tree:** 6 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `38bd80a` | ACTIS Bot | 2026-09-09 | docs: update configuration guide and .env.example documentation |
 | `0d64bdb` | ACTIS Bot | 2026-09-09 | test: add unit tests for safe dictionary serialization and secret masking |
 | `bceb00b` | ACTIS Bot | 2026-09-09 | test: add unit tests for extended configuration validation rules |
 | `7ae6a3e` | ACTIS Bot | 2026-09-09 | test: add unit tests for bounded environment variable loaders |
@@ -133,7 +134,6 @@
 | `566fc2c` | ACTIS Bot | 2026-09-09 | feat: add external API timeout and app name validation rules |
 | `caa1fed` | ACTIS Bot | 2026-09-09 | feat: add environment name and database timeout validation rules |
 | `951fb0c` | ACTIS Bot | 2026-09-09 | feat: implement bounded numeric and path parsing helpers in env_loader |
-| `36beb85` | ACTIS Bot | 2026-09-09 | feat: add environment profile handling with isolated test paths |
 
 ## Known Issues
 
