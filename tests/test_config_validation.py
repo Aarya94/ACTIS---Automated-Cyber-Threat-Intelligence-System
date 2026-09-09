@@ -9,7 +9,13 @@ network endpoints, and log levels.
 import pytest
 
 from config.defaults import create_default_config
-from config.settings import RiskEngineConfig, ScannerConfig, ServerConfig
+from config.settings import (
+    DatabaseConfig,
+    ExternalApiConfig,
+    RiskEngineConfig,
+    ScannerConfig,
+    ServerConfig,
+)
 from config.validator import (
     ConfigurationError,
     validate_config,
@@ -18,6 +24,10 @@ from config.validator import (
     validate_scanner_settings,
     validate_server_settings,
     validate_log_level,
+    validate_environment,
+    validate_database_settings,
+    validate_app_name,
+    validate_api_settings,
 )
 
 
@@ -109,3 +119,43 @@ def test_strict_mode_raises_configuration_error():
     with pytest.raises(ConfigurationError) as exc_info:
         validate_config(cfg, strict=True)
     assert "ACTIS Configuration Validation Failed" in str(exc_info.value)
+
+def test_invalid_environment_validation():
+    """Environment must belong to approved deployment profiles."""
+    assert len(validate_environment("invalid_env")) > 0
+    assert len(validate_environment("custom_env")) > 0
+    assert len(validate_environment("development")) == 0
+    assert len(validate_environment("testing")) == 0
+    assert len(validate_environment("production")) == 0
+    assert len(validate_environment("staging")) == 0
+
+
+def test_database_settings_validation(tmp_path):
+    """Database timeout must be strictly positive and path non-empty."""
+    bad_timeout = DatabaseConfig(
+        db_path=tmp_path / "test.db",
+        backend_db_path=tmp_path / "backend.db",
+        timeout_seconds=-5.0,
+    )
+    errors = validate_database_settings(bad_timeout)
+    assert any("timeout_seconds must be > 0" in e for e in errors)
+
+
+def test_app_name_validation():
+    """Application name must be a non-empty string."""
+    assert len(validate_app_name("")) > 0
+    assert len(validate_app_name("   ")) > 0
+    assert len(validate_app_name("ACTIS")) == 0
+
+
+def test_api_request_timeout_validation():
+    """External threat intel API timeout must be within (0, 120] seconds."""
+    bad_zero = ExternalApiConfig(request_timeout=0.0)
+    assert any("must be > 0" in e for e in validate_api_settings(bad_zero))
+
+    bad_large = ExternalApiConfig(request_timeout=300.0)
+    assert any("cannot exceed 120s" in e for e in validate_api_settings(bad_large))
+
+    valid_api = ExternalApiConfig(request_timeout=15.0)
+    assert len(validate_api_settings(valid_api)) == 0
+

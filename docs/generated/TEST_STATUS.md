@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-09-09 12:31:51 UTC  
+**Generated:** 2026-09-09 12:32:24 UTC  
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)  
 
 This document inventories all automated test files, test classes, and test functions
@@ -12,7 +12,7 @@ recorded only after confirmed execution.
 ## Test Suite Summary
 
 - **Total Test Files:** `10`
-- **Total Discovered Test Cases:** `60`
+- **Total Discovered Test Cases:** `64`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -24,7 +24,7 @@ recorded only after confirmed execution.
 |---|---|---|
 | `tests/test_backend_api.py` | 4 tests | `PASSING` |
 | `tests/test_config_loading.py` | 9 tests | `PASSING` |
-| `tests/test_config_validation.py` | 7 tests | `PASSING` |
+| `tests/test_config_validation.py` | 11 tests | `PASSING` |
 | `tests/test_doc_generator.py` | 20 tests | `PASSING` |
 | `tests/test_risk_engine.py` | 3 tests | `PASSING` |
 | `tests/test_static_pe.py` | 3 tests | `PASSING` |
@@ -58,7 +58,7 @@ recorded only after confirmed execution.
 - `test_bounded_int_and_float_loader()`
 - `test_path_env_loader()`
 
-### `tests/test_config_validation.py` (7 tests)
+### `tests/test_config_validation.py` (11 tests)
 
 **Standalone Test Functions:**
 - `test_valid_default_config_passes_validation()`
@@ -68,6 +68,10 @@ recorded only after confirmed execution.
 - `test_scanner_limits_validation()`
 - `test_server_network_validation()`
 - `test_strict_mode_raises_configuration_error()`
+- `test_invalid_environment_validation()`
+- `test_database_settings_validation()`
+- `test_app_name_validation()`
+- `test_api_request_timeout_validation()`
 
 ### `tests/test_doc_generator.py` (20 tests)
 
