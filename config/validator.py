@@ -10,7 +10,7 @@ import math
 from typing import List, Optional
 from urllib.parse import urlparse
 
-from config.settings import AppConfig, RiskEngineConfig, ScannerConfig, ServerConfig
+from config.settings import AppConfig, DatabaseConfig, RiskEngineConfig, ScannerConfig, ServerConfig
 
 
 class ConfigurationError(ValueError):
@@ -19,6 +19,7 @@ class ConfigurationError(ValueError):
 
 
 VALID_LOG_LEVELS = {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}
+VALID_ENVIRONMENTS = {"development", "testing", "staging", "production"}
 
 
 def validate_weights(risk_config: RiskEngineConfig) -> List[str]:
@@ -95,6 +96,29 @@ def validate_log_level(log_level: str) -> List[str]:
     return errors
 
 
+
+def validate_environment(environment: str) -> List[str]:
+    """Validates that environment matches approved deployment profiles."""
+    errors = []
+    if environment.lower() not in VALID_ENVIRONMENTS:
+        errors.append(
+            f"environment must be one of {sorted(VALID_ENVIRONMENTS)} (got '{environment}')"
+        )
+    return errors
+
+
+def validate_database_settings(db_config: DatabaseConfig) -> List[str]:
+    """Validates operational database configuration constraints."""
+    errors = []
+    if db_config.timeout_seconds <= 0:
+        errors.append(
+            f"database timeout_seconds must be > 0 (got {db_config.timeout_seconds})"
+        )
+    if not db_config.db_path:
+        errors.append("database db_path must not be empty")
+    return errors
+
+
 def validate_config(config: AppConfig, strict: bool = True) -> List[str]:
     """
     Validates complete ACTIS AppConfig. Returns list of error messages.
@@ -103,6 +127,10 @@ def validate_config(config: AppConfig, strict: bool = True) -> List[str]:
     errors: List[str] = []
 
     errors.extend(validate_log_level(config.log_level))
+    errors.extend(validate_environment(config.environment))
+
+    if config.database:
+        errors.extend(validate_database_settings(config.database))
 
     if config.risk:
         errors.extend(validate_weights(config.risk))
