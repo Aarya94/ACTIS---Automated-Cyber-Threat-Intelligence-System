@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-09-09 12:32:24 UTC  
+**Generated:** 2026-09-09 12:32:56 UTC  
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)  
 
 This document inventories all automated test files, test classes, and test functions
@@ -12,7 +12,7 @@ recorded only after confirmed execution.
 ## Test Suite Summary
 
 - **Total Test Files:** `10`
-- **Total Discovered Test Cases:** `64`
+- **Total Discovered Test Cases:** `66`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -23,7 +23,7 @@ recorded only after confirmed execution.
 | Test File | Test Cases | Status |
 |---|---|---|
 | `tests/test_backend_api.py` | 4 tests | `PASSING` |
-| `tests/test_config_loading.py` | 9 tests | `PASSING` |
+| `tests/test_config_loading.py` | 11 tests | `PASSING` |
 | `tests/test_config_validation.py` | 11 tests | `PASSING` |
 | `tests/test_doc_generator.py` | 20 tests | `PASSING` |
 | `tests/test_risk_engine.py` | 3 tests | `PASSING` |
@@ -45,7 +45,7 @@ recorded only after confirmed execution.
 - `test_unauthenticated_submission()`
 - `test_authenticated_submission_and_sync()`
 
-### `tests/test_config_loading.py` (9 tests)
+### `tests/test_config_loading.py` (11 tests)
 
 **Standalone Test Functions:**
 - `test_default_config_instantiation()`
@@ -57,6 +57,8 @@ recorded only after confirmed execution.
 - `test_dynamic_get_config_reload()`
 - `test_bounded_int_and_float_loader()`
 - `test_path_env_loader()`
+- `test_config_to_dict_redaction_and_structure()`
+- `test_config_to_dict_unmasked()`
 
 ### `tests/test_config_validation.py` (11 tests)
 

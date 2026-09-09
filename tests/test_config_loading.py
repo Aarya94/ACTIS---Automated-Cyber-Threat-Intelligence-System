@@ -186,3 +186,39 @@ def test_path_env_loader(monkeypatch, tmp_path):
     assert get_path("TEST_PATH_MISSING", must_exist=False) == (tmp_path / "nonexistent.bin").resolve()
     assert get_path("TEST_PATH_UNSET", default=None) is None
 
+def test_config_to_dict_redaction_and_structure():
+    """Verifies that to_dict(mask_secrets=True) safely redacts all secrets for logging."""
+    cfg = create_default_config()
+    cfg.apis.virustotal_api_key = "vt_real_secret_token_12345"
+    cfg.apis.abuseipdb_api_key = "abuse_real_secret_token_67890"
+    cfg.server.client_api_key = "server_real_secret_token_abcde"
+
+    masked = cfg.to_dict(mask_secrets=True)
+    assert isinstance(masked, dict)
+    assert masked["app_name"] == "ACTIS"
+
+    # Verify sensitive credentials are NOT leaked in plain text
+    assert "vt_real_secret_token_12345" not in str(masked)
+    assert "abuse_real_secret_token_67890" not in str(masked)
+    assert "server_real_secret_token_abcde" not in str(masked)
+
+    # Verify redaction placeholders are present
+    assert "vt****45" in masked["apis"]["virustotal_api_key"]
+    assert "ab****90" in masked["apis"]["abuseipdb_api_key"]
+    assert "se****de" in masked["server"]["client_api_key"]
+
+    # Verify paths are converted to strings for clean JSON serialization
+    assert isinstance(masked["database"]["db_path"], str)
+    assert isinstance(masked["models"]["phishing_model_path"], str)
+
+
+def test_config_to_dict_unmasked():
+    """Verifies that to_dict(mask_secrets=False) preserves full values for internal processes."""
+    cfg = create_default_config()
+    cfg.apis.virustotal_api_key = "vt_internal_key_99999"
+    cfg.server.client_api_key = "server_internal_key_88888"
+
+    unmasked = cfg.to_dict(mask_secrets=False)
+    assert unmasked["apis"]["virustotal_api_key"] == "vt_internal_key_99999"
+    assert unmasked["server"]["client_api_key"] == "server_internal_key_88888"
+

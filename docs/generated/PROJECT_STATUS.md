@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-09-09 12:32:24 UTC  
+**Generated:** 2026-09-09 12:32:56 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`7ae6a3e`)  
+**Current Git Branch:** `main` (`bceb00b`)  
 
 ---
 
@@ -111,19 +111,20 @@
 ## Test Status
 
 - **Total Test Files:** `10`
-- **Total Discovered Test Functions:** `64`
+- **Total Discovered Test Functions:** `66`
 - **Coverage Areas:** Configuration validation, SQLite database schema & CRUD, Phishing/Malware model contracts, PE feature extraction, API backend.
 
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `7ae6a3e`
+- **HEAD Commit:** `bceb00b`
 - **Working Tree:** 1 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `bceb00b` | ACTIS Bot | 2026-09-09 | test: add unit tests for extended configuration validation rules |
 | `7ae6a3e` | ACTIS Bot | 2026-09-09 | test: add unit tests for bounded environment variable loaders |
 | `c38f632` | ACTIS Bot | 2026-09-09 | test: add unit tests for environment profile path isolation |
 | `5bee8ca` | ACTIS Bot | 2026-09-09 | feat: implement dynamic get_config accessor with reload capability |
@@ -133,7 +134,6 @@
 | `951fb0c` | ACTIS Bot | 2026-09-09 | feat: implement bounded numeric and path parsing helpers in env_loader |
 | `36beb85` | ACTIS Bot | 2026-09-09 | feat: add environment profile handling with isolated test paths |
 | `5ff89e0` | ACTIS Bot | 2026-09-09 | feat: add gitbook-docs.yaml for GitBook Site Git Sync |
-| `ed2fcf3` | ACTIS Bot | 2026-09-09 | feat: configure GitBook documentation structure with table of contents and quickstart guide |
 
 ## Known Issues
 
