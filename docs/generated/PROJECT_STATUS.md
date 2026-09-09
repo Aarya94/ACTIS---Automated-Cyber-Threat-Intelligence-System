@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-09-09 14:39:39 UTC  
+**Generated:** 2026-09-09 14:40:14 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`39db203`)  
+**Current Git Branch:** `main` (`26d4b3d`)  
 
 ---
 
@@ -117,13 +117,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `39db203`
+- **HEAD Commit:** `26d4b3d`
 - **Working Tree:** 1 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `26d4b3d` | Aaryan Suman | 2026-09-09 | feat: implement feature matrix extraction and label binarization |
 | `39db203` | Aaryan Suman | 2026-09-09 | feat: implement dataset schema validation and integrity verification |
 | `0afd272` | Aaryan Suman | 2026-09-09 | feat: implement raw malware dataset loading with identifier isolation |
 | `1d0f2d6` | Aaryan Suman | 2026-09-09 | feat: define Windows PE malware dataset schema contract |
@@ -133,7 +134,6 @@
 | `bceb00b` | ACTIS Bot | 2026-09-09 | test: add unit tests for extended configuration validation rules |
 | `7ae6a3e` | ACTIS Bot | 2026-09-09 | test: add unit tests for bounded environment variable loaders |
 | `c38f632` | ACTIS Bot | 2026-09-09 | test: add unit tests for environment profile path isolation |
-| `5bee8ca` | ACTIS Bot | 2026-09-09 | feat: implement dynamic get_config accessor with reload capability |
 
 ## Known Issues
 
