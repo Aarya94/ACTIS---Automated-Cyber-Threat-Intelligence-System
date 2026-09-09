@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-09-09 14:40:54 UTC  
+**Generated:** 2026-09-09 14:41:25 UTC  
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)  
 
 This document inventories all automated test files, test classes, and test functions
@@ -11,8 +11,8 @@ recorded only after confirmed execution.
 
 ## Test Suite Summary
 
-- **Total Test Files:** `10`
-- **Total Discovered Test Cases:** `66`
+- **Total Test Files:** `11`
+- **Total Discovered Test Cases:** `74`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -26,6 +26,7 @@ recorded only after confirmed execution.
 | `tests/test_config_loading.py` | 11 tests | `PASSING` |
 | `tests/test_config_validation.py` | 11 tests | `PASSING` |
 | `tests/test_doc_generator.py` | 20 tests | `PASSING` |
+| `tests/test_malware_dataset.py` | 8 tests | `PASSING` |
 | `tests/test_risk_engine.py` | 3 tests | `PASSING` |
 | `tests/test_static_pe.py` | 3 tests | `PASSING` |
 | `tests/test_text_analyzer.py` | 3 tests | `PASSING` |
@@ -114,6 +115,18 @@ recorded only after confirmed execution.
 
 **Class `TestGeneratorCli`:**
 - `test_cli_check_mode()`
+
+### `tests/test_malware_dataset.py` (8 tests)
+
+**Class `TestMalwareDatasetSchemaContracts`:**
+- `test_schema_feature_columns_count()`
+- `test_schema_expected_feature_names()`
+- `test_schema_identifier_columns()`
+- `test_schema_label_conventions()`
+- `test_schema_all_expected_columns()`
+- `test_schema_validate_columns_success()`
+- `test_schema_validate_columns_missing_features()`
+- `test_schema_validate_columns_missing_label()`
 
 ### `tests/test_risk_engine.py` (3 tests)
 

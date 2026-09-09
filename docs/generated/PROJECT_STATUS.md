@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-09-09 14:40:54 UTC  
+**Generated:** 2026-09-09 14:41:25 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`a2ec5b3`)  
+**Current Git Branch:** `main` (`ef9c7ac`)  
 
 ---
 
@@ -110,20 +110,21 @@
 
 ## Test Status
 
-- **Total Test Files:** `10`
-- **Total Discovered Test Functions:** `66`
+- **Total Test Files:** `11`
+- **Total Discovered Test Functions:** `74`
 - **Coverage Areas:** Configuration validation, SQLite database schema & CRUD, Phishing/Malware model contracts, PE feature extraction, API backend.
 
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `a2ec5b3`
+- **HEAD Commit:** `ef9c7ac`
 - **Working Tree:** 1 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `ef9c7ac` | Aaryan Suman | 2026-09-09 | feat: implement class distribution and balance analysis |
 | `a2ec5b3` | Aaryan Suman | 2026-09-09 | feat: implement dataset quality inspection and diagnostic reporting |
 | `26d4b3d` | Aaryan Suman | 2026-09-09 | feat: implement feature matrix extraction and label binarization |
 | `39db203` | Aaryan Suman | 2026-09-09 | feat: implement dataset schema validation and integrity verification |
@@ -133,7 +134,6 @@
 | `38bd80a` | ACTIS Bot | 2026-09-09 | docs: update configuration guide and .env.example documentation |
 | `0d64bdb` | ACTIS Bot | 2026-09-09 | test: add unit tests for safe dictionary serialization and secret masking |
 | `bceb00b` | ACTIS Bot | 2026-09-09 | test: add unit tests for extended configuration validation rules |
-| `7ae6a3e` | ACTIS Bot | 2026-09-09 | test: add unit tests for bounded environment variable loaders |
 
 ## Known Issues
 
