@@ -84,3 +84,48 @@ def get_list(key: str, default: Optional[List[str]] = None, delimiter: str = ","
         return list(default)
     tokens = [t.strip() for t in val.split(delimiter) if t.strip()]
     return tokens if tokens else list(default)
+
+def get_int_bounded(
+    key: str,
+    default: int = 0,
+    min_val: Optional[int] = None,
+    max_val: Optional[int] = None,
+) -> int:
+    """Retrieves an integer environment variable, enforcing optional bounds."""
+    parsed = get_int(key, default)
+    if min_val is not None and parsed < min_val:
+        return default
+    if max_val is not None and parsed > max_val:
+        return default
+    return parsed
+
+
+def get_float_bounded(
+    key: str,
+    default: float = 0.0,
+    min_val: Optional[float] = None,
+    max_val: Optional[float] = None,
+) -> float:
+    """Retrieves a float environment variable, enforcing optional bounds."""
+    parsed = get_float(key, default)
+    if min_val is not None and parsed < min_val:
+        return default
+    if max_val is not None and parsed > max_val:
+        return default
+    return parsed
+
+
+def get_path(
+    key: str,
+    default: Optional[Path] = None,
+    must_exist: bool = False,
+) -> Optional[Path]:
+    """Retrieves a Path from an environment variable, expanding user home (~)."""
+    val = get_str(key, "")
+    if not val:
+        return default
+    p = Path(val).expanduser().resolve()
+    if must_exist and not p.exists():
+        return default
+    return p
+
