@@ -18,6 +18,7 @@
 ## ⚙️ Configuration & Contracts
 * [Configuration Guide](docs/configuration.md)
 * [Database & ML Contracts](docs/contracts.md)
+* [Windows PE Malware Dataset](docs/ml_malware_dataset.md)
 
 ## 📅 4-Month Development Roadmap
 * [Roadmap Overview](docs/roadmap/README.md)
