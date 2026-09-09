@@ -18,8 +18,11 @@ from config.paths import (
     LOGS_DIR,
     REPORTS_DIR,
     DATABASE_PATH,
+    TEST_DATABASE_PATH,
+    TEST_CENTRAL_BACKEND_DB,
     PathConfig,
 )
+from config.config import get_config
 from config.settings import (
     AppConfig,
     DatabaseConfig,
@@ -114,3 +117,36 @@ def test_secret_redaction_in_repr():
     srv_repr = repr(srv_cfg)
     assert "super_secret_client_token" not in srv_repr
     assert "su****en" in srv_repr
+
+def test_testing_profile_uses_isolated_test_paths():
+    """Verifies that the testing profile safely routes databases to isolated test files."""
+    test_cfg = create_default_config(environment="testing")
+    assert test_cfg.environment == "testing"
+    assert test_cfg.log_level == "WARNING"
+    assert test_cfg.database.db_path == TEST_DATABASE_PATH
+    assert test_cfg.database.backend_db_path == TEST_CENTRAL_BACKEND_DB
+    assert test_cfg.database.db_path != DATABASE_PATH
+
+
+def test_production_profile_configuration():
+    """Verifies that the production profile configures standard paths and INFO logging."""
+    prod_cfg = create_default_config(environment="production")
+    assert prod_cfg.environment == "production"
+    assert prod_cfg.log_level == "INFO"
+    assert prod_cfg.database.db_path == DATABASE_PATH
+
+
+def test_dynamic_get_config_reload():
+    """Verifies get_config singleton access and reload capability across environments."""
+    base_cfg = get_config()
+    assert base_cfg is not None
+
+    # Reload with testing environment profile
+    reloaded_cfg = get_config(reload=True, environment="testing")
+    assert reloaded_cfg.environment == "testing"
+    assert reloaded_cfg.database.db_path == TEST_DATABASE_PATH
+
+    # Reset back to default development
+    reset_cfg = get_config(reload=True, environment="development")
+    assert reset_cfg.environment == "development"
+
