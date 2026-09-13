@@ -1,3 +1,11 @@
+from scanners.pe_feature_contract import (
+    FileMetadata,
+    PEIdentifiers,
+    PEImportFeature,
+    PEMetadata,
+    PESectionFeature,
+    PEStaticFeatures,
+)
 """
 ACTIS Safe File Feature Extractor Module
 Performs non-destructive, read-only static analysis on files.
@@ -535,6 +543,9 @@ class FileFeatureExtractor:
             "entropy": 0.0,
             "sha256": "",
             "md5": "",
+            "sha1": "",
+            "pe_header_metadata": {},
+            "import_metadata": {},
             "pe_features": {},
             "ml_feature_vector": [],
             "sections": [],
@@ -547,8 +558,9 @@ class FileFeatureExtractor:
         # Calculate cryptographic hashes
         try:
             hashes = cls.calculate_hashes(path)
-            result["sha256"] = hashes["sha256"]
-            result["md5"] = hashes["md5"]
+            result["sha256"] = hashes.get("sha256", "")
+            result["md5"] = hashes.get("md5", "")
+            result["sha1"] = hashes.get("sha1", "")
         except Exception as e:
             result["warnings"].append(f"Hash calculation failed: {e}")
             return result
@@ -579,8 +591,18 @@ class FileFeatureExtractor:
             result["warnings"].append(f"PE parsing error: {e}")
             return result
 
-        # Extract PE Characteristics
+        # Extract PE Characteristics using modular extractors
         try:
+            header_meta = extract_pe_header_metadata(pe)
+            result["pe_header_metadata"] = header_meta
+
+            sec_features = extract_pe_section_features(pe)
+            result["sections"] = sec_features
+
+            imp_features = extract_pe_import_features(pe)
+            result["import_metadata"] = imp_features
+            result["imported_dlls"] = imp_features["imported_dlls"]
+            result["suspicious_apis_found"] = imp_features["suspicious_apis_found"]
             # 1. Machine
             machine = getattr(pe.FILE_HEADER, "Machine", 0)
 
@@ -716,3 +738,89 @@ class FileFeatureExtractor:
                 pass
 
         return result
+
+
+    @classmethod
+    def extract_structured_features(cls, file_path: Union[str, Path]) -> PEStaticFeatures:
+        """
+        Extracts PE features returning the strongly-typed PEStaticFeatures contract.
+        Safely separates identifiers from ML features.
+        """
+        res = cls.extract_features(file_path)
+
+        identifiers = PEIdentifiers(
+            path=res.get("file_path", ""),
+            filename=res.get("file_name", ""),
+            sha256=res.get("sha256", ""),
+            md5=res.get("md5", ""),
+            sha1=res.get("sha1", ""),
+        )
+
+        file_metadata = FileMetadata(
+            file_size=res.get("file_size", 0),
+            extension=res.get("extension", ""),
+            entropy=res.get("entropy", 0.0),
+            is_pe=res.get("is_pe", False),
+            is_valid=res.get("is_valid", False),
+        )
+
+        pe_meta = None
+        raw_pe_header = res.get("pe_header_metadata")
+        if raw_pe_header:
+            pe_meta = PEMetadata(
+                architecture=raw_pe_header.get("machine_name", "UNKNOWN"),
+                machine=raw_pe_header.get("machine", 0),
+                entry_point=raw_pe_header.get("entry_point", 0),
+                image_base=raw_pe_header.get("image_base", 0),
+                subsystem=raw_pe_header.get("subsystem", 0),
+                subsystem_name=raw_pe_header.get("subsystem_name", "UNKNOWN"),
+                number_of_sections=raw_pe_header.get("number_of_sections", 0),
+                major_linker_version=raw_pe_header.get("major_linker_version", 0),
+                minor_linker_version=raw_pe_header.get("minor_linker_version", 0),
+                major_operating_system_version=raw_pe_header.get("major_operating_system_version", 0),
+                major_image_version=raw_pe_header.get("major_image_version", 0),
+                dll_characteristics=raw_pe_header.get("dll_characteristics", 0),
+                size_of_stack_reserve=raw_pe_header.get("size_of_stack_reserve", 0),
+                time_date_stamp=raw_pe_header.get("time_date_stamp", 0),
+            )
+
+        sections: List[PESectionFeature] = []
+        for s in res.get("sections", []):
+            sections.append(
+                PESectionFeature(
+                    name=s.get("name", ""),
+                    virtual_address=s.get("virtual_address", 0),
+                    virtual_size=s.get("virtual_size", 0),
+                    raw_size=s.get("raw_size", 0),
+                    characteristics=s.get("characteristics", 0),
+                    entropy=s.get("entropy", 0.0),
+                    is_executable=s.get("is_executable", False),
+                    is_readable=s.get("is_readable", False),
+                    is_writable=s.get("is_writable", False),
+                    is_write_and_execute=s.get("is_write_and_execute", False),
+                    is_high_entropy=s.get("is_high_entropy", False),
+                )
+            )
+
+        imports_contract = None
+        raw_imports = res.get("import_metadata")
+        if raw_imports:
+            imports_contract = PEImportFeature(
+                imported_dll_count=raw_imports.get("imported_dll_count", 0),
+                imported_function_count=raw_imports.get("imported_function_count", 0),
+                imported_dlls=tuple(raw_imports.get("imported_dlls", [])),
+                imported_functions=tuple(raw_imports.get("imported_functions", [])),
+                suspicious_apis_found=tuple(raw_imports.get("suspicious_apis_found", [])),
+                suspicious_api_count=raw_imports.get("suspicious_api_count", 0),
+            )
+
+        return PEStaticFeatures(
+            identifiers=identifiers,
+            file_metadata=file_metadata,
+            pe_metadata=pe_meta,
+            sections=sections,
+            imports=imports_contract,
+            pe_features_15=res.get("pe_features", {}),
+            is_signed=res.get("is_signed", False),
+            warnings=res.get("warnings", []),
+        )
