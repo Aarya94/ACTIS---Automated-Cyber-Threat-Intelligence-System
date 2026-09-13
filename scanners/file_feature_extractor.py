@@ -356,6 +356,66 @@ def extract_pe_section_features(pe: pefile.PE) -> List[Dict[str, Any]]:
     return sections_list
 
 
+
+def extract_pe_import_features(pe: pefile.PE) -> Dict[str, Any]:
+    """
+    Safely extracts imported DLLs, function names, and matches suspicious threat APIs.
+
+    Parameters
+    ----------
+    pe : pefile.PE
+        Loaded pefile.PE instance.
+
+    Returns
+    -------
+    Dict[str, Any]
+        Dictionary containing imported DLL count, function count, lists of DLLs
+        and functions, and detected suspicious APIs.
+    """
+    imported_dlls: List[str] = []
+    imported_functions: List[str] = []
+    suspicious_apis: List[str] = []
+
+    if hasattr(pe, "DIRECTORY_ENTRY_IMPORT"):
+        for entry in pe.DIRECTORY_ENTRY_IMPORT:
+            try:
+                raw_dll = getattr(entry, "dll", b"")
+                if isinstance(raw_dll, bytes):
+                    dll_name = raw_dll.decode("utf-8", errors="ignore").strip("\x00").lower()
+                else:
+                    dll_name = str(raw_dll).strip("\x00").lower()
+
+                if dll_name and dll_name not in imported_dlls:
+                    imported_dlls.append(dll_name)
+
+                for imp in getattr(entry, "imports", []):
+                    func_name = ""
+                    raw_func = getattr(imp, "name", None)
+                    if raw_func and isinstance(raw_func, bytes):
+                        func_name = raw_func.decode("utf-8", errors="ignore").strip("\x00")
+                    elif raw_func:
+                        func_name = str(raw_func).strip("\x00")
+                    elif hasattr(imp, "ordinal") and imp.ordinal is not None:
+                        func_name = f"Ordinal_{imp.ordinal}"
+
+                    if func_name:
+                        imported_functions.append(func_name)
+                        if func_name in SUSPICIOUS_APIS and func_name not in suspicious_apis:
+                            suspicious_apis.append(func_name)
+
+            except Exception:
+                continue
+
+    return {
+        "imported_dll_count": len(imported_dlls),
+        "imported_function_count": len(imported_functions),
+        "imported_dlls": imported_dlls,
+        "imported_functions": imported_functions,
+        "suspicious_apis_found": suspicious_apis,
+        "suspicious_api_count": len(suspicious_apis),
+    }
+
+
 class FileFeatureExtractor:
     """Performs safe, read-only static analysis on local files."""
 
