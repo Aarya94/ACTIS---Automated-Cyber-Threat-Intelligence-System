@@ -284,6 +284,78 @@ def extract_pe_header_metadata(pe: pefile.PE) -> Dict[str, Any]:
     }
 
 
+
+# Section characteristics flags (WinNT.h)
+IMAGE_SCN_MEM_EXECUTE = 0x20000000
+IMAGE_SCN_MEM_READ = 0x40000000
+IMAGE_SCN_MEM_WRITE = 0x80000000
+IMAGE_SCN_CNT_CODE = 0x00000020
+IMAGE_SCN_CNT_INITIALIZED_DATA = 0x00000040
+IMAGE_SCN_CNT_UNINITIALIZED_DATA = 0x00000080
+
+
+def extract_pe_section_features(pe: pefile.PE) -> List[Dict[str, Any]]:
+    """
+    Extracts structural and entropy features for each section in a PE binary.
+
+    Parameters
+    ----------
+    pe : pefile.PE
+        Loaded pefile.PE instance.
+
+    Returns
+    -------
+    List[Dict[str, Any]]
+        List of section dictionaries containing name, virtual/raw sizes,
+        entropy, memory characteristics, and security heuristic flags.
+    """
+    sections_list: List[Dict[str, Any]] = []
+    sections = getattr(pe, "sections", [])
+
+    for sec in sections:
+        try:
+            raw_name = getattr(sec, "Name", b"")
+            if isinstance(raw_name, bytes):
+                sec_name = raw_name.decode("utf-8", errors="ignore").strip("\x00")
+            else:
+                sec_name = str(raw_name).strip("\x00")
+
+            virt_address = int(getattr(sec, "VirtualAddress", 0))
+            virt_size = int(getattr(sec, "Misc_VirtualSize", 0))
+            raw_size = int(getattr(sec, "SizeOfRawData", 0))
+            characteristics = int(getattr(sec, "Characteristics", 0))
+
+            # Calculate section entropy safely
+            try:
+                sec_entropy = round(float(sec.get_entropy()), 4)
+            except Exception:
+                sec_entropy = 0.0
+
+            is_exec = bool(characteristics & IMAGE_SCN_MEM_EXECUTE)
+            is_read = bool(characteristics & IMAGE_SCN_MEM_READ)
+            is_write = bool(characteristics & IMAGE_SCN_MEM_WRITE)
+            is_wx = is_exec and is_write
+            is_high_entropy = sec_entropy >= 7.0
+
+            sections_list.append({
+                "name": sec_name,
+                "virtual_address": virt_address,
+                "virtual_size": virt_size,
+                "raw_size": raw_size,
+                "characteristics": characteristics,
+                "entropy": sec_entropy,
+                "is_executable": is_exec,
+                "is_readable": is_read,
+                "is_writable": is_write,
+                "is_write_and_execute": is_wx,
+                "is_high_entropy": is_high_entropy,
+            })
+        except Exception:
+            continue
+
+    return sections_list
+
+
 class FileFeatureExtractor:
     """Performs safe, read-only static analysis on local files."""
 
