@@ -9,7 +9,111 @@ import math
 import re
 import hashlib
 from pathlib import Path
-from typing import Dict, Any, List, Optional, Sequence, Union
+import struct
+from typing import Dict, Any, List, Optional, Sequence, Tuple, Union
+
+
+# Standard DOS and PE magic signatures
+DOS_SIGNATURE = b"MZ"
+PE_SIGNATURE = b"PE\x00\x00"
+
+# Common Machine architecture mappings (IMAGE_FILE_HEADER.Machine)
+PE_MACHINE_MAP: Dict[int, str] = {
+    0x014C: "IMAGE_FILE_MACHINE_I386",     # Intel 386 / 32-bit x86
+    0x8664: "IMAGE_FILE_MACHINE_AMD64",    # AMD64 / 64-bit x86_64
+    0x0200: "IMAGE_FILE_MACHINE_IA64",     # Intel Itanium
+    0x01C0: "IMAGE_FILE_MACHINE_ARM",      # ARM little-endian
+    0xAA64: "IMAGE_FILE_MACHINE_ARM64",    # ARM64 little-endian
+}
+
+
+def is_pe_file(file_path: Union[str, Path]) -> bool:
+    """
+    Safely inspects file header magic bytes to verify if the file is a Windows PE executable.
+    
+    Reads only minimal bytes (DOS header and PE signature offset).
+    Never executes or invokes the file.
+
+    Parameters
+    ----------
+    file_path : Union[str, Path]
+        Path to the candidate file.
+
+    Returns
+    -------
+    bool
+        True if the file contains valid DOS (MZ) and PE headers, False otherwise.
+    """
+    is_pe, _ = detect_pe_format(file_path)
+    return is_pe
+
+
+def detect_pe_format(file_path: Union[str, Path]) -> Tuple[bool, Optional[str]]:
+    """
+    Inspects and classifies a Windows PE file using non-destructive byte verification.
+
+    Checks:
+    1. File existence and accessibility.
+    2. Minimum DOS header size (>= 64 bytes).
+    3. DOS magic signature (b"MZ" at offset 0).
+    4. e_lfanew offset validation (at offset 0x3C).
+    5. PE signature (b"PE\x00\x00" at e_lfanew).
+    6. Machine architecture indicator.
+
+    Parameters
+    ----------
+    file_path : Union[str, Path]
+        Path to the target file.
+
+    Returns
+    -------
+    Tuple[bool, Optional[str]]
+        (is_pe, format_description_or_rejection_reason)
+    """
+    path = Path(file_path)
+    if not path.is_file():
+        return False, "NON_EXISTENT_FILE"
+
+    try:
+        file_size = path.stat().st_size
+    except OSError as e:
+        return False, f"STAT_ERROR: {e}"
+
+    if file_size < 64:
+        return False, "TOO_SMALL_FOR_PE"
+
+    try:
+        with open(path, "rb") as f:
+            # Read first 64 bytes containing the DOS header
+            dos_header = f.read(64)
+            if len(dos_header) < 64 or not dos_header.startswith(DOS_SIGNATURE):
+                return False, "INVALID_DOS_SIGNATURE"
+
+            # Offset 0x3C is e_lfanew (4 bytes little-endian signed/unsigned offset to PE header)
+            pe_offset = struct.unpack("<I", dos_header[0x3C:0x40])[0]
+
+            # e_lfanew must be reasonably bounded within the file
+            if pe_offset < 64 or pe_offset + 4 > file_size:
+                return False, "INVALID_PE_OFFSET"
+
+            # Seek to PE signature
+            f.seek(pe_offset)
+            pe_sig = f.read(4)
+            if pe_sig != PE_SIGNATURE:
+                return False, "INVALID_PE_SIGNATURE"
+
+            # Read 2-byte Machine field from COFF File Header (immediately following PE\0\0)
+            machine_bytes = f.read(2)
+            machine_name = "UNKNOWN_ARCH"
+            if len(machine_bytes) == 2:
+                machine_val = struct.unpack("<H", machine_bytes)[0]
+                machine_name = PE_MACHINE_MAP.get(machine_val, f"ARCH_0x{machine_val:04X}")
+
+            return True, machine_name
+
+    except (OSError, struct.error) as e:
+        return False, f"READ_ERROR: {e}"
+
 
 from config.config import HASH_CHUNK_SIZE, MAX_FILE_SIZE_BYTES, get_logger
 
