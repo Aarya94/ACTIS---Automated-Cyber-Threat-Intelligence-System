@@ -202,6 +202,88 @@ def calculate_entropy(data: bytes) -> float:
     return round(entropy, 4)
 
 
+
+# Subsystem type mapping
+PE_SUBSYSTEM_MAP: Dict[int, str] = {
+    1: "IMAGE_SUBSYSTEM_NATIVE",
+    2: "IMAGE_SUBSYSTEM_WINDOWS_GUI",
+    3: "IMAGE_SUBSYSTEM_WINDOWS_CUI",
+    5: "IMAGE_SUBSYSTEM_OS2_CUI",
+    7: "IMAGE_SUBSYSTEM_POSIX_CUI",
+    9: "IMAGE_SUBSYSTEM_WINDOWS_CE_GUI",
+    10: "IMAGE_SUBSYSTEM_EFI_APPLICATION",
+    11: "IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER",
+    12: "IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER",
+    14: "IMAGE_SUBSYSTEM_XBOX",
+    16: "IMAGE_SUBSYSTEM_WINDOWS_BOOT_APPLICATION",
+}
+
+
+def extract_pe_header_metadata(pe: pefile.PE) -> Dict[str, Any]:
+    """
+    Extracts fundamental PE header and optional header metadata safely.
+
+    Parameters
+    ----------
+    pe : pefile.PE
+        Loaded pefile.PE instance.
+
+    Returns
+    -------
+    Dict[str, Any]
+        Dictionary containing extracted header fields with safe zero/None defaults.
+    """
+    file_header = getattr(pe, "FILE_HEADER", None)
+    optional_header = getattr(pe, "OPTIONAL_HEADER", None)
+
+    machine = getattr(file_header, "Machine", 0) if file_header else 0
+    machine_name = PE_MACHINE_MAP.get(machine, f"ARCH_0x{machine:04X}" if machine else "UNKNOWN")
+    num_sections = getattr(file_header, "NumberOfSections", 0) if file_header else 0
+    time_date_stamp = getattr(file_header, "TimeDateStamp", 0) if file_header else 0
+    file_characteristics = getattr(file_header, "Characteristics", 0) if file_header else 0
+
+    entry_point = getattr(optional_header, "AddressOfEntryPoint", 0) if optional_header else 0
+    image_base = getattr(optional_header, "ImageBase", 0) if optional_header else 0
+    subsystem_id = getattr(optional_header, "Subsystem", 0) if optional_header else 0
+    subsystem_name = PE_SUBSYSTEM_MAP.get(subsystem_id, f"SUBSYSTEM_0x{subsystem_id:04X}" if subsystem_id else "UNKNOWN")
+
+    major_linker = getattr(optional_header, "MajorLinkerVersion", 0) if optional_header else 0
+    minor_linker = getattr(optional_header, "MinorLinkerVersion", 0) if optional_header else 0
+    major_os = getattr(optional_header, "MajorOperatingSystemVersion", 0) if optional_header else 0
+    minor_os = getattr(optional_header, "MinorOperatingSystemVersion", 0) if optional_header else 0
+    major_image = getattr(optional_header, "MajorImageVersion", 0) if optional_header else 0
+    minor_image = getattr(optional_header, "MinorImageVersion", 0) if optional_header else 0
+
+    stack_reserve = getattr(optional_header, "SizeOfStackReserve", 0) if optional_header else 0
+    stack_commit = getattr(optional_header, "SizeOfStackCommit", 0) if optional_header else 0
+    heap_reserve = getattr(optional_header, "SizeOfHeapReserve", 0) if optional_header else 0
+    heap_commit = getattr(optional_header, "SizeOfHeapCommit", 0) if optional_header else 0
+    dll_char = getattr(optional_header, "DllCharacteristics", 0) if optional_header else 0
+
+    return {
+        "machine": int(machine),
+        "machine_name": machine_name,
+        "number_of_sections": int(num_sections),
+        "time_date_stamp": int(time_date_stamp),
+        "characteristics": int(file_characteristics),
+        "entry_point": int(entry_point),
+        "image_base": int(image_base),
+        "subsystem": int(subsystem_id),
+        "subsystem_name": subsystem_name,
+        "major_linker_version": int(major_linker),
+        "minor_linker_version": int(minor_linker),
+        "major_operating_system_version": int(major_os),
+        "minor_operating_system_version": int(minor_os),
+        "major_image_version": int(major_image),
+        "minor_image_version": int(minor_image),
+        "size_of_stack_reserve": int(stack_reserve),
+        "size_of_stack_commit": int(stack_commit),
+        "size_of_heap_reserve": int(heap_reserve),
+        "size_of_heap_commit": int(heap_commit),
+        "dll_characteristics": int(dll_char),
+    }
+
+
 class FileFeatureExtractor:
     """Performs safe, read-only static analysis on local files."""
 
