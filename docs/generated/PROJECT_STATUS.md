@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-09-13 20:58:35 UTC  
+**Generated:** 2026-09-13 21:01:11 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`4caed0e`)  
+**Current Git Branch:** `main` (`f24885e`)  
 
 ---
 
@@ -111,19 +111,20 @@
 ## Test Status
 
 - **Total Test Files:** `11`
-- **Total Discovered Test Functions:** `91`
+- **Total Discovered Test Functions:** `109`
 - **Coverage Areas:** Configuration validation, SQLite database schema & CRUD, Phishing/Malware model contracts, PE feature extraction, API backend.
 
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `4caed0e`
-- **Working Tree:** 1 untracked/unstaged changes
+- **HEAD Commit:** `f24885e`
+- **Working Tree:** 2 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `f24885e` | Aaryan Suman | 2026-09-14 | fix: harden PE analysis against malformed files |
 | `4caed0e` | Aaryan Suman | 2026-09-14 | feat: add structured PE feature contract |
 | `b6a4ed5` | Aaryan Suman | 2026-09-14 | feat: add PE entropy feature extraction |
 | `00e0392` | Aaryan Suman | 2026-09-14 | feat: add PE import feature extraction |
@@ -133,7 +134,6 @@
 | `5490a6d` | Aaryan Suman | 2026-09-14 | feat: add safe file hashing utilities |
 | `af738b2` | Aaryan Suman | 2026-09-09 | docs: record Day 3 development changelog and synchronize generated docs |
 | `54ec9c9` | Aaryan Suman | 2026-09-09 | docs: document Windows PE malware dataset and data preparation foundation |
-| `4177478` | Aaryan Suman | 2026-09-09 | test: add unit tests for feature preparation, quality inspection, and class balance |
 
 ## Known Issues
 

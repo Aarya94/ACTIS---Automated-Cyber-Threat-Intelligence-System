@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-09-13 20:58:35 UTC  
+**Generated:** 2026-09-13 21:01:11 UTC  
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)  
 
 This document inventories all automated test files, test classes, and test functions
@@ -12,7 +12,7 @@ recorded only after confirmed execution.
 ## Test Suite Summary
 
 - **Total Test Files:** `11`
-- **Total Discovered Test Cases:** `91`
+- **Total Discovered Test Cases:** `109`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -28,7 +28,7 @@ recorded only after confirmed execution.
 | `tests/test_doc_generator.py` | 20 tests | `PASSING` |
 | `tests/test_malware_dataset.py` | 25 tests | `PASSING` |
 | `tests/test_risk_engine.py` | 3 tests | `PASSING` |
-| `tests/test_static_pe.py` | 3 tests | `PASSING` |
+| `tests/test_static_pe.py` | 21 tests | `PASSING` |
 | `tests/test_text_analyzer.py` | 3 tests | `PASSING` |
 | `tests/test_threat_database.py` | 3 tests | `PASSING` |
 | `tests/test_url_scanner.py` | 4 tests | `PASSING` |
@@ -158,12 +158,42 @@ recorded only after confirmed execution.
 - `test_benign_low_risk()`
 - `test_combined_ml_and_heuristic_escalation()`
 
-### `tests/test_static_pe.py` (3 tests)
+### `tests/test_static_pe.py` (21 tests)
 
 **Standalone Test Functions:**
-- `test_entropy_calculation()`
-- `test_non_pe_static_analysis()`
 - `test_pe_static_analysis_notepad()`
+
+**Class `TestSafeFileHashing`:**
+- `test_calculate_file_hashes_success()`
+- `test_calculate_file_hashes_nonexistent_file()`
+- `test_calculate_file_hashes_unsupported_algo()`
+
+**Class `TestShannonEntropyCalculations`:**
+- `test_entropy_empty_data()`
+- `test_entropy_homogeneous_bytes()`
+- `test_entropy_uniform_distribution()`
+- `test_calculate_file_entropy()`
+- `test_calculate_file_entropy_empty()`
+- `test_analyze_pe_entropy_distribution()`
+
+**Class `TestWindowsPEFileDetection`:**
+- `test_detect_pe_synthetic_pe()`
+- `test_detect_pe_text_file()`
+- `test_detect_pe_random_binary()`
+- `test_detect_pe_truncated_pe()`
+
+**Class `TestPEMetadataAndSectionExtraction`:**
+- `test_synthetic_pe_extraction()`
+- `test_mocked_import_feature_extraction()`
+
+**Class `TestStructuredPEFeatureContract`:**
+- `test_structured_features_extraction()`
+
+**Class `TestMalformedAndEdgeCaseHandling`:**
+- `test_nonexistent_file()`
+- `test_empty_file()`
+- `test_corrupted_pe_signature()`
+- `test_directory_passed_as_file()`
 
 ### `tests/test_text_analyzer.py` (3 tests)
 

@@ -705,34 +705,7 @@ class FileFeatureExtractor:
             except Exception:
                 btc_count = 0
 
-            # 13. Section metadata
-            sections_list = []
-            for sec in pe.sections:
-                sec_name = sec.Name.decode("utf-8", errors="ignore").strip("\x00")
-                sec_entropy = sec.get_entropy()
-                sections_list.append({
-                    "name": sec_name,
-                    "virtual_size": sec.Misc_VirtualSize,
-                    "raw_size": sec.SizeOfRawData,
-                    "entropy": round(sec_entropy, 4)
-                })
-            result["sections"] = sections_list
-
-            # 14. Imports & Suspicious APIs
-            imported_dlls = []
-            suspicious_apis_found = []
-            if hasattr(pe, "DIRECTORY_ENTRY_IMPORT"):
-                for entry in pe.DIRECTORY_ENTRY_IMPORT:
-                    dll_name = entry.dll.decode("utf-8", errors="ignore").lower()
-                    imported_dlls.append(dll_name)
-                    for imp in entry.imports:
-                        if imp.name:
-                            func_name = imp.name.decode("utf-8", errors="ignore")
-                            if func_name in SUSPICIOUS_APIS:
-                                suspicious_apis_found.append(func_name)
-                                
-            result["imported_dlls"] = imported_dlls
-            result["suspicious_apis_found"] = list(set(suspicious_apis_found))
+            # Sections and Imports are extracted using extract_pe_section_features and extract_pe_import_features above.
 
             # Exact 15 features matching malware_dataset.csv
             pe_features = {
