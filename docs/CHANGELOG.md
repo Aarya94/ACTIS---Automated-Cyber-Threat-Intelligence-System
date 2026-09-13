@@ -12,6 +12,27 @@ Milestone Scope: Architecture planning, configuration management, logging infras
 
 ---
 
+### 2026-09-14 — Week 1 Day 5: Safe Windows PE Static File Analysis Foundation
+
+Implemented the safe, non-destructive, read-only Windows Portable Executable (PE) static analysis foundation. Built streaming multi-algorithm file hashing (SHA-256, MD5, SHA-1), fast pre-parser binary PE signature detection, core header metadata extraction, section metrics with W+X risk flagging, import table and threat API heuristics, Shannon entropy analysis, and the formal strongly-typed `PEStaticFeatures` feature contract cleanly separating threat-intelligence identifiers from ML features. Hardened against malformed/corrupted files and expanded automated test coverage to 109 passing unit tests.
+
+#### Commits
+
+| Commit | Type | Description | Files | Verification |
+|--------|------|-------------|-------|--------------|
+| `5490a6d` | feat | Add safe file hashing utilities | `scanners/file_feature_extractor.py` | Passed (91 tests) |
+| `2472bd7` | feat | Add Windows PE file detection | `scanners/file_feature_extractor.py` | Passed (91 tests) |
+| `0bc56ea` | feat | Add PE metadata extraction foundation | `scanners/file_feature_extractor.py` | Passed (91 tests) |
+| `75e6a83` | feat | Add PE section feature extraction | `scanners/file_feature_extractor.py` | Passed (91 tests) |
+| `00e0392` | feat | Add PE import feature extraction | `scanners/file_feature_extractor.py` | Passed (91 tests) |
+| `b6a4ed5` | feat | Add PE entropy feature extraction | `scanners/file_feature_extractor.py` | Passed (91 tests) |
+| `4caed0e` | feat | Add structured PE feature contract | `scanners/pe_feature_contract.py`, `scanners/file_feature_extractor.py` | Passed (91 tests) |
+| `f24885e` | fix | Harden PE analysis against malformed files | `scanners/file_feature_extractor.py` | Passed (91 tests) |
+| `9549fbe` | test | Add PE static analysis test suite | `tests/test_static_pe.py`, `scanners/file_feature_extractor.py` | Passed (109 tests) |
+| `ef285cd` | docs | Document ACTIS static file analysis workflow | `docs/static_pe_analysis.md`, `SUMMARY.md` | Passed (109 tests) |
+
+---
+
 ### 2026-09-09 — Week 1 Day 3: Windows PE Malware Dataset Inspection & Data Preparation Foundation
 
 Established the authentic data ingestion, schema validation, metadata identifier isolation, quality audit, and label normalization foundation for the Windows PE malware dataset (`data/malware_dataset.csv`, 62,485 samples, 15 PE structural features, 2 metadata identifiers, 1 label). Enforced zero data leakage, target binarization (`is_malware`), and added 25 automated unit tests (91 total suite tests).

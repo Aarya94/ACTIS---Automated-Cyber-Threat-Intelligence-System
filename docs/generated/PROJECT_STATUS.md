@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-09-13 21:02:18 UTC  
+**Generated:** 2026-09-13 21:03:52 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`9549fbe`)  
+**Current Git Branch:** `main` (`ef285cd`)  
 
 ---
 
@@ -117,13 +117,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `9549fbe`
-- **Working Tree:** 2 untracked/unstaged changes
+- **HEAD Commit:** `ef285cd`
+- **Working Tree:** 7 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `ef285cd` | Aaryan Suman | 2026-09-14 | docs: document ACTIS static file analysis workflow |
 | `9549fbe` | Aaryan Suman | 2026-09-14 | test: add PE static analysis test suite |
 | `f24885e` | Aaryan Suman | 2026-09-14 | fix: harden PE analysis against malformed files |
 | `4caed0e` | Aaryan Suman | 2026-09-14 | feat: add structured PE feature contract |
@@ -133,7 +134,6 @@
 | `0bc56ea` | Aaryan Suman | 2026-09-14 | feat: add PE metadata extraction foundation |
 | `2472bd7` | Aaryan Suman | 2026-09-14 | feat: add Windows PE file detection |
 | `5490a6d` | Aaryan Suman | 2026-09-14 | feat: add safe file hashing utilities |
-| `af738b2` | Aaryan Suman | 2026-09-09 | docs: record Day 3 development changelog and synchronize generated docs |
 
 ## Known Issues
 
