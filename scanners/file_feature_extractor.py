@@ -9,10 +9,60 @@ import math
 import re
 import hashlib
 from pathlib import Path
-from typing import Dict, Any, List, Optional
-import pefile
+from typing import Dict, Any, List, Optional, Sequence, Union
 
 from config.config import HASH_CHUNK_SIZE, MAX_FILE_SIZE_BYTES, get_logger
+
+
+def calculate_file_hashes(
+    file_path: Union[str, Path],
+    algorithms: Sequence[str] = ("sha256", "md5", "sha1"),
+    chunk_size: int = HASH_CHUNK_SIZE,
+) -> Dict[str, str]:
+    """
+    Calculates cryptographic hashes for a file using memory-efficient streaming.
+
+    Parameters
+    ----------
+    file_path : Union[str, Path]
+        Path to the target file.
+    algorithms : Sequence[str]
+        Hash algorithms to compute (defaults to sha256, md5, sha1).
+    chunk_size : int
+        Buffer chunk size for streaming reads.
+
+    Returns
+    -------
+    Dict[str, str]
+        Mapping of algorithm names to lowercase hex digest strings.
+
+    Raises
+    ------
+    FileNotFoundError
+        If file does not exist.
+    ValueError
+        If an unsupported hash algorithm is requested.
+    """
+    path = Path(file_path)
+    if not path.is_file():
+        raise FileNotFoundError(f"Target file does not exist: {path}")
+
+    hashers = {}
+    for algo in algorithms:
+        algo_lower = algo.lower()
+        if hasattr(hashlib, algo_lower):
+            hashers[algo_lower] = getattr(hashlib, algo_lower)()
+        else:
+            raise ValueError(f"Unsupported hash algorithm: {algo}")
+
+    with open(path, "rb") as f:
+        while chunk := f.read(chunk_size):
+            for h in hashers.values():
+                h.update(chunk)
+
+    return {algo: h.hexdigest().lower() for algo, h in hashers.items()}
+
+import pefile
 
 logger = get_logger("FileFeatureExtractor")
 
@@ -52,20 +102,9 @@ class FileFeatureExtractor:
     """Performs safe, read-only static analysis on local files."""
 
     @staticmethod
-    def calculate_hashes(file_path: Path) -> Dict[str, str]:
-        """Calculates SHA-256 and MD5 using memory-efficient streaming chunks."""
-        sha256 = hashlib.sha256()
-        md5 = hashlib.md5()
-        
-        with open(file_path, "rb") as f:
-            while chunk := f.read(HASH_CHUNK_SIZE):
-                sha256.update(chunk)
-                md5.update(chunk)
-                
-        return {
-            "sha256": sha256.hexdigest().lower(),
-            "md5": md5.hexdigest().lower()
-        }
+    def calculate_hashes(file_path: Union[str, Path]) -> Dict[str, str]:
+        """Calculates SHA-256, MD5, and SHA-1 using memory-efficient streaming chunks."""
+        return calculate_file_hashes(file_path, algorithms=("sha256", "md5", "sha1"))
 
     @classmethod
     def extract_features(cls, file_path: Path) -> Dict[str, Any]:
