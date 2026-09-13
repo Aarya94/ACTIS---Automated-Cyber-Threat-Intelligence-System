@@ -202,6 +202,93 @@ def calculate_entropy(data: bytes) -> float:
     return round(entropy, 4)
 
 
+# Alias for explicit Shannon entropy calculation
+calculate_shannon_entropy = calculate_entropy
+
+
+def calculate_file_entropy(
+    file_path: Union[str, Path],
+    max_sample_bytes: int = 4 * 1024 * 1024,
+) -> float:
+    """
+    Calculates Shannon entropy for a file safely by reading up to max_sample_bytes.
+
+    Parameters
+    ----------
+    file_path : Union[str, Path]
+        Path to the target file.
+    max_sample_bytes : int
+        Maximum bytes to read for entropy estimation (defaults to 4MB).
+
+    Returns
+    -------
+    float
+        Shannon entropy value between 0.0 and 8.0.
+    """
+    path = Path(file_path)
+    if not path.is_file():
+        return 0.0
+
+    try:
+        file_size = path.stat().st_size
+        if file_size == 0:
+            return 0.0
+
+        read_size = min(file_size, max_sample_bytes)
+        with open(path, "rb") as f:
+            sample_data = f.read(read_size)
+            return calculate_entropy(sample_data)
+    except OSError:
+        return 0.0
+
+
+def analyze_pe_entropy_distribution(
+    sections: List[Dict[str, Any]],
+    file_entropy: float,
+) -> Dict[str, Any]:
+    """
+    Analyzes entropy distribution across PE sections to evaluate packing/encryption signals.
+
+    Parameters
+    ----------
+    sections : List[Dict[str, Any]]
+        Extracted section dictionaries containing 'entropy' values.
+    file_entropy : float
+        Overall file entropy.
+
+    Returns
+    -------
+    Dict[str, Any]
+        Dictionary of entropy metrics including min, max, mean, and packing indicator.
+    """
+    if not sections:
+        return {
+            "file_entropy": file_entropy,
+            "section_entropy_mean": 0.0,
+            "section_entropy_max": 0.0,
+            "section_entropy_min": 0.0,
+            "high_entropy_section_count": 0,
+            "is_likely_packed": file_entropy >= 7.2,
+        }
+
+    entropies = [s.get("entropy", 0.0) for s in sections]
+    max_e = max(entropies) if entropies else 0.0
+    min_e = min(entropies) if entropies else 0.0
+    mean_e = round(sum(entropies) / len(entropies), 4) if entropies else 0.0
+    high_e_count = sum(1 for e in entropies if e >= 7.0)
+    is_packed = bool(file_entropy >= 7.2 or max_e >= 7.2)
+
+    return {
+        "file_entropy": file_entropy,
+        "section_entropy_mean": mean_e,
+        "section_entropy_max": round(max_e, 4),
+        "section_entropy_min": round(min_e, 4),
+        "high_entropy_section_count": high_e_count,
+        "is_likely_packed": is_packed,
+    }
+
+
+
 
 # Subsystem type mapping
 PE_SUBSYSTEM_MAP: Dict[int, str] = {

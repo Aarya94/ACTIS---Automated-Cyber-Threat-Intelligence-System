@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-09-13 20:56:07 UTC  
+**Generated:** 2026-09-13 20:56:47 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`75e6a83`)  
+**Current Git Branch:** `main` (`00e0392`)  
 
 ---
 
@@ -117,13 +117,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `75e6a83`
+- **HEAD Commit:** `00e0392`
 - **Working Tree:** 1 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `00e0392` | Aaryan Suman | 2026-09-14 | feat: add PE import feature extraction |
 | `75e6a83` | Aaryan Suman | 2026-09-14 | feat: add PE section feature extraction |
 | `0bc56ea` | Aaryan Suman | 2026-09-14 | feat: add PE metadata extraction foundation |
 | `2472bd7` | Aaryan Suman | 2026-09-14 | feat: add Windows PE file detection |
@@ -133,7 +134,6 @@
 | `4177478` | Aaryan Suman | 2026-09-09 | test: add unit tests for feature preparation, quality inspection, and class balance |
 | `92362fe` | Aaryan Suman | 2026-09-09 | test: add unit tests for schema validation and edge case errors |
 | `6e5b5b0` | Aaryan Suman | 2026-09-09 | test: add unit tests for dataset loading and identifier isolation |
-| `ffda49d` | Aaryan Suman | 2026-09-09 | test: add unit tests for malware dataset schema contracts |
 
 ## Known Issues
 
