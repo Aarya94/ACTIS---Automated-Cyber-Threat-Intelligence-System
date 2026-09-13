@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-09-13 20:57:57 UTC  
+**Generated:** 2026-09-13 20:58:35 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`b6a4ed5`)  
+**Current Git Branch:** `main` (`4caed0e`)  
 
 ---
 
@@ -117,13 +117,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `b6a4ed5`
-- **Working Tree:** 2 untracked/unstaged changes
+- **HEAD Commit:** `4caed0e`
+- **Working Tree:** 1 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `4caed0e` | Aaryan Suman | 2026-09-14 | feat: add structured PE feature contract |
 | `b6a4ed5` | Aaryan Suman | 2026-09-14 | feat: add PE entropy feature extraction |
 | `00e0392` | Aaryan Suman | 2026-09-14 | feat: add PE import feature extraction |
 | `75e6a83` | Aaryan Suman | 2026-09-14 | feat: add PE section feature extraction |
@@ -133,7 +134,6 @@
 | `af738b2` | Aaryan Suman | 2026-09-09 | docs: record Day 3 development changelog and synchronize generated docs |
 | `54ec9c9` | Aaryan Suman | 2026-09-09 | docs: document Windows PE malware dataset and data preparation foundation |
 | `4177478` | Aaryan Suman | 2026-09-09 | test: add unit tests for feature preparation, quality inspection, and class balance |
-| `92362fe` | Aaryan Suman | 2026-09-09 | test: add unit tests for schema validation and edge case errors |
 
 ## Known Issues
 

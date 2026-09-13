@@ -520,25 +520,21 @@ class FileFeatureExtractor:
         return calculate_file_hashes(file_path, algorithms=("sha256", "md5", "sha1"))
 
     @classmethod
-    def extract_features(cls, file_path: Path) -> Dict[str, Any]:
+    def extract_features(cls, file_path: Union[str, Path]) -> Dict[str, Any]:
         """
-        Extracts comprehensive static metadata and ML features.
+        Extracts comprehensive static metadata and ML features safely.
         Never executes the target file.
+        Hardened against nonexistent, empty, truncated, corrupted, and non-PE files.
         """
         path = Path(file_path)
-        if not path.exists():
-            return {"error": f"File does not exist: {path}", "is_valid": False}
 
-        file_size = path.stat().st_size
-        extension = path.suffix.lower()
-
-        # Basic metadata dictionary
+        # Basic metadata dictionary initialized with safe defaults
         result: Dict[str, Any] = {
-            "file_path": str(path.resolve()),
-            "file_name": path.name,
-            "extension": extension,
-            "file_size": file_size,
-            "is_valid": True,
+            "file_path": str(path),
+            "file_name": path.name if path.name else str(path),
+            "extension": path.suffix.lower() if path.suffix else "",
+            "file_size": 0,
+            "is_valid": False,
             "is_pe": False,
             "entropy": 0.0,
             "sha256": "",
@@ -554,6 +550,31 @@ class FileFeatureExtractor:
             "is_signed": False,
             "warnings": []
         }
+
+        # Validate path existence and file type
+        try:
+            if not path.exists():
+                result["error"] = f"File does not exist: {path.name}"
+                return result
+            if path.is_dir():
+                result["error"] = f"Path is a directory, not a regular file: {path.name}"
+                return result
+            stat_res = path.stat()
+            file_size = stat_res.st_size
+            result["file_size"] = file_size
+            result["file_path"] = str(path.resolve())
+            result["is_valid"] = True
+        except PermissionError:
+            result["error"] = f"Permission denied accessing target file: {path.name}"
+            return result
+        except OSError as e:
+            result["error"] = f"Filesystem error accessing target file: {e.__class__.__name__}"
+            return result
+
+        # Handle empty files safely
+        if file_size == 0:
+            result["warnings"].append("Target file is empty (0 bytes).")
+            return result
 
         # Calculate cryptographic hashes
         try:
@@ -578,17 +599,28 @@ class FileFeatureExtractor:
             result["warnings"].append(f"File exceeds maximum safe static analysis size ({MAX_FILE_SIZE_BYTES} bytes)")
             return result
 
+        # Pre-check binary format before invoking heavy parser
+        is_pe_candidate, pe_format_desc = detect_pe_format(path)
+        if not is_pe_candidate:
+            result["is_pe"] = False
+            return result
+
         # Attempt safe PE parsing
+        pe = None
         try:
             pe = pefile.PE(str(path), fast_load=True)
             result["is_pe"] = True
-            pe.parse_data_directories()
+            try:
+                pe.parse_data_directories()
+            except Exception as pe_dir_err:
+                result["warnings"].append(f"PE data directories partially malformed: {pe_dir_err.__class__.__name__}")
         except pefile.PEFormatError:
-            # File is legitimate non-PE file (PDF, TXT, JPG, etc.)
             result["is_pe"] = False
+            result["warnings"].append("File headers contain invalid PE formatting.")
             return result
         except Exception as e:
-            result["warnings"].append(f"PE parsing error: {e}")
+            result["is_pe"] = False
+            result["warnings"].append(f"PE parser exception: {e.__class__.__name__}")
             return result
 
         # Extract PE Characteristics using modular extractors
