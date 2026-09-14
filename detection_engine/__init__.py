@@ -11,6 +11,11 @@ from detection_engine.evidence_model import (
     EvidenceSignal,
     DetectionEvidence,
 )
+from detection_engine.ml_prediction_contract import (
+    MLModelType,
+    MLPredictionStatus,
+    MLPredictionResult,
+)
 
 __all__ = [
     "DetectionResult",
@@ -21,4 +26,7 @@ __all__ = [
     "EvidenceSeverity",
     "EvidenceSignal",
     "DetectionEvidence",
+    "MLModelType",
+    "MLPredictionStatus",
+    "MLPredictionResult",
 ]
