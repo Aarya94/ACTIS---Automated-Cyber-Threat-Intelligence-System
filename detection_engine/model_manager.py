@@ -2,11 +2,13 @@
 ACTIS Model Manager Module
 Coordinates machine learning model loading, schema validation, version verification,
 and safe inference for phishing URL and Windows PE malware models.
+Provides structured MLPredictionResult generation and feature contract validation.
 """
 
 import json
-from typing import Dict, Any, List, Optional, Union
+from typing import Dict, Any, List, Optional, Union, Tuple
 import numpy as np
+import pandas as pd
 import joblib
 
 from config.config import (
@@ -15,6 +17,11 @@ from config.config import (
     MALWARE_MODEL_PATH,
     MALWARE_METADATA_PATH,
     get_logger
+)
+from detection_engine.ml_prediction_contract import (
+    MLModelType,
+    MLPredictionStatus,
+    MLPredictionResult,
 )
 
 logger = get_logger("ModelManager")
@@ -35,9 +42,9 @@ class ModelManager:
         if getattr(self, "_initialized", False):
             return
         self.phishing_model = None
-        self.phishing_metadata = {}
+        self.phishing_metadata: Dict[str, Any] = {}
         self.malware_model = None
-        self.malware_metadata = {}
+        self.malware_metadata: Dict[str, Any] = {}
         self._load_models()
         self._initialized = True
 
@@ -77,104 +84,154 @@ class ModelManager:
         else:
             logger.warning(f"Malware model or metadata not found at {MALWARE_MODEL_PATH}")
 
+    # --------------------------------------------------------------------------
+    # Status & Feature Schema Accessors
+    # --------------------------------------------------------------------------
+
+    def is_phishing_model_available(self) -> bool:
+        """Returns True if phishing model is loaded and ready for inference."""
+        return self.phishing_model is not None
+
+    def is_malware_model_available(self) -> bool:
+        """Returns True if malware model is loaded and ready for inference."""
+        return self.malware_model is not None
+
     def get_phishing_feature_schema(self) -> List[str]:
-        """Returns the exact ordered feature list required by the phishing model."""
+        """Returns ordered list of feature names expected by the phishing model."""
         return self.phishing_metadata.get("features", [])
 
     def get_malware_feature_schema(self) -> List[str]:
-        """Returns the exact ordered feature list required by the malware model."""
+        """Returns ordered list of feature names expected by the malware model."""
         return self.malware_metadata.get("features", [])
 
-    def predict_phishing(self, features: Union[List[float], Dict[str, Any]]) -> Dict[str, Any]:
+    def get_phishing_features(self) -> List[str]:
+        """Alias for get_phishing_feature_schema."""
+        return self.get_phishing_feature_schema()
+
+    def get_malware_features(self) -> List[str]:
+        """Alias for get_malware_feature_schema."""
+        return self.get_malware_feature_schema()
+
+    def get_model_metadata(self, model_type: MLModelType) -> Dict[str, Any]:
+        """Returns complete metadata dictionary for the requested model type."""
+        if model_type == MLModelType.PHISHING_URL:
+            return dict(self.phishing_metadata)
+        elif model_type == MLModelType.WINDOWS_PE_MALWARE:
+            return dict(self.malware_metadata)
+        return {}
+
+    def validate_feature_vector(self, model_type: MLModelType, features: List[float]) -> Tuple[bool, Optional[str]]:
+        """Validates that a feature vector matches expected dimensions and value constraints."""
+        expected_features = (
+            self.get_phishing_feature_schema() if model_type == MLModelType.PHISHING_URL
+            else self.get_malware_feature_schema()
+        )
+        if not expected_features:
+            return True, None
+
+        if len(features) != len(expected_features):
+            return False, f"Expected {len(expected_features)} features, received {len(features)}."
+
+        if any(np.isnan(f) or np.isinf(f) for f in features):
+            return False, "Feature vector contains NaN or Infinite values."
+
+        return True, None
+
+    # --------------------------------------------------------------------------
+    # Structured Inference (Day 6 Contract)
+    # --------------------------------------------------------------------------
+
+    def predict_phishing_structured(self, features: Union[List[float], Dict[str, Any]]) -> MLPredictionResult:
         """
-        Executes inference for URL phishing.
-        Features can be a list in exact schema order or a feature dictionary.
+        Executes phishing model inference returning a strongly-typed MLPredictionResult.
         """
-        if self.phishing_model is None:
-            return {
-                "available": False,
-                "error": "Phishing ML model not loaded.",
-                "is_phishing": False,
-                "probability": 0.0,
-                "confidence": 0.0
-            }
-            
-        expected_features = self.get_phishing_feature_schema()
-        
+        model_name = self.phishing_metadata.get("model_name", "phishing_rf")
+        model_version = self.phishing_metadata.get("model_version", "1.0.0")
+
+        if not self.is_phishing_model_available():
+            return MLPredictionResult.unavailable(
+                model_name=model_name,
+                model_type=MLModelType.PHISHING_URL,
+                reason="Phishing model binary is not loaded or missing."
+            )
+
+        expected_cols = self.get_phishing_feature_schema()
         try:
-            # Prepare feature vector
             if isinstance(features, dict):
-                feature_vec = [float(features.get(f, 0)) for f in expected_features]
+                feature_vec = [float(features.get(f, 0)) for f in expected_cols]
             else:
-                if len(features) != len(expected_features):
-                    raise ValueError(
-                        f"Phishing feature length mismatch: expected {len(expected_features)}, got {len(features)}"
-                    )
                 feature_vec = [float(x) for x in features]
-                
-            import pandas as pd
-            X = pd.DataFrame([feature_vec], columns=expected_features)
+
+            valid, error_msg = self.validate_feature_vector(MLModelType.PHISHING_URL, feature_vec)
+            if not valid:
+                return MLPredictionResult(
+                    model_name=model_name,
+                    model_version=model_version,
+                    model_type=MLModelType.PHISHING_URL,
+                    status=MLPredictionStatus.SCHEMA_MISMATCH,
+                    error_message=error_msg
+                )
+
+            X = pd.DataFrame([feature_vec], columns=expected_cols)
             pred = int(self.phishing_model.predict(X)[0])
             
-            # Predict probabilities if supported
             if hasattr(self.phishing_model, "predict_proba"):
                 probs = self.phishing_model.predict_proba(X)[0]
                 prob_phishing = float(probs[1]) if len(probs) > 1 else float(probs[0])
             else:
                 prob_phishing = 1.0 if pred == 1 else 0.0
-                
-            is_phishing = bool(pred == 1)
-            confidence = prob_phishing if is_phishing else (1.0 - prob_phishing)
-            
-            return {
-                "available": True,
-                "model_name": self.phishing_metadata.get("model_name", "phishing_rf"),
-                "model_version": self.phishing_metadata.get("model_version", "1.0.0"),
-                "is_phishing": is_phishing,
-                "prediction": pred,
-                "probability": round(prob_phishing, 4),
-                "confidence": round(confidence, 4),
-                "label": "phishing" if is_phishing else "legitimate"
-            }
-            
-        except Exception as e:
-            logger.error(f"Error during phishing inference: {e}")
-            return {
-                "available": False,
-                "error": str(e),
-                "is_phishing": False,
-                "probability": 0.0,
-                "confidence": 0.0
-            }
 
-    def predict_malware(self, features: Union[List[float], Dict[str, Any]]) -> Dict[str, Any]:
+            is_threat = (pred == 1)
+            confidence = prob_phishing if is_threat else (1.0 - prob_phishing)
+            label = "phishing" if is_threat else "legitimate"
+
+            return MLPredictionResult(
+                model_name=model_name,
+                model_version=model_version,
+                model_type=MLModelType.PHISHING_URL,
+                status=MLPredictionStatus.AVAILABLE,
+                is_threat=is_threat,
+                probability=round(prob_phishing, 4),
+                confidence=round(confidence, 4),
+                prediction_label=label,
+                features_used=expected_cols
+            )
+        except Exception as e:
+            logger.error(f"Error executing phishing prediction: {e}")
+            return MLPredictionResult.from_error(model_name, MLModelType.PHISHING_URL, e)
+
+    def predict_malware_structured(self, features: Union[List[float], Dict[str, Any]]) -> MLPredictionResult:
         """
-        Executes inference for Windows PE malware.
-        Features can be a list in exact schema order or a feature dictionary.
+        Executes Windows PE malware model inference returning a strongly-typed MLPredictionResult.
         """
-        if self.malware_model is None:
-            return {
-                "available": False,
-                "error": "Windows PE Malware ML model not loaded.",
-                "is_malware": False,
-                "probability": 0.0,
-                "confidence": 0.0
-            }
-            
-        expected_features = self.get_malware_feature_schema()
-        
+        model_name = self.malware_metadata.get("model_name", "windows_pe_malware_rf")
+        model_version = self.malware_metadata.get("model_version", "1.0.0")
+
+        if not self.is_malware_model_available():
+            return MLPredictionResult.unavailable(
+                model_name=model_name,
+                model_type=MLModelType.WINDOWS_PE_MALWARE,
+                reason="Malware model binary is not loaded or missing."
+            )
+
+        expected_cols = self.get_malware_feature_schema()
         try:
             if isinstance(features, dict):
-                feature_vec = [float(features.get(f, 0)) for f in expected_features]
+                feature_vec = [float(features.get(f, 0)) for f in expected_cols]
             else:
-                if len(features) != len(expected_features):
-                    raise ValueError(
-                        f"Malware feature length mismatch: expected {len(expected_features)}, got {len(features)}"
-                    )
                 feature_vec = [float(x) for x in features]
-                
-            import pandas as pd
-            X = pd.DataFrame([feature_vec], columns=expected_features)
+
+            valid, error_msg = self.validate_feature_vector(MLModelType.WINDOWS_PE_MALWARE, feature_vec)
+            if not valid:
+                return MLPredictionResult(
+                    model_name=model_name,
+                    model_version=model_version,
+                    model_type=MLModelType.WINDOWS_PE_MALWARE,
+                    status=MLPredictionStatus.SCHEMA_MISMATCH,
+                    error_message=error_msg
+                )
+
+            X = pd.DataFrame([feature_vec], columns=expected_cols)
             pred = int(self.malware_model.predict(X)[0])
             
             if hasattr(self.malware_model, "predict_proba"):
@@ -182,30 +239,73 @@ class ModelManager:
                 prob_malware = float(probs[1]) if len(probs) > 1 else float(probs[0])
             else:
                 prob_malware = 1.0 if pred == 1 else 0.0
-                
-            is_malware = bool(pred == 1)
-            confidence = prob_malware if is_malware else (1.0 - prob_malware)
-            
-            return {
-                "available": True,
-                "model_name": self.malware_metadata.get("model_name", "windows_pe_malware_rf"),
-                "model_version": self.malware_metadata.get("model_version", "1.0.0"),
-                "is_malware": is_malware,
-                "prediction": pred,
-                "probability": round(prob_malware, 4),
-                "confidence": round(confidence, 4),
-                "label": "malicious" if is_malware else "benign"
-            }
-            
+
+            is_threat = (pred == 1)
+            confidence = prob_malware if is_threat else (1.0 - prob_malware)
+            label = "malicious" if is_threat else "benign"
+
+            return MLPredictionResult(
+                model_name=model_name,
+                model_version=model_version,
+                model_type=MLModelType.WINDOWS_PE_MALWARE,
+                status=MLPredictionStatus.AVAILABLE,
+                is_threat=is_threat,
+                probability=round(prob_malware, 4),
+                confidence=round(confidence, 4),
+                prediction_label=label,
+                features_used=expected_cols
+            )
         except Exception as e:
-            logger.error(f"Error during Windows PE malware inference: {e}")
+            logger.error(f"Error executing malware prediction: {e}")
+            return MLPredictionResult.from_error(model_name, MLModelType.WINDOWS_PE_MALWARE, e)
+
+    # --------------------------------------------------------------------------
+    # Legacy Compatibility Methods
+    # --------------------------------------------------------------------------
+
+    def predict_phishing(self, features: Union[List[float], Dict[str, Any]]) -> Dict[str, Any]:
+        """Legacy dict-based phishing prediction."""
+        res = self.predict_phishing_structured(features)
+        if res.status != MLPredictionStatus.AVAILABLE:
             return {
                 "available": False,
-                "error": str(e),
+                "error": res.error_message or "Phishing ML model not loaded.",
+                "is_phishing": False,
+                "probability": 0.0,
+                "confidence": 0.0
+            }
+        return {
+            "available": True,
+            "model_name": res.model_name,
+            "model_version": res.model_version,
+            "is_phishing": res.is_threat,
+            "prediction": 1 if res.is_threat else 0,
+            "probability": res.probability,
+            "confidence": res.confidence,
+            "label": res.prediction_label
+        }
+
+    def predict_malware(self, features: Union[List[float], Dict[str, Any]]) -> Dict[str, Any]:
+        """Legacy dict-based malware prediction."""
+        res = self.predict_malware_structured(features)
+        if res.status != MLPredictionStatus.AVAILABLE:
+            return {
+                "available": False,
+                "error": res.error_message or "Windows PE Malware ML model not loaded.",
                 "is_malware": False,
                 "probability": 0.0,
                 "confidence": 0.0
             }
+        return {
+            "available": True,
+            "model_name": res.model_name,
+            "model_version": res.model_version,
+            "is_malware": res.is_threat,
+            "prediction": 1 if res.is_threat else 0,
+            "probability": res.probability,
+            "confidence": res.confidence,
+            "label": res.prediction_label
+        }
 
 
 # Global singleton instance

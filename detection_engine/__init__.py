@@ -42,6 +42,10 @@ from detection_engine.explanation_generator import (
     ConfidenceEngine,
     ExplanationGenerator,
 )
+from detection_engine.model_manager import (
+    ModelManager,
+    model_manager,
+)
 
 __all__ = [
     "DetectionResult",
@@ -73,4 +77,6 @@ __all__ = [
     "RiskClassifier",
     "ConfidenceEngine",
     "ExplanationGenerator",
+    "ModelManager",
+    "model_manager",
 ]
