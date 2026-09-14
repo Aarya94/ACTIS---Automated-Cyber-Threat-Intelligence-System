@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-09-14 17:57:13 UTC  
+**Generated:** 2026-09-14 18:02:44 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`56307dd`)  
+**Current Git Branch:** `main` (`e1e3821`)  
 
 ---
 
@@ -117,13 +117,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `56307dd`
+- **HEAD Commit:** `e1e3821`
 - **Working Tree:** 2 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `e1e3821` | Aaryan Suman | 2026-09-14 | test: add risk engine edge case coverage |
 | `56307dd` | Aaryan Suman | 2026-09-14 | test: add detection engine validation suite |
 | `93aff4d` | Aaryan Suman | 2026-09-14 | feat: implement unified detection decision engine |
 | `bb84daa` | Aaryan Suman | 2026-09-14 | feat: add model manager abstraction interface |
@@ -133,7 +134,6 @@
 | `8372c3f` | Aaryan Suman | 2026-09-14 | feat: add threat intelligence evidence contract |
 | `ad3c831` | Aaryan Suman | 2026-09-14 | feat: add rule evaluation result contract |
 | `4b1b29f` | Aaryan Suman | 2026-09-14 | feat: add ML prediction result contract |
-| `7ce0550` | Aaryan Suman | 2026-09-14 | feat: add structured detection evidence model |
 
 ## Known Issues
 

@@ -20,6 +20,7 @@
 * [Database & ML Contracts](docs/contracts.md)
 * [Windows PE Malware Dataset](docs/ml_malware_dataset.md)
 * [Safe Static PE Analysis](docs/static_pe_analysis.md)
+* [Detection Engine & Decision Fusion](docs/detection_engine_workflow.md)
 
 ## 📅 4-Month Development Roadmap
 * [Roadmap Overview](docs/roadmap/README.md)
