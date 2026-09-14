@@ -1,6 +1,6 @@
 # ACTIS Database Reference
 
-**Generated:** 2026-09-14 17:33:19 UTC  
+**Generated:** 2026-09-14 17:36:15 UTC  
 **Source of Truth:** DDL Schema Analysis (`reports/threat_database.py`)  
 
 This document describes the relational database persistence subsystem for ACTIS.

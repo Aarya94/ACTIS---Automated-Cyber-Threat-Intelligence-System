@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-09-14 17:33:19 UTC  
+**Generated:** 2026-09-14 17:36:15 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`8372c3f`)  
+**Current Git Branch:** `main` (`2065654`)  
 
 ---
 
@@ -117,13 +117,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `8372c3f`
+- **HEAD Commit:** `2065654`
 - **Working Tree:** 2 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `2065654` | Aaryan Suman | 2026-09-14 | feat: implement deterministic risk scoring engine |
 | `8372c3f` | Aaryan Suman | 2026-09-14 | feat: add threat intelligence evidence contract |
 | `ad3c831` | Aaryan Suman | 2026-09-14 | feat: add rule evaluation result contract |
 | `4b1b29f` | Aaryan Suman | 2026-09-14 | feat: add ML prediction result contract |
@@ -133,7 +134,6 @@
 | `ef285cd` | Aaryan Suman | 2026-09-14 | docs: document ACTIS static file analysis workflow |
 | `9549fbe` | Aaryan Suman | 2026-09-14 | test: add PE static analysis test suite |
 | `f24885e` | Aaryan Suman | 2026-09-14 | fix: harden PE analysis against malformed files |
-| `4caed0e` | Aaryan Suman | 2026-09-14 | feat: add structured PE feature contract |
 
 ## Known Issues
 

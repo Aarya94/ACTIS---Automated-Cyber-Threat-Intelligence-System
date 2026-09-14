@@ -35,6 +35,8 @@ from detection_engine.risk_engine import (
     RiskScoringWeights,
     ScoreBreakdown,
     RiskScoringEngine,
+    RiskThresholdConfig,
+    RiskClassifier,
 )
 
 __all__ = [
@@ -63,4 +65,6 @@ __all__ = [
     "RiskScoringWeights",
     "ScoreBreakdown",
     "RiskScoringEngine",
+    "RiskThresholdConfig",
+    "RiskClassifier",
 ]

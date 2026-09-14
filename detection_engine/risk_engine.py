@@ -348,3 +348,113 @@ class RiskEngine:
                 "is_known_malicious": is_known_malicious
             }
         }
+
+
+from detection_engine.detection_contract import RiskLevel, DetectionStatus
+
+
+@dataclass(frozen=True)
+class RiskThresholdConfig:
+    """Configurable boundaries for risk tier classification."""
+    informational_max: float = 20.0
+    low_max: float = 35.0
+    medium_max: float = 70.0
+    high_max: float = 85.0
+    critical_min: float = 85.0
+
+    def validate(self) -> None:
+        if not (0.0 <= self.informational_max <= self.low_max <= self.medium_max <= self.high_max <= 100.0):
+            raise ValueError("Thresholds must be strictly monotonic non-decreasing between 0.0 and 100.0.")
+
+
+class RiskClassifier:
+    """
+    Deterministic risk classification engine with safety overrides.
+    Maps continuous numeric scores (0-100) to standard RiskLevel and DetectionStatus tiers.
+    """
+
+    DEFAULT_THRESHOLDS = RiskThresholdConfig(
+        informational_max=20.0,
+        low_max=float(RISK_MEDIUM_THRESHOLD),
+        medium_max=float(RISK_HIGH_THRESHOLD),
+        high_max=float(RISK_CRITICAL_THRESHOLD),
+        critical_min=float(RISK_CRITICAL_THRESHOLD)
+    )
+
+    RECOMMENDED_ACTIONS = {
+        RiskLevel.CRITICAL: (
+            "CRITICAL THREAT DETECTED: Immediate containment required. Do not execute or open this target. "
+            "Isolate the host or remove the malicious artifact immediately."
+        ),
+        RiskLevel.HIGH: (
+            "HIGH RISK DETECTED: Strong malicious indicators present. Do not execute or supply credentials. "
+            "Manual security analyst verification strongly recommended."
+        ),
+        RiskLevel.MEDIUM: (
+            "SUSPICIOUS ACTIVITY: Target exhibits anomalous or potentially deceptive characteristics. "
+            "Exercise caution and independently verify the source."
+        ),
+        RiskLevel.LOW: (
+            "LOW RISK: Minor or routine security indicators observed. "
+            "Standard operational security hygiene applies."
+        ),
+        RiskLevel.INFORMATIONAL: (
+            "BENIGN / INFORMATIONAL: No malicious indicators detected. Target conforms to expected safe profiles."
+        )
+    }
+
+    @classmethod
+    def classify(
+        cls,
+        score: float,
+        is_confirmed_threat: bool = False,
+        is_whitelisted: bool = False,
+        has_critical_evidence: bool = False,
+        thresholds: Optional[RiskThresholdConfig] = None
+    ) -> Tuple[RiskLevel, DetectionStatus, str]:
+        """
+        Classifies risk score into standardized tiers with deterministic security overrides.
+        Returns (RiskLevel, DetectionStatus, recommended_action).
+        """
+        cfg = thresholds or cls.DEFAULT_THRESHOLDS
+
+        # Override 1: Verified Whitelist / False Positive
+        if is_whitelisted:
+            level = RiskLevel.INFORMATIONAL
+            status = DetectionStatus.BENIGN
+            action = "Target is verified as a trusted whitelist entity or confirmed false positive."
+            return level, status, action
+
+        # Override 2: Confirmed Malicious Threat Intelligence
+        if is_confirmed_threat:
+            level = RiskLevel.CRITICAL
+            status = DetectionStatus.MALICIOUS
+            action = cls.RECOMMENDED_ACTIONS[RiskLevel.CRITICAL]
+            return level, status, action
+
+        # Override 3: Critical Evidence Escalation
+        if has_critical_evidence and score >= cfg.low_max:
+            level = RiskLevel.CRITICAL
+            status = DetectionStatus.MALICIOUS
+            action = cls.RECOMMENDED_ACTIONS[RiskLevel.CRITICAL]
+            return level, status, action
+
+        # Continuous Threshold Mapping
+        if score >= cfg.critical_min:
+            level = RiskLevel.CRITICAL
+            status = DetectionStatus.MALICIOUS
+        elif score >= cfg.medium_max:
+            level = RiskLevel.HIGH
+            status = DetectionStatus.MALICIOUS
+        elif score >= cfg.low_max:
+            level = RiskLevel.MEDIUM
+            status = DetectionStatus.SUSPICIOUS
+        elif score >= cfg.informational_max:
+            level = RiskLevel.LOW
+            status = DetectionStatus.BENIGN
+        else:
+            level = RiskLevel.INFORMATIONAL
+            status = DetectionStatus.BENIGN
+
+        action = cls.RECOMMENDED_ACTIONS[level]
+        return level, status, action
