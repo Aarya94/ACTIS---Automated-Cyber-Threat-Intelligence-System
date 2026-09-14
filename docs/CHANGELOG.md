@@ -12,6 +12,30 @@ Milestone Scope: Architecture planning, configuration management, logging infras
 
 ---
 
+### 2026-09-14 — Week 1 Day 6: Detection Engine & ML Model Integration Foundation
+
+Implemented the central analytical intelligence layer of ACTIS, establishing the structured detection decision pipeline, heterogeneous evidence models, ML prediction contracts, rule evaluation results, threat intelligence evidence representations, deterministic mathematical risk scoring with dynamic active-layer normalization, five-tier risk classification with safety overrides, internal decision confidence calculation, grounded explanation generation, and model manager integration. Expanded automated test suite to 128 passing unit tests (100% pass rate).
+
+#### Commits
+
+| Commit | Type | Description | Files | Verification |
+|--------|------|-------------|-------|--------------|
+| `c2b046e` | feat | Add detection result contract | `detection_engine/detection_contract.py`, `detection_engine/__init__.py` | Passed (109 tests) |
+| `7ce0550` | feat | Add structured detection evidence model | `detection_engine/evidence_model.py`, `detection_engine/__init__.py` | Passed (109 tests) |
+| `4b1b29f` | feat | Add ML prediction result contract | `detection_engine/ml_prediction_contract.py`, `detection_engine/__init__.py` | Passed (109 tests) |
+| `ad3c831` | feat | Add rule evaluation result contract | `detection_engine/rule_engine.py`, `detection_engine/__init__.py` | Passed (109 tests) |
+| `8372c3f` | feat | Add threat intelligence evidence contract | `detection_engine/threat_intel_contract.py`, `detection_engine/__init__.py` | Passed (109 tests) |
+| `2065654` | feat | Implement deterministic risk scoring engine | `detection_engine/risk_engine.py`, `detection_engine/__init__.py` | Passed (109 tests) |
+| `f9482ae` | feat | Add risk classification thresholds and override logic | `detection_engine/risk_engine.py`, `detection_engine/__init__.py` | Passed (109 tests) |
+| `ef7d2e2` | feat | Add detection explanation and confidence calculation | `detection_engine/explanation_generator.py`, `detection_engine/__init__.py` | Passed (109 tests) |
+| `bb84daa` | feat | Add model manager abstraction interface | `detection_engine/model_manager.py`, `detection_engine/__init__.py` | Passed (109 tests) |
+| `93aff4d` | feat | Implement unified detection decision engine | `detection_engine/decision_engine.py`, `detection_engine/__init__.py` | Passed (109 tests) |
+| `56307dd` | test | Add detection engine validation suite | `tests/test_detection_engine.py` | Passed (120 tests) |
+| `e1e3821` | test | Add risk engine edge case coverage | `tests/test_risk_engine_day6.py`, `detection_engine/risk_engine.py` | Passed (128 tests) |
+| `bfbb6ee` | docs | Document detection engine workflow | `docs/detection_engine_workflow.md`, `SUMMARY.md` | Passed (128 tests) |
+
+---
+
 ### 2026-09-14 — Week 1 Day 5: Safe Windows PE Static File Analysis Foundation
 
 Implemented the safe, non-destructive, read-only Windows Portable Executable (PE) static analysis foundation. Built streaming multi-algorithm file hashing (SHA-256, MD5, SHA-1), fast pre-parser binary PE signature detection, core header metadata extraction, section metrics with W+X risk flagging, import table and threat API heuristics, Shannon entropy analysis, and the formal strongly-typed `PEStaticFeatures` feature contract cleanly separating threat-intelligence identifiers from ML features. Hardened against malformed/corrupted files and expanded automated test coverage to 109 passing unit tests.
