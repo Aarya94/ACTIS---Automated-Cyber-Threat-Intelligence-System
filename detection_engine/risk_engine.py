@@ -177,8 +177,10 @@ class RiskScoringEngine:
             mitigation_adj = 0.0
             reputation_signals = evidence.get_signals_by_source(EvidenceSource.REPUTATION) + evidence.get_signals_by_source(EvidenceSource.USER_OVERRIDE)
             for rep in reputation_signals:
-                if rep.score_contribution < 0:
-                    mitigation_adj += abs(rep.score_contribution)
+                if rep.severity in (EvidenceSeverity.INFO, EvidenceSeverity.LOW) and rep.score_contribution > 0:
+                    mitigation_adj += rep.score_contribution
+                elif rep.raw_data and "mitigation_score" in rep.raw_data:
+                    mitigation_adj += float(rep.raw_data["mitigation_score"])
 
             final_score = max(0.0, min(100.0, raw_composite - mitigation_adj))
 

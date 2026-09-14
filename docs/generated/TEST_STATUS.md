@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-09-14 17:52:37 UTC  
+**Generated:** 2026-09-14 17:57:13 UTC  
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)  
 
 This document inventories all automated test files, test classes, and test functions
@@ -11,8 +11,8 @@ recorded only after confirmed execution.
 
 ## Test Suite Summary
 
-- **Total Test Files:** `12`
-- **Total Discovered Test Cases:** `120`
+- **Total Test Files:** `13`
+- **Total Discovered Test Cases:** `128`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -29,6 +29,7 @@ recorded only after confirmed execution.
 | `tests/test_doc_generator.py` | 20 tests | `PASSING` |
 | `tests/test_malware_dataset.py` | 25 tests | `PASSING` |
 | `tests/test_risk_engine.py` | 3 tests | `PASSING` |
+| `tests/test_risk_engine_day6.py` | 8 tests | `PASSING` |
 | `tests/test_static_pe.py` | 21 tests | `PASSING` |
 | `tests/test_text_analyzer.py` | 3 tests | `PASSING` |
 | `tests/test_threat_database.py` | 3 tests | `PASSING` |
@@ -179,6 +180,20 @@ recorded only after confirmed execution.
 - `test_confirmed_threat_fast_track()`
 - `test_benign_low_risk()`
 - `test_combined_ml_and_heuristic_escalation()`
+
+### `tests/test_risk_engine_day6.py` (8 tests)
+
+**Class `TestRiskScoringEdgeCases`:**
+- `test_zero_signals_scoring()`
+- `test_single_active_layer_dynamic_renormalization()`
+- `test_custom_weights_and_zero_weight_layers()`
+- `test_reputation_mitigation_subtraction()`
+
+**Class `TestRiskClassificationThresholdBoundaries`:**
+- `test_exact_threshold_transitions()`
+- `test_whitelist_safety_override()`
+- `test_confirmed_threat_override()`
+- `test_deterministic_repeatability()`
 
 ### `tests/test_static_pe.py` (21 tests)
 

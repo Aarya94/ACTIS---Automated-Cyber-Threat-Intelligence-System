@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-09-14 17:52:37 UTC  
+**Generated:** 2026-09-14 17:57:13 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`93aff4d`)  
+**Current Git Branch:** `main` (`56307dd`)  
 
 ---
 
@@ -110,20 +110,21 @@
 
 ## Test Status
 
-- **Total Test Files:** `12`
-- **Total Discovered Test Functions:** `120`
+- **Total Test Files:** `13`
+- **Total Discovered Test Functions:** `128`
 - **Coverage Areas:** Configuration validation, SQLite database schema & CRUD, Phishing/Malware model contracts, PE feature extraction, API backend.
 
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `93aff4d`
-- **Working Tree:** 1 untracked/unstaged changes
+- **HEAD Commit:** `56307dd`
+- **Working Tree:** 2 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `56307dd` | Aaryan Suman | 2026-09-14 | test: add detection engine validation suite |
 | `93aff4d` | Aaryan Suman | 2026-09-14 | feat: implement unified detection decision engine |
 | `bb84daa` | Aaryan Suman | 2026-09-14 | feat: add model manager abstraction interface |
 | `ef7d2e2` | Aaryan Suman | 2026-09-14 | feat: add detection explanation and confidence calculation |
@@ -133,7 +134,6 @@
 | `ad3c831` | Aaryan Suman | 2026-09-14 | feat: add rule evaluation result contract |
 | `4b1b29f` | Aaryan Suman | 2026-09-14 | feat: add ML prediction result contract |
 | `7ce0550` | Aaryan Suman | 2026-09-14 | feat: add structured detection evidence model |
-| `c2b046e` | Aaryan Suman | 2026-09-14 | feat: add detection result contract |
 
 ## Known Issues
 
