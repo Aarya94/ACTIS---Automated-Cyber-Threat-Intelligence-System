@@ -25,6 +25,11 @@ from detection_engine.rule_engine import (
     RuleDefinition,
     GenericRuleRegistry,
 )
+from detection_engine.threat_intel_contract import (
+    ThreatIntelVerdict,
+    IndicatorType,
+    ThreatIntelEvidence,
+)
 
 __all__ = [
     "DetectionResult",
@@ -45,4 +50,7 @@ __all__ = [
     "RuleEvaluationResult",
     "RuleDefinition",
     "GenericRuleRegistry",
+    "ThreatIntelVerdict",
+    "IndicatorType",
+    "ThreatIntelEvidence",
 ]

@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-09-14 17:24:34 UTC  
+**Generated:** 2026-09-14 17:27:23 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`4b1b29f`)  
+**Current Git Branch:** `main` (`ad3c831`)  
 
 ---
 
@@ -117,13 +117,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `4b1b29f`
+- **HEAD Commit:** `ad3c831`
 - **Working Tree:** 2 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `ad3c831` | Aaryan Suman | 2026-09-14 | feat: add rule evaluation result contract |
 | `4b1b29f` | Aaryan Suman | 2026-09-14 | feat: add ML prediction result contract |
 | `7ce0550` | Aaryan Suman | 2026-09-14 | feat: add structured detection evidence model |
 | `c2b046e` | Aaryan Suman | 2026-09-14 | feat: add detection result contract |
@@ -133,7 +134,6 @@
 | `f24885e` | Aaryan Suman | 2026-09-14 | fix: harden PE analysis against malformed files |
 | `4caed0e` | Aaryan Suman | 2026-09-14 | feat: add structured PE feature contract |
 | `b6a4ed5` | Aaryan Suman | 2026-09-14 | feat: add PE entropy feature extraction |
-| `00e0392` | Aaryan Suman | 2026-09-14 | feat: add PE import feature extraction |
 
 ## Known Issues
 
