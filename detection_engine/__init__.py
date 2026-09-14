@@ -46,6 +46,7 @@ from detection_engine.model_manager import (
     ModelManager,
     model_manager,
 )
+from detection_engine.decision_engine import DetectionDecisionEngine
 
 __all__ = [
     "DetectionResult",
@@ -79,4 +80,5 @@ __all__ = [
     "ExplanationGenerator",
     "ModelManager",
     "model_manager",
+    "DetectionDecisionEngine",
 ]

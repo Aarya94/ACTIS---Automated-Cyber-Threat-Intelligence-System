@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-09-14 17:45:09 UTC  
+**Generated:** 2026-09-14 17:48:08 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`ef7d2e2`)  
+**Current Git Branch:** `main` (`bb84daa`)  
 
 ---
 
@@ -117,13 +117,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `ef7d2e2`
+- **HEAD Commit:** `bb84daa`
 - **Working Tree:** 2 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `bb84daa` | Aaryan Suman | 2026-09-14 | feat: add model manager abstraction interface |
 | `ef7d2e2` | Aaryan Suman | 2026-09-14 | feat: add detection explanation and confidence calculation |
 | `f9482ae` | Aaryan Suman | 2026-09-14 | feat: add risk classification thresholds and override logic |
 | `2065654` | Aaryan Suman | 2026-09-14 | feat: implement deterministic risk scoring engine |
@@ -133,7 +134,6 @@
 | `7ce0550` | Aaryan Suman | 2026-09-14 | feat: add structured detection evidence model |
 | `c2b046e` | Aaryan Suman | 2026-09-14 | feat: add detection result contract |
 | `7aacdf7` | Aaryan Suman | 2026-09-14 | docs: record Day 5 development changelog and synchronize generated docs |
-| `ef285cd` | Aaryan Suman | 2026-09-14 | docs: document ACTIS static file analysis workflow |
 
 ## Known Issues
 
