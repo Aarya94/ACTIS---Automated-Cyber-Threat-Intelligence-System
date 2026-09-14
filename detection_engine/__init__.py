@@ -16,6 +16,15 @@ from detection_engine.ml_prediction_contract import (
     MLPredictionStatus,
     MLPredictionResult,
 )
+from detection_engine.rule_engine import (
+    RuleEngine,
+    RuleSeverity,
+    RuleTargetType,
+    RuleMatch,
+    RuleEvaluationResult,
+    RuleDefinition,
+    GenericRuleRegistry,
+)
 
 __all__ = [
     "DetectionResult",
@@ -29,4 +38,11 @@ __all__ = [
     "MLModelType",
     "MLPredictionStatus",
     "MLPredictionResult",
+    "RuleEngine",
+    "RuleSeverity",
+    "RuleTargetType",
+    "RuleMatch",
+    "RuleEvaluationResult",
+    "RuleDefinition",
+    "GenericRuleRegistry",
 ]
