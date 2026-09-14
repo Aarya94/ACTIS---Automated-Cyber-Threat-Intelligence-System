@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-09-14 17:48:08 UTC  
+**Generated:** 2026-09-14 17:52:37 UTC  
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)  
 
 This document inventories all automated test files, test classes, and test functions
@@ -11,8 +11,8 @@ recorded only after confirmed execution.
 
 ## Test Suite Summary
 
-- **Total Test Files:** `11`
-- **Total Discovered Test Cases:** `109`
+- **Total Test Files:** `12`
+- **Total Discovered Test Cases:** `120`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -25,6 +25,7 @@ recorded only after confirmed execution.
 | `tests/test_backend_api.py` | 4 tests | `PASSING` |
 | `tests/test_config_loading.py` | 11 tests | `PASSING` |
 | `tests/test_config_validation.py` | 11 tests | `PASSING` |
+| `tests/test_detection_engine.py` | 11 tests | `PASSING` |
 | `tests/test_doc_generator.py` | 20 tests | `PASSING` |
 | `tests/test_malware_dataset.py` | 25 tests | `PASSING` |
 | `tests/test_risk_engine.py` | 3 tests | `PASSING` |
@@ -75,6 +76,27 @@ recorded only after confirmed execution.
 - `test_database_settings_validation()`
 - `test_app_name_validation()`
 - `test_api_request_timeout_validation()`
+
+### `tests/test_detection_engine.py` (11 tests)
+
+**Class `TestDetectionContractsAndEvidence`:**
+- `test_detection_result_clamping_and_properties()`
+- `test_detection_evidence_aggregation_and_filtering()`
+
+**Class `TestRuleEngineContractsAndEvaluation`:**
+- `test_rule_match_to_evidence_signal()`
+- `test_generic_rule_registry_execution()`
+
+**Class `TestMLAndThreatIntelContracts`:**
+- `test_ml_prediction_result_conversion()`
+- `test_ml_prediction_unavailable_and_error()`
+- `test_threat_intel_evidence_from_local_intel()`
+
+**Class `TestDetectionDecisionEngineEndToEnd`:**
+- `test_decision_engine_with_confirmed_malicious_ti()`
+- `test_decision_engine_with_benign_evidence()`
+- `test_decision_engine_empty_evidence_safe_fallback()`
+- `test_decision_engine_combined_ml_and_rules()`
 
 ### `tests/test_doc_generator.py` (20 tests)
 
