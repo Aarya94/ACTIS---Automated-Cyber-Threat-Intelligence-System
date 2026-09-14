@@ -1,10 +1,13 @@
 """
-ACTIS Risk Engine Module
-Combines evidence from local threat intelligence, machine learning inference,
-rule-based heuristics, and external threat feeds into an explainable 0-100 risk score.
+ACTIS Risk Scoring Engine
+Combines multi-layer security evidence from threat intelligence, machine learning,
+heuristic rule engines, and static PE metadata into a deterministic, explainable risk score (0-100).
+Implements dynamic weight re-normalization across active evidence layers and mutual confirmation boosts.
 """
 
-from typing import Dict, Any, List, Optional
+from dataclasses import dataclass, field
+from typing import Dict, Any, List, Optional, Tuple
+
 from config.config import (
     RISK_CRITICAL_THRESHOLD,
     RISK_HIGH_THRESHOLD,
@@ -15,8 +18,183 @@ from config.config import (
     WEIGHT_EXTERNAL_INTEL,
     get_logger
 )
+from detection_engine.evidence_model import (
+    DetectionEvidence,
+    EvidenceSignal,
+    EvidenceSource,
+    EvidenceSeverity,
+)
 
 logger = get_logger("RiskEngine")
+
+
+@dataclass(frozen=True)
+class RiskScoringWeights:
+    """
+    Normalized weight configurations for security evidence layers.
+    ACTIS project-defined heuristic weights balancing threat intelligence, ML, rules, and anomalies.
+    """
+    threat_intel: float = WEIGHT_KNOWN_INTEL
+    ml_probability: float = WEIGHT_ML_PROBABILITY
+    heuristic_rules: float = WEIGHT_HEURISTIC_RULES
+    static_pe: float = WEIGHT_EXTERNAL_INTEL
+
+    def __post_init__(self):
+        total = self.threat_intel + self.ml_probability + self.heuristic_rules + self.static_pe
+        if total <= 0:
+            raise ValueError("Total weights must be strictly positive.")
+
+
+@dataclass(frozen=True)
+class ScoreBreakdown:
+    """Detailed score audit trail showing exact contribution per layer."""
+    threat_intel_score: float
+    ml_score: float
+    rules_score: float
+    static_pe_score: float
+    active_layers: List[str]
+    mutual_confirmation_boost: bool
+    mitigation_adjustment: float
+    raw_composite: float
+    final_score: float
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "threat_intel_score": round(self.threat_intel_score, 2),
+            "ml_score": round(self.ml_score, 2),
+            "rules_score": round(self.rules_score, 2),
+            "static_pe_score": round(self.static_pe_score, 2),
+            "active_layers": list(self.active_layers),
+            "mutual_confirmation_boost": self.mutual_confirmation_boost,
+            "mitigation_adjustment": round(self.mitigation_adjustment, 2),
+            "raw_composite": round(self.raw_composite, 2),
+            "final_score": round(self.final_score, 2)
+        }
+
+
+class RiskScoringEngine:
+    """
+    Deterministic mathematical risk scoring engine.
+    Applies multi-attribute utility theory across heterogenous security findings.
+    """
+
+    DEFAULT_WEIGHTS = RiskScoringWeights(
+        threat_intel=WEIGHT_KNOWN_INTEL,
+        ml_probability=WEIGHT_ML_PROBABILITY,
+        heuristic_rules=WEIGHT_HEURISTIC_RULES,
+        static_pe=WEIGHT_EXTERNAL_INTEL
+    )
+
+    @classmethod
+    def score_evidence(
+        cls,
+        evidence: DetectionEvidence,
+        weights: Optional[RiskScoringWeights] = None
+    ) -> Tuple[float, ScoreBreakdown]:
+        """
+        Computes composite 0.0 to 100.0 risk score from structured DetectionEvidence.
+        Dynamically renormalizes across active evidence layers to prevent missing-evidence bias.
+        """
+        w = weights or cls.DEFAULT_WEIGHTS
+
+        # Layer 1: Threat Intelligence
+        ti_signals = evidence.get_signals_by_source(EvidenceSource.THREAT_INTELLIGENCE)
+        ti_score = 0.0
+        ti_active = False
+        is_known_malicious = False
+        if ti_signals:
+            ti_active = True
+            ti_score = max(s.score_contribution for s in ti_signals)
+            is_known_malicious = any(s.severity == EvidenceSeverity.CRITICAL for s in ti_signals)
+
+        # Layer 2: Machine Learning
+        ml_signals = evidence.get_signals_by_source(EvidenceSource.MACHINE_LEARNING)
+        ml_score = 0.0
+        ml_active = False
+        if ml_signals:
+            ml_active = True
+            ml_score = max(s.score_contribution for s in ml_signals)
+
+        # Layer 3: Heuristic Rules
+        rule_signals = evidence.get_signals_by_source(EvidenceSource.HEURISTIC_RULES)
+        rule_score = 0.0
+        rule_active = False
+        if rule_signals:
+            rule_active = True
+            rule_score = min(100.0, sum(s.score_contribution for s in rule_signals))
+
+        # Layer 4: Static PE / Anomaly Findings
+        static_signals = evidence.get_signals_by_source(EvidenceSource.STATIC_PE) + evidence.get_signals_by_source(EvidenceSource.ANOMALY)
+        static_score = 0.0
+        static_active = False
+        if static_signals:
+            static_active = True
+            static_score = min(100.0, sum(s.score_contribution for s in static_signals))
+
+        # Fast-track: Confirmed malicious threat intelligence guarantees critical floor
+        mutual_boost = False
+        if is_known_malicious:
+            final_score = max(90.0, ti_score)
+            raw_composite = final_score
+            active_layers = ["THREAT_INTELLIGENCE"]
+            mitigation_adj = 0.0
+        else:
+            numerator = 0.0
+            denominator = 0.0
+            active_layers = []
+
+            if ti_active:
+                numerator += ti_score * w.threat_intel
+                denominator += w.threat_intel
+                active_layers.append("THREAT_INTELLIGENCE")
+
+            if ml_active:
+                numerator += ml_score * w.ml_probability
+                denominator += w.ml_probability
+                active_layers.append("MACHINE_LEARNING")
+
+            if rule_active:
+                numerator += rule_score * w.heuristic_rules
+                denominator += w.heuristic_rules
+                active_layers.append("HEURISTIC_RULES")
+
+            if static_active:
+                numerator += static_score * w.static_pe
+                denominator += w.static_pe
+                active_layers.append("STATIC_PE")
+
+            if denominator > 0.0:
+                raw_composite = numerator / denominator
+            else:
+                raw_composite = 0.0
+
+            # Mutual confirmation escalation: when ML and heuristics both indicate high risk
+            if ml_score >= 70.0 and rule_score >= 50.0:
+                raw_composite = min(100.0, raw_composite * 1.25)
+                mutual_boost = True
+
+            # Mitigations (e.g. Whitelist / False positive signals)
+            mitigation_adj = 0.0
+            reputation_signals = evidence.get_signals_by_source(EvidenceSource.REPUTATION) + evidence.get_signals_by_source(EvidenceSource.USER_OVERRIDE)
+            for rep in reputation_signals:
+                if rep.score_contribution < 0:
+                    mitigation_adj += abs(rep.score_contribution)
+
+            final_score = max(0.0, min(100.0, raw_composite - mitigation_adj))
+
+        breakdown = ScoreBreakdown(
+            threat_intel_score=ti_score,
+            ml_score=ml_score,
+            rules_score=rule_score,
+            static_pe_score=static_score,
+            active_layers=active_layers,
+            mutual_confirmation_boost=mutual_boost,
+            mitigation_adjustment=mitigation_adj,
+            raw_composite=raw_composite,
+            final_score=round(final_score, 1)
+        )
+
+        return round(final_score, 1), breakdown
 
 
 class RiskEngine:
@@ -34,14 +212,7 @@ class RiskEngine:
     ) -> Dict[str, Any]:
         """
         Fuses multiple evidence layers into a standardized risk evaluation.
-        
-        Args:
-            target_type: 'url', 'domain', 'hash', 'file'
-            target_value: The target string or file path
-            known_intel: Result from local SQLite threat database lookup
-            ml_result: Output from ModelManager
-            heuristic_result: Output from RuleEngine
-            external_intel: Output from external API providers (e.g. VirusTotal)
+        Maintains complete backward compatibility with existing tests and modules.
         """
         reasons: List[str] = []
         is_known_malicious = False
@@ -112,7 +283,6 @@ class RiskEngine:
         if is_known_malicious:
             final_score = max(90.0, known_score)
         else:
-            # Dynamically normalize weights across active/available evidence layers
             active_weights = {}
             if known_intel and known_intel.get("found"):
                 active_weights["known"] = WEIGHT_KNOWN_INTEL
@@ -134,14 +304,12 @@ class RiskEngine:
             else:
                 weighted_sum = 0.0
 
-            # Boost score if ML and Heuristics mutually confirm suspicion
             if ml_score >= 70.0 and rule_score >= 50.0:
                 weighted_sum = min(100.0, weighted_sum * 1.25)
                 reasons.append("High correlation detected: Machine learning inference and rule heuristics independently confirm threat.")
 
             final_score = max(0.0, min(100.0, round(weighted_sum, 1)))
 
-        # Categorical Risk Level
         if final_score >= RISK_CRITICAL_THRESHOLD:
             risk_level = "CRITICAL"
             recommended_action = (

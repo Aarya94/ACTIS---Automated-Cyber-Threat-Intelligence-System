@@ -30,6 +30,12 @@ from detection_engine.threat_intel_contract import (
     IndicatorType,
     ThreatIntelEvidence,
 )
+from detection_engine.risk_engine import (
+    RiskEngine,
+    RiskScoringWeights,
+    ScoreBreakdown,
+    RiskScoringEngine,
+)
 
 __all__ = [
     "DetectionResult",
@@ -53,4 +59,8 @@ __all__ = [
     "ThreatIntelVerdict",
     "IndicatorType",
     "ThreatIntelEvidence",
+    "RiskEngine",
+    "RiskScoringWeights",
+    "ScoreBreakdown",
+    "RiskScoringEngine",
 ]
