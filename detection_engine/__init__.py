@@ -38,6 +38,10 @@ from detection_engine.risk_engine import (
     RiskThresholdConfig,
     RiskClassifier,
 )
+from detection_engine.explanation_generator import (
+    ConfidenceEngine,
+    ExplanationGenerator,
+)
 
 __all__ = [
     "DetectionResult",
@@ -67,4 +71,6 @@ __all__ = [
     "RiskScoringEngine",
     "RiskThresholdConfig",
     "RiskClassifier",
+    "ConfidenceEngine",
+    "ExplanationGenerator",
 ]
