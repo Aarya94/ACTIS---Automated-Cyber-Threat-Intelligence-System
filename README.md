@@ -102,7 +102,7 @@ ACTIS operates under strict defensive boundaries:
 
 ## 📊 Current Implementation vs. Roadmap
 
-### Implemented Baseline Foundation (Days 1–9)
+### Implemented Baseline Foundation (Days 1–10)
 - **Configuration Management (`config/`):** Strongly-typed `AppConfig`, environment loader, path resolver, constraint validation (11 passing tests).
 - **Enterprise Logging (`config/logger.py`):** Rotating file logs, structured JSON formatters, credential sanitization.
 - **Relational Threat Database & Scan History (`reports/`):** SQLite schema with WAL mode (`threats`, `indicators`, `scans`, `detections`, `scan_items`, `file_scan_states`), indexed queries, JSON/CSV/Markdown report generation.
@@ -114,10 +114,10 @@ ACTIS operates under strict defensive boundaries:
 - **Device Scanner (`scanners/device_scanner.py`):** User-authorized directory and drive traversal, junction/reparse-point loop safety, safe file metadata extraction, streaming chunked SHA-256 fingerprinting with race detection, cooperative cancellation, structured `DeviceScanResult`.
 - **Incremental Scan State (`scanners/incremental_state.py`):** Deterministic change classification (`NEW_FILE`, `UNCHANGED_FILE`, `CHANGED_FILE`, `REMOVED_FILE`, `UNAVAILABLE_FILE`), analytical/model version invalidation tags, SQLite scan state persistence, and skipping deep analysis for verified unchanged files.
 - **Windows Protection Service Foundation (`service/`):** Lightweight resident background service managing endpoint state, deterministic lifecycle (`start`, `stop`, `pause`, `resume`), state transitions (`STOPPED`, `STARTING`, `RUNNING`, `PAUSED`, `DEGRADED`, `FAILED`), worker pool coordination, bounded recovery, canonical `SecurityEvent` schema, bounded intake queue, `EventDispatcher` routing, and decoupled `AnalysisOrchestrationBoundary` handoff.
-- **Automated Test Infrastructure (`tests/`):** 200 unit and integration tests passing with 100% success rate.
+- **Event-Driven File Protection (`scanners/file_watcher.py`, `service/file_pipeline.py`):** Real-time Windows filesystem event monitoring (`watchdog` bridge `FilesystemEventSource`), canonical path normalization (`FilesystemEventNormalizer`), temporary/editor file filtering (`FileEventFilter`), sliding-window debouncing (`FileEventDebouncer`), bounded queue backpressure (`SecurityEventQueue`), incremental scan state integration (`FileProtectionPipeline`), pre/post-inspection race condition hardening, and direct delegation to the existing `ThreatDetector` static analysis pipeline.
+- **Automated Test Infrastructure (`tests/`):** 229 unit and integration tests passing with 100% success rate.
 
-### Planned Subsystems in Target Architecture (Days 10–16)
-- **Event-Driven File Protection (Day 10):** Real-time filesystem hooks (`watchdog`) with write-stability debounce filtering.
+### Planned Subsystems in Target Architecture (Days 11–16)
 - **Online Threat Intelligence Connectors (Day 11):** VirusTotal v3 client with rate limiting and offline fallback.
 - **Central ACTIS Threat Intelligence API (Day 12):** FastAPI federated intelligence sharing service with anti-poisoning state machine.
 - **Command Dashboard & Desktop Alerts (Day 13):** Streamlit user console and native Windows toast notifications.
@@ -125,7 +125,7 @@ ACTIS operates under strict defensive boundaries:
 - **Security Hardening & Broad Testing (Day 15):** Adversarial sample evaluation and stress testing.
 - **Final Integration & Release (Day 16):** Milestone packaging, documentation finalization, and demonstration scripts.
 
-*(Note: Prototype files for some of these future modules exist historically in the repository; they are being systematically hardened and integrated per the post-Day-7 roadmap and are not yet production-ready.)*
+*(Note: Prototype files for some of these future modules exist historically in the repository; they are being systematically hardened and integrated per the post-Day-7 roadmap and are not yet production-ready. ACTIS is a development-stage prototype, not a full commercial antivirus or EDR system.)*
 
 ---
 
@@ -136,8 +136,8 @@ ACTIS/
 ├── config/                   # Type-safe configuration, environment loader, logging
 ├── data/                     # Local SQLite databases, training datasets
 ├── models/                   # Serialized ML model artifacts (*.pkl) and JSON metadata
-├── service/                  # Windows Protection Service foundation (lifecycle, state, workers, queue, dispatcher)
-├── scanners/                 # Event/input providers (URL, text, PE static analyzer, device scanner)
+├── service/                  # Windows Protection Service & file protection pipeline (lifecycle, state, workers, queue, dispatcher, debouncer)
+├── scanners/                 # Event/input providers (URL, text, PE static analyzer, device scanner, file watcher)
 ├── detection_engine/         # Decision engine, risk engine, heuristic rule engine
 ├── threat_intelligence/      # Local indicator lookup, external API clients, sync manager
 ├── reports/                  # SQLite threat database schemas, query interfaces, reports
@@ -164,8 +164,8 @@ pytest tests/ -v
 ```
 
 **Current Verification Status:**
-- **200 tests collected**
-- **200 tests passed (100% success rate)**
+- **229 tests collected**
+- **229 tests passed (100% success rate)**
 - **0 failures / 0 errors**
 
 ---

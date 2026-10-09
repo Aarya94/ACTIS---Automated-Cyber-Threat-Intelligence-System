@@ -154,25 +154,25 @@ Following the Day 7 milestone, ACTIS evolved beyond a collection of independent 
 ## Layered Component Breakdown
 
 ### 1. Windows Resident Layer (`ACTIS Protection Service`)
-- **Status:** `IMPLEMENTED` (Completed in Day 9 Foundation).
+- **Status:** `IMPLEMENTED` (Foundation in Day 9, Event-Driven File Protection in Day 10).
 - **Responsibilities:**
   - Manages Windows resident service lifecycle (`start`, `stop`, `pause`, `resume`).
   - Enforces deterministic state transitions (`STOPPED`, `STARTING`, `RUNNING`, `PAUSED`, `DEGRADED`, `FAILED`).
   - Coordinates background worker pools with graceful cancellation, thread safety, and bounded recovery.
-  - Ingests canonical `SecurityEvent` objects via thread-safe bounded queue (`SecurityEventQueue`).
-  - Dispatches security events to the Analysis Orchestrator without executing detection or ML logic inside the service layer.
+  - Ingests canonical `SecurityEvent` objects via thread-safe bounded queue (`SecurityEventQueue`) with burst backpressure tracking.
+  - Owns the filesystem event intake pipeline: `FilesystemEventSource` -> `FilesystemEventNormalizer` -> `FileEventFilter` -> `FileEventDebouncer` -> `SecurityEventQueue`.
+  - Dispatches security events to the Analysis Orchestrator / `FileProtectionPipeline` across a strict architectural boundary.
   - Provides Windows Service Control Manager (SCM) host adapter (`WindowsServiceHost`).
-  - *Boundary:* Real-time filesystem monitoring hooks are deferred to Day 10.
 
-### 2. Event & Input Layer (`scanners/`)
-- **Status:** Core Foundation & Device Scanner `IMPLEMENTED`; Advanced Sensors `PROTOTYPE / NOT YET MILESTONE-COMPLETE`.
+### 2. Event & Input Layer (`scanners/`, `service/`)
+- **Status:** Core Foundation, Device Scanner, and Event-Driven File Protection `IMPLEMENTED`; Advanced Sensors `PROTOTYPE / NOT YET MILESTONE-COMPLETE`.
 - **Role:** Translates raw inputs and system events into strongly-typed security event objects.
   - *URL Ingest (`url_scanner.py`):* `IMPLEMENTED` (Validates, normalizes, extracts 19 morphological features).
   - *Message Ingest (`text_analyzer.py`):* `IMPLEMENTED` (Parses links, detects urgency, deduplicates, delegates to URL scanner).
   - *Static PE Ingest (`file_feature_extractor.py`):* `IMPLEMENTED` (Extracts 15 static PE features, SHA-256, MD5, byte entropy).
   - *Device Scanner (`device_scanner.py`):* `IMPLEMENTED` (Completed in Day 8: user-authorized recursive crawler, junction loop protection, streaming SHA-256, structured scan results).
   - *Incremental Scan State (`incremental_state.py`):* `IMPLEMENTED` (Completed in Day 8: SQLite change classification, state persistence, skip unchanged files).
-  - *File Watcher (`file_watcher.py`):* `PROTOTYPE / NOT YET MILESTONE-COMPLETE` (Filesystem change monitor; scheduled for Day 10).
+  - *Event-Driven File Protection (`scanners/file_watcher.py`, `service/file_pipeline.py`):* `IMPLEMENTED` (Completed in Day 10: watchdog observer, normalizer, temporary file filter, debouncer, incremental state integration, race-hardened analysis handoff).
   - *Clipboard Monitor (`clipboard_scanner.py`):* `PROTOTYPE / NOT YET MILESTONE-COMPLETE` (URL clipboard monitor).
 
 ### 3. Analysis Orchestrator

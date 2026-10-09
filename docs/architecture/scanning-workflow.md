@@ -16,7 +16,7 @@ In the post-Day-7 architecture, **scanners and sensors act strictly as event/inp
 | **Message Scanner** | Plaintext, emails, chats | `IMPLEMENTED` | Boundary cleanup, social engineering urgency heuristics, deduplication, strict delegation to URL scanner. |
 | **Static PE Extractor** | Windows PE executables | `IMPLEMENTED` | Safe read-only binary parsing (`pefile`), 15 static PE features, SHA-256, MD5, byte entropy. |
 | **Device Scanner** | Filesystem trees, volumes | `IMPLEMENTED` | Recursive crawler with cooperative cancellation, junction/reparse-point loop safety, safe metadata, streaming chunked SHA-256 fingerprinting, incremental scan state, and canonical analysis pipeline delegation. |
-| **File Watcher** | Real-time file drops | `PROTOTYPE / NOT YET MILESTONE-COMPLETE` | Filesystem change events (`watchdog`) with write-stability debounce. Target: Day 10. |
+| **File Watcher** | Real-time file drops | `IMPLEMENTED` | Filesystem change events (`watchdog`) with normalization, temporary-file filtering, debounce window, bounded queue, incremental state check, race protection, and canonical analysis delegation. (Completed Day 10) |
 | **Clipboard Monitor** | Windows clipboard buffer | `PROTOTYPE / NOT YET MILESTONE-COMPLETE` | Background URL hook with strict privacy filtering. |
 
 ---
@@ -101,10 +101,16 @@ MessageScanResult Aggregation (Max Risk + SE Urgency)
 7. **State Persistence & Structured Reporting:** Constructs updated `FileScanState` with versioning tags, persists to SQLite, and returns a strongly-typed `DeviceScanResult`.
 8. **Cooperative Cancellation:** `ScanCancellationToken` allows callers to interrupt ongoing scans at any time without data corruption or lingering file locks.
 
-### E. Background File Watcher — *Target: Day 10*
-1. **Event Capture:** Observes file creation and modification events via Windows filesystem hooks (`watchdog`).
-2. **Debounce Delay:** Enforces debounce intervals to allow file write operations to finalize before opening for read-only inspection.
-3. **Orchestrator Handoff:** Dispatches settled file paths into the Analysis Orchestrator without blocking the OS event pump.
+### E. Event-Driven File Protection (`scanners/file_watcher.py`, `service/file_pipeline.py`) — *Completed Day 10*
+1. **Event Capture & Bridging:** `FilesystemEventSource` monitors user-authorized paths using native Windows notifications via `watchdog.Observer`, converting OS events into non-blocking callback notifications.
+2. **Path Normalization:** `FilesystemEventNormalizer` standardizes absolute path resolution, slashes, and Windows case-folding.
+3. **Filtering:** `FileEventFilter` ignores directory events, inaccessible paths, and temporary/editor swap patterns (`.tmp`, `~$*`, `.crdownload`, `.part`).
+4. **Debouncing & Deduplication:** `FileEventDebouncer` coalesces rapid write sequences (configurable window, default 0.5s) and checks file size stability before analysis.
+5. **Bounded Intake Queue:** `SecurityEventQueue` buffers events with bounded capacity, high-watermark tracking, and throttled drop logging under burst pressure.
+6. **Incremental State Integration:** `FileProtectionPipeline` verifies file metadata against `IncrementalStateManager`. If size, modification time, and model versions match, the file is classified as `UNCHANGED` and expensive analysis is skipped.
+7. **Filesystem Race Hardening:** Verifies file existence and streams pre/post-fingerprints (`compute_file_fingerprint`, stat comparison) to catch files that disappeared (`DISAPPEARED`), became inaccessible (`INACCESSIBLE`), or mutated during analysis (`CHANGED_DURING_ANALYSIS`).
+8. **Canonical Pipeline Delegation:** Eligible new or changed files pass into canonical `scan_file` -> `ThreatDetector.analyze_file` without duplicating detection logic.
+9. **State Persistence:** Results are persisted to SQLite via `IncrementalStateManager.record_file_scan()`.
 
 ### F. Clipboard URL Scanner — *Target: Post-Day 10*
 1. **Clipboard Monitoring:** Inspects clipboard string content on change notifications.

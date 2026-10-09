@@ -10,19 +10,20 @@ This document details the multi-layered threat evaluation pipeline employed by A
 
 ## 1. End-to-End Pipeline in the Target Architecture
 
-In the post-Day-7 architecture, target inputs flow from the **Event/Input Layer** through the **Analysis Orchestrator** into the **Detection Decision Engine**:
+In the event-driven architecture, target inputs (including real-time filesystem events connected in Day 10) flow from the **Event/Input Layer** through the **Analysis Orchestrator** into the **Detection Decision Engine**:
 
 ```text
-                                  +-----------------------+
-                                  |   Security Event      |
-                                  | (File, URL, Message)  |
-                                  +-----------+-----------+
-                                              |
-                                              v
-                                  +-----------------------+
-                                  | Analysis Orchestrator |
-                                  | (Coordinate Analysis) |
-                                  +-----------+-----------+
+                                  +---------------------------------------+
+                                  |            Security Event             |
+                                  | (Filesystem Event, File, URL, Message)|
+                                  +-------------------+-------------------+
+                                                      |
+                                                      v
+                                  +---------------------------------------+
+                                  |         Analysis Orchestrator         |
+                                  | (Coordinate Incremental State & Deep  |
+                                  |  Inspection via ThreatDetector)       |
+                                  +-------------------+-------------------+
                                               |
                         +---------------------+---------------------+
                         |                     |                     |

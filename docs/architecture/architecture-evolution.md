@@ -197,8 +197,8 @@ To ensure absolute transparency and prevent misleading claims, components are ca
 | **Detection Decision Engine (`detection_engine/`)** | `IMPLEMENTED` | Multi-criteria fusion, dynamic weight normalization, rule engine, confidence scoring. |
 | **Device Scanner (`scanners/device_scanner.py`)** | `IMPLEMENTED` | Completed in Day 8: loop safety, chunked streaming SHA-256, structured scan result, incremental state tracking. |
 | **Windows Protection Service (`service/`)** | `IMPLEMENTED` | Completed in Day 9: deterministic lifecycle, state machine, worker management, SecurityEvent contract, bounded intake queue, EventDispatcher, AnalysisOrchestrator handoff, and Windows SCM host adapter. |
-| **Automated Test Suite (`tests/`)** | `IMPLEMENTED` | 200 automated unit and integration tests passing with 100% success rate. |
-| **Event-Driven File Watcher (`scanners/file_watcher.py`)** | `PLANNED` | Prototype watchdog script exists; event filtering and orchestrator handoff planned for Day 10. |
+| **Automated Test Suite (`tests/`)** | `IMPLEMENTED` | 229 automated unit and integration tests passing with 100% success rate. |
+| **Event-Driven File Protection (`scanners/file_watcher.py`, `service/file_pipeline.py`)** | `IMPLEMENTED` | Completed in Day 10: watchdog observer, path normalization, temporary file filtering, debouncing, bounded queue backpressure, incremental state integration, race hardening, and ThreatDetector analysis handoff. |
 | **Online Threat Intelligence (`threat_intelligence/api_clients.py`)** | `PROTOTYPE / NOT YET MILESTONE-COMPLETE` | Prototype VT client; rate-limiting and normalized abstraction scheduled for Day 11. |
 | **Central ACTIS TI API (`backend/`, `threat_intelligence/sync_manager.py`)** | `PROTOTYPE / NOT YET MILESTONE-COMPLETE` | Prototype FastAPI server; federated synchronization scheduled for Day 12. |
 | **Dashboard & Notifications (`dashboard/`, `notifications/`)** | `PROTOTYPE / NOT YET MILESTONE-COMPLETE` | Streamlit and notifier prototypes; integrated UI and alerts scheduled for Day 13. |
@@ -210,12 +210,12 @@ To ensure absolute transparency and prevent misleading claims, components are ca
 
 Following this architectural evolution, future development will systematically build out the event-driven platform:
 
-- **Day 8:** Device Scanner + Incremental Scan State
-- **Day 9:** Windows Protection Service Foundation
-- **Day 10:** Event-Driven File Protection
-- **Day 11:** Online Threat Intelligence
-- **Day 12:** Central ACTIS Threat Intelligence
-- **Day 13:** Dashboard + Notification Layer
-- **Day 14:** AI Security Assistant
-- **Day 15:** Security Hardening + Broad Threat Coverage Testing
-- **Day 16:** Final Integration + Demo + Release
+- **Day 8:** Device Scanner + Incremental Scan State (`COMPLETED`)
+- **Day 9:** Windows Protection Service Foundation (`COMPLETED`)
+- **Day 10:** Event-Driven File Protection (`COMPLETED`)
+- **Day 11:** Online Threat Intelligence (`PLANNED`)
+- **Day 12:** Central ACTIS Threat Intelligence (`PLANNED`)
+- **Day 13:** Dashboard + Notification Layer (`PLANNED`)
+- **Day 14:** AI Security Assistant (`PLANNED`)
+- **Day 15:** Security Hardening + Broad Threat Coverage Testing (`PLANNED`)
+- **Day 16:** Final Integration + Demo + Release (`PLANNED`)

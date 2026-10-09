@@ -39,11 +39,11 @@ To maintain absolute architectural truthfulness and prevent overclaiming, every 
   - *PE Feature Extractor (`file_feature_extractor.py`):* `IMPLEMENTED` (Read-only static extraction of PE headers, sections, byte entropy, SHA-256, and MD5 hashes).
   - *Device Scanner (`device_scanner.py`):* `IMPLEMENTED` (Completed in Day 8: safe recursive crawler, junction/reparse-point loop safety, safe metadata, streaming chunked SHA-256 fingerprinting with race detection, cancellation, structured `DeviceScanResult`).
   - *Incremental Scan State (`incremental_state.py`):* `IMPLEMENTED` (Completed in Day 8: change classification for `NEW`, `UNCHANGED`, `CHANGED`, `REMOVED`, version invalidation tags, SQLite persistence).
-  - *File Watcher (`file_watcher.py`):* `PROTOTYPE / NOT YET MILESTONE-COMPLETE` (Prototype watchdog script; event filtering and debounce scheduled for Day 10).
+  - *File Watcher (`file_watcher.py`):* `IMPLEMENTED` (Completed in Day 10: `FilesystemEventSource` watchdog bridge, thread-safe lifecycle, observer management, non-blocking callback bridge).
   - *Clipboard Scanner (`clipboard_scanner.py`):* `PROTOTYPE / NOT YET MILESTONE-COMPLETE` (URL clipboard monitor prototype).
 - **Role in Target Architecture:** Event and input providers. Scanners do NOT implement independent detection or risk logic; they normalize input and delegate to the Analysis Orchestrator.
-- **Dependencies:** `config`, `pefile`, `hashlib`, `urllib.parse`, `re`.
-- **Allowed Operations:** Read files in binary mode; compute mathematical hashes; extract structural metadata.
+- **Dependencies:** `config`, `pefile`, `hashlib`, `urllib.parse`, `re`, `watchdog`.
+- **Allowed Operations:** Read files in binary mode; compute mathematical hashes; extract structural metadata; observe filesystem change events.
 - **Forbidden Operations:** Execute inspected binaries; alter user files; follow infinite junction loops; capture keystrokes.
 
 ---
@@ -86,14 +86,13 @@ To maintain absolute architectural truthfulness and prevent overclaiming, every 
 ---
 
 ### 2.6 Windows Protection Service (`service/`)
-- **Status:** `IMPLEMENTED` (Completed in Day 9)
-- **Purpose:** Lightweight Windows resident service foundation maintaining deterministic lifecycle (`start`, `stop`, `pause`, `resume`), worker thread coordination, bounded failure recovery, `SecurityEvent` canonical contract, bounded FIFO queue (`SecurityEventQueue`), `EventDispatcher` subscription routing, decoupled `AnalysisOrchestrationBoundary` handoff, and Windows SCM host bridge (`WindowsServiceHost`).
-- **Inputs:** `SecurityEvent` objects from input sources (CLI, tests, future scanners).
-- **Outputs:** Dispatched security events across the analysis boundary; `ServiceHealth` telemetry.
-- **Dependencies:** `config`, `service.lifecycle`, `service.state`, `service.workers`, `service.events`, `service.dispatcher`, `service.health`, `service.windows_host`.
-- **Allowed Operations:** Thread-safe state transitions; queueing events; managing worker threads; non-blocking SCM control dispatch.
-- **Forbidden Operations:** Perform heavy ML or file parsing directly inside the resident service layer; tamper with OS security controls; create stealth persistence / registry run keys.
-- **Boundary Note:** Real-time filesystem event monitoring (`watchdog` file watcher) is explicitly deferred to Day 10.
+- **Status:** `IMPLEMENTED` (Foundation completed in Day 9, Event-Driven File Protection completed in Day 10)
+- **Purpose:** Lightweight Windows resident service foundation maintaining deterministic lifecycle (`start`, `stop`, `pause`, `resume`), worker thread coordination, bounded failure recovery, `SecurityEvent` canonical contract, bounded FIFO queue (`SecurityEventQueue`) with peak tracking and drop backpressure, `EventDispatcher` subscription routing, decoupled `AnalysisOrchestrationBoundary` handoff, Windows SCM host bridge (`WindowsServiceHost`), filesystem path normalization (`FilesystemEventNormalizer`), temporary/directory event filtering (`FileEventFilter`), rapid-write debouncing and stability checks (`FileEventDebouncer`), and incremental state file analysis pipeline (`FileProtectionPipeline`).
+- **Inputs:** Windows filesystem events via `FilesystemEventSource`, manual scan tasks, and client security events.
+- **Outputs:** Debounced, normalized security events dispatched across the analysis boundary; `ServiceHealth` operational telemetry; structured `EventProcessingResult` records.
+- **Dependencies:** `config`, `service.lifecycle`, `service.state`, `service.workers`, `service.events`, `service.dispatcher`, `service.health`, `service.windows_host`, `service.file_normalizer`, `service.file_filter`, `service.debouncer`, `service.file_pipeline`, `scanners.incremental_state`, `scanners.file_scanner`.
+- **Allowed Operations:** Thread-safe state transitions; queueing events; managing worker threads; non-blocking SCM control dispatch; read-only file event ingestion; incremental state verification; delegating analysis to `ThreatDetector`.
+- **Forbidden Operations:** Execute inspected binaries; delete or quarantine user files; tamper with OS security controls; create stealth persistence / registry run keys.
 
 ---
 

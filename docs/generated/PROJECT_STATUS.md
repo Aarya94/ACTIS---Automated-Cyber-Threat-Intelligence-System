@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-09 13:43:23 UTC  
+**Generated:** 2026-10-09 13:49:17 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`4ce21ab`)  
+**Current Git Branch:** `main` (`acf96f4`)  
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `4ce21ab`
-- **Working Tree:** 3 untracked/unstaged changes
+- **HEAD Commit:** `acf96f4`
+- **Working Tree:** 9 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `acf96f4` | Aaryan Suman | 2026-10-09 | test: add event-to-analysis integration coverage |
 | `4ce21ab` | Aaryan Suman | 2026-10-09 | test: add event burst and queue stability coverage |
 | `55852db` | Aaryan Suman | 2026-10-09 | test: add filesystem event and debounce coverage |
 | `38debd5` | Aaryan Suman | 2026-10-09 | feat: harden event processing against filesystem races |
@@ -140,7 +141,6 @@
 | `72b2eba` | Aaryan Suman | 2026-10-09 | feat: add bounded protection event queue |
 | `2ab558f` | Aaryan Suman | 2026-10-09 | feat: implement filesystem event debouncing |
 | `603d9cc` | Aaryan Suman | 2026-10-09 | feat: add filesystem event filtering |
-| `3f5c507` | Aaryan Suman | 2026-10-09 | feat: normalize ACTIS filesystem events |
 
 ## Known Issues
 

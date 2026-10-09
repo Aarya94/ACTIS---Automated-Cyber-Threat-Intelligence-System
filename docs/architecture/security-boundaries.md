@@ -22,6 +22,7 @@ ACTIS is authorized to perform the following defensive cybersecurity functions:
 8. **Calculate Multi-Criteria Risk Scores:** Synthesize ML probabilities, deterministic heuristic rules, and threat intelligence matches into a normalized 0–100 risk score.
 9. **Notify and Warn Users:** Format and present actionable security alerts and explainable evidence breakdowns via console badges, desktop notifications, and dashboard telemetry.
 10. **Explain Security Findings:** Provide plain-English conversational summaries of why a file, URL, or indicator was flagged, referencing grounded local database records.
+11. **Observe Real-Time Filesystem Events Safely:** Passive event intake via Windows filesystem hooks (`watchdog`), path normalization, temporary file filtering, and debouncing without modifying, renaming, deleting, or locking user files.
 
 ---
 

@@ -8,31 +8,39 @@
 
 ## 1. Event-Driven Data Flow Lifecycle
 
-In the post-Day-7 event-driven architecture, data traverses from operating system stimuli through the resident protection layer into the centralized analysis orchestrator, detection engine, and persistence layers:
+In the event-driven architecture implemented across Days 9 and 10, data traverses from operating system stimuli through the resident protection layer into the centralized analysis orchestrator, detection engine, and persistence layers:
 
 ```text
-  [Windows OS / User Space]
-             │
-             ▼
+  [Windows Filesystem Changes]
+               │
+               ▼
+  ┌────────────────────────────────────────────────────────┐
+  │         Filesystem Event Source (watchdog)             │
+  │ - Native filesystem notifications (CREATED, MODIFIED,  │
+  │   MOVED, DELETED) captured via non-blocking bridge     │
+  └──────────────────────────┬─────────────────────────────┘
+                             │
+                             ▼
   ┌────────────────────────────────────────────────────────┐
   │         ACTIS Protection Service (Resident)            │
-  │ - System event intake & debouncing                     │
-  │ - File-write completion stability verification         │
-  │ - Non-blocking event queueing                          │
+  │ - Path normalization (canonical absolute, case-folded) │
+  │ - Event filtering (temporary files, directories)       │
+  │ - Time-window debouncing & duplicate coalescing        │
+  │ - Bounded SecurityEventQueue with burst backpressure   │
   └──────────────────────────┬─────────────────────────────┘
                              │
                              ▼
   ┌────────────────────────────────────────────────────────┐
-  │                 Event / Input Layer                    │
-  │ - FileSecurityEvent    (Path, timestamp, trigger)      │
-  │ - UrlSecurityEvent     (Normalized URL, source)        │
-  │ - MessageSecurityEvent (Extracted links, urgency)      │
-  │ - OnDemandScanEvent    (Target path, recursive flag)   │
+  │         Incremental Scan State Integration             │
+  │ - Metadata inspection (size, mtime, ctime)             │
+  │ - Change classification (NEW, UNCHANGED, CHANGED)      │
+  │ - Skip unchanged files (reuse verified verdicts)       │
+  │ - Streaming SHA-256 fingerprinting & race verification │
   └──────────────────────────┬─────────────────────────────┘
                              │
                              ▼
   ┌────────────────────────────────────────────────────────┐
-  │                 Analysis Orchestrator                  │
+  │         Analysis Orchestrator / Pipeline               │
   │ - Canonical URL Normalization & Feature Extraction     │
   │ - Safe Read-Only Static PE Inspection & Byte Entropy   │
   │ - Hash Computation (SHA-256, MD5)                      │
@@ -72,9 +80,13 @@ In the post-Day-7 event-driven architecture, data traverses from operating syste
 ## 2. Data Objects in Motion
 
 ### 2.1 File Security Events & Executables
-- **Ingestion:** Generated when a file is created, downloaded, modified, or queued by an on-demand scan.
-- **Debounce & Stabilization:** The Protection Service applies write-stability checks (e.g. verifying file handles are released) before dispatching the event.
-- **Inspection:** Inspected strictly in read-only binary mode (`open(path, 'rb')`). Cryptographic hashes (SHA-256, MD5), byte entropy distributions, and static PE headers are parsed entirely in memory.
+- **Ingestion:** Generated when a file is created, downloaded, modified, or queued by an on-demand scan. Real-time file drops are captured via `FilesystemEventSource` using Windows filesystem APIs (`watchdog`).
+- **Normalization & Filtering:** `FilesystemEventNormalizer` resolves canonical absolute paths, standardizes separators, and applies Windows case-folding. `FileEventFilter` discards directory changes and temporary swap/lock files (`.tmp`, `~$*`, `.crdownload`, `.part`).
+- **Debounce & Stabilization:** `FileEventDebouncer` coalesces rapid burst writes (e.g. repeated writes within 0.5s) into a single logical event, checking file existence and size stability before dispatch.
+- **Queueing & Backpressure:** Validated events enter `SecurityEventQueue` (bounded capacity). When bursts exceed capacity, oldest non-critical events are coalesced or dropped with throttled logging to prevent memory exhaustion or thread leaks.
+- **Incremental State Check:** `FileProtectionPipeline` compares file metadata against `IncrementalStateManager` SQLite records. Unchanged files skip deep analysis; new or changed files proceed.
+- **Race Condition Guardrails:** Before and after static PE analysis, file fingerprints and metadata are verified (`compute_file_fingerprint`, stat comparison) to detect files that disappeared (`DISAPPEARED`), became inaccessible (`INACCESSIBLE`), or mutated during analysis (`CHANGED_DURING_ANALYSIS`).
+- **Inspection:** Inspected strictly in read-only binary mode (`open(path, 'rb')`). Cryptographic hashes (SHA-256, MD5), byte entropy distributions, and static PE headers are parsed entirely in memory without code execution.
 - **Privacy Boundary:** **ACTIS NEVER uploads complete user files or documents to any external server or third-party API.** Only cryptographic hashes (SHA-256/MD5) are queried externally. Personal documents (PDFs, Word documents, spreadsheets, images) are never exfiltrated.
 
 ### 2.2 URL Security Events & Domains
