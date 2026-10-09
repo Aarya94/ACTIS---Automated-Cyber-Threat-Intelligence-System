@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-09 12:06:00 UTC  
+**Generated:** 2026-10-09 12:07:03 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`2539b3a`)  
+**Current Git Branch:** `main` (`5714124`)  
 
 ---
 
@@ -117,13 +117,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `2539b3a`
+- **HEAD Commit:** `5714124`
 - **Working Tree:** 1 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `5714124` | Aaryan Suman | 2026-10-09 | feat: add safe file metadata collection for device scans |
 | `2539b3a` | Aaryan Suman | 2026-10-09 | feat: harden device scanner filesystem traversal |
 | `8adbf5a` | Aaryan Suman | 2026-10-09 | docs: regenerate project status and synchronize generated documentation |
 | `00d26ff` | Aaryan Suman | 2026-10-09 | docs: synchronize architecture index and GitBook summary |
@@ -133,7 +134,6 @@
 | `9dc58c2` | Aaryan Suman | 2026-10-09 | docs: update detection and risk architecture with shared threat intelligence |
 | `92cb608` | Aaryan Suman | 2026-10-09 | docs: define analysis orchestration and scanning delegation architecture |
 | `8e7b996` | Aaryan Suman | 2026-10-09 | docs: define ACTIS protection service boundary and event intake layer |
-| `33cf2c9` | Aaryan Suman | 2026-10-09 | docs: evolve ACTIS system architecture to event-driven protection model |
 
 ## Known Issues
 

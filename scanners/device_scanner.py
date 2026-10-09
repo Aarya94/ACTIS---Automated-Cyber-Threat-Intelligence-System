@@ -7,6 +7,7 @@ permission handling, and progress tracking.
 
 import os
 import time
+import hashlib
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Callable
 
@@ -90,6 +91,61 @@ def collect_file_metadata(file_path: Path, max_size_bytes: int = MAX_FILE_SIZE_B
             is_oversized=False,
             error=str(e)
         )
+
+
+@dataclass
+class FileFingerprint:
+    """Represents a computed cryptographic fingerprint and validation outcome."""
+    sha256: str
+    status: str  # "OK", "HASH_FAILED", "FILE_CHANGED_DURING_HASH", "INACCESSIBLE", "SKIPPED_OVERSIZED"
+    error: Optional[str] = None
+
+
+def compute_file_fingerprint(
+    file_path: Path,
+    max_size_bytes: int = MAX_FILE_SIZE_BYTES,
+    chunk_size: int = 65536
+) -> FileFingerprint:
+    """
+    Computes streaming SHA-256 hash safely with race-condition detection.
+    Compares file metadata (mtime and size) before and after stream reading.
+    """
+    try:
+        st_before = file_path.stat()
+    except (PermissionError, FileNotFoundError, OSError) as e:
+        return FileFingerprint(sha256="", status="INACCESSIBLE", error=str(e))
+
+    if st_before.st_size > max_size_bytes:
+        return FileFingerprint(
+            sha256="",
+            status="SKIPPED_OVERSIZED",
+            error=f"Size {st_before.st_size} exceeds limit {max_size_bytes}"
+        )
+
+    hasher = hashlib.sha256()
+    try:
+        with open(file_path, "rb") as f:
+            while True:
+                chunk = f.read(chunk_size)
+                if not chunk:
+                    break
+                hasher.update(chunk)
+    except (PermissionError, OSError) as e:
+        return FileFingerprint(sha256="", status="HASH_FAILED", error=str(e))
+
+    # Verify file was not modified or resized during reading
+    try:
+        st_after = file_path.stat()
+        if st_before.st_mtime != st_after.st_mtime or st_before.st_size != st_after.st_size:
+            return FileFingerprint(
+                sha256="",
+                status="FILE_CHANGED_DURING_HASH",
+                error="File was modified or resized during stream read"
+            )
+    except (PermissionError, FileNotFoundError, OSError) as e:
+        return FileFingerprint(sha256="", status="HASH_FAILED", error=f"Post-hash stat failed: {e}")
+
+    return FileFingerprint(sha256=hasher.hexdigest(), status="OK", error=None)
 
 
 class ScanCancellationToken:
