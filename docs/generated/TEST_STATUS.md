@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-10-09 10:35:51 UTC  
+**Generated:** 2026-10-09 10:37:05 UTC  
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)  
 
 This document inventories all automated test files, test classes, and test functions
@@ -12,7 +12,7 @@ recorded only after confirmed execution.
 ## Test Suite Summary
 
 - **Total Test Files:** `13`
-- **Total Discovered Test Cases:** `141`
+- **Total Discovered Test Cases:** `144`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -25,7 +25,7 @@ recorded only after confirmed execution.
 | `tests/test_backend_api.py` | 4 tests | `PASSING` |
 | `tests/test_config_loading.py` | 11 tests | `PASSING` |
 | `tests/test_config_validation.py` | 11 tests | `PASSING` |
-| `tests/test_detection_engine.py` | 11 tests | `PASSING` |
+| `tests/test_detection_engine.py` | 14 tests | `PASSING` |
 | `tests/test_doc_generator.py` | 20 tests | `PASSING` |
 | `tests/test_malware_dataset.py` | 25 tests | `PASSING` |
 | `tests/test_risk_engine.py` | 3 tests | `PASSING` |
@@ -78,7 +78,7 @@ recorded only after confirmed execution.
 - `test_app_name_validation()`
 - `test_api_request_timeout_validation()`
 
-### `tests/test_detection_engine.py` (11 tests)
+### `tests/test_detection_engine.py` (14 tests)
 
 **Class `TestDetectionContractsAndEvidence`:**
 - `test_detection_result_clamping_and_properties()`
@@ -98,6 +98,9 @@ recorded only after confirmed execution.
 - `test_decision_engine_with_benign_evidence()`
 - `test_decision_engine_empty_evidence_safe_fallback()`
 - `test_decision_engine_combined_ml_and_rules()`
+- `test_url_pipeline_with_local_threat_intel_match()`
+- `test_url_pipeline_with_ml_prediction_and_heuristics()`
+- `test_url_pipeline_model_unavailable_safe_fallback()`
 
 ### `tests/test_doc_generator.py` (20 tests)
 

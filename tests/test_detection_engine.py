@@ -284,3 +284,47 @@ class TestDetectionDecisionEngineEndToEnd:
         assert res.detection_status == DetectionStatus.MALICIOUS
         assert res.risk_score >= 60.0
         assert res.confidence >= 0.70
+
+    def test_url_pipeline_with_local_threat_intel_match(self):
+        """Verifies end-to-end URL analysis with a confirmed local threat intelligence match."""
+        from detection_engine.threat_detector import threat_detector
+
+        url = "http://paypal-security-verification.xyz/login.php"
+        res = threat_detector.analyze_url(url)
+
+        assert res["is_threat"] is True
+        assert res["risk_level"] in ("HIGH", "CRITICAL")
+        assert res["score"] >= 60.0
+        assert "detection_result" in res
+        assert res["detection_result"]["target_identifier"] == url
+        assert res["detection_result"]["detection_status"] == "MALICIOUS"
+        assert res["confidence"] > 0.50
+
+    def test_url_pipeline_with_ml_prediction_and_heuristics(self):
+        """Verifies end-to-end URL analysis fusing ML and lexical heuristic rules."""
+        from detection_engine.threat_detector import threat_detector
+
+        suspicious_url = "http://192.168.1.1:8080/secure-banking-login.xyz/verify.php?token=123"
+        res = threat_detector.analyze_url(suspicious_url)
+
+        assert res["is_valid"] is True
+        assert res["target_type"] == "url"
+        assert "detection_result" in res
+        assert len(res["reasons"]) > 0
+        assert res["heuristic_result"]["score"] > 0
+
+    def test_url_pipeline_model_unavailable_safe_fallback(self, monkeypatch):
+        """Verifies safe fallback when ML model is unavailable during URL scanning."""
+        from detection_engine.threat_detector import threat_detector
+        from detection_engine.model_manager import model_manager
+
+        monkeypatch.setattr(model_manager, "is_phishing_model_available", lambda: False)
+
+        safe_url = "https://example.com/status"
+        res = threat_detector.analyze_url(safe_url)
+
+        assert res["is_valid"] is True
+        assert res["ml_result"]["available"] is False
+        assert "detection_result" in res
+        assert res["score"] < 50.0
+
