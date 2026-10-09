@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-09 10:24:35 UTC  
+**Generated:** 2026-10-09 10:26:55 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`6e2bedf`)  
+**Current Git Branch:** `main` (`d18631f`)  
 
 ---
 
@@ -117,13 +117,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `6e2bedf`
+- **HEAD Commit:** `d18631f`
 - **Working Tree:** 1 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `d18631f` | Aaryan Suman | 2026-10-09 | feat: expand safe lexical heuristics in rule engine |
 | `6e2bedf` | Aaryan Suman | 2026-10-09 | feat: harden URL feature extraction with contract validation |
 | `ce21a5b` | Aaryan Suman | 2026-10-09 | feat: add canonical URL normalization and domain extraction |
 | `3bae715` | Aaryan Suman | 2026-10-09 | feat: add robust URL validation and sanitization helpers |
@@ -133,7 +134,6 @@
 | `56307dd` | Aaryan Suman | 2026-09-14 | test: add detection engine validation suite |
 | `93aff4d` | Aaryan Suman | 2026-09-14 | feat: implement unified detection decision engine |
 | `bb84daa` | Aaryan Suman | 2026-09-14 | feat: add model manager abstraction interface |
-| `ef7d2e2` | Aaryan Suman | 2026-09-14 | feat: add detection explanation and confidence calculation |
 
 ## Known Issues
 

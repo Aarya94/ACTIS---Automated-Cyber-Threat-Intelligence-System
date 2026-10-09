@@ -23,12 +23,14 @@ class ThreatDetector:
     """Central detection pipeline orchestrator."""
 
     def __init__(self):
-        # In-memory scan cache: hash -> analysis_result
+        # In-memory scan caches
         self._hash_cache: Dict[str, Dict[str, Any]] = {}
+        self._url_cache: Dict[str, Dict[str, Any]] = {}
 
     def clear_cache(self):
-        """Clears the in-memory scan hash cache."""
+        """Clears both the in-memory file hash and URL scan caches."""
         self._hash_cache.clear()
+        self._url_cache.clear()
 
     def analyze_file(
         self,
@@ -142,49 +144,98 @@ class ThreatDetector:
 
     def analyze_url(
         self,
-        url: str,
+        url: Any,
         scan_id: Optional[int] = None,
         check_external: bool = False
     ) -> Dict[str, Any]:
         """
         Executes complete multi-layer security analysis on a URL.
+        Validates input, applies canonical normalization, inspects local TI,
+        evaluates morphological features and heuristics, and fuses decisions
+        via the DetectionDecisionEngine. Operates strictly in READ-ONLY mode.
         """
-        # Step 1: Normalize URL & Extract Domain
-        clean_url = url.strip()
-        if not clean_url.startswith(("http://", "https://")):
-            clean_url = "http://" + clean_url
+        from scanners.url_scanner import validate_url, normalize_url, extract_domain, extract_url_features
+        from detection_engine.decision_engine import DetectionDecisionEngine
+        from detection_engine.detection_contract import InputType
+        from detection_engine.threat_intel_contract import ThreatIntelEvidence, IndicatorType
 
-        parsed = urlparse(clean_url)
-        domain = (parsed.netloc or "").lower()
-        if domain.startswith("www."):
-            domain = domain[4:]
+        # Step 1: Input Validation
+        is_valid, validation_error = validate_url(url)
+        if not is_valid:
+            return {
+                "target_type": "url",
+                "url": str(url or ""),
+                "domain": "",
+                "score": 0.0,
+                "risk_level": "INFORMATIONAL",
+                "is_threat": False,
+                "reasons": [f"Invalid URL: {validation_error}"],
+                "recommended_action": "Provide a syntactically valid HTTP or HTTPS URL.",
+                "ml_result": {"available": False, "probability": 0.0, "is_phishing": False},
+                "heuristic_result": {"score": 0, "heuristic_score": 0, "rules_triggered": [], "reasons": []},
+                "threat_intel": {"found": False, "is_known_threat": False},
+                "detection_result": None,
+                "confidence": 0.0,
+                "is_valid": False,
+                "error": validation_error,
+                "from_cache": False
+            }
 
-        # Step 2: Threat Intelligence Lookup
-        intel_result = threat_lookup.lookup_url(clean_url, domain, query_external=check_external)
+        # Step 2: Canonical Normalization & In-Memory Cache Lookup
+        canonical_url = normalize_url(url)
+        domain = extract_domain(canonical_url)
+
+        if canonical_url in self._url_cache:
+            cached_result = dict(self._url_cache[canonical_url])
+            cached_result["from_cache"] = True
+            return cached_result
+
+        # Step 3: Local & External Threat Intelligence Lookup
+        intel_result = threat_lookup.lookup_url(canonical_url, domain, query_external=check_external)
         known_intel = intel_result.get("local_intel")
         external_intel = intel_result.get("external_intel")
+        ti_evidence = ThreatIntelEvidence.from_local_intel(
+            intel=known_intel,
+            indicator=canonical_url,
+            indicator_type=IndicatorType.URL
+        )
 
-        # Step 3: Extract Morphological Features (19 features)
-        from scanners.url_scanner import extract_url_features
-        features = extract_url_features(clean_url)
+        # Step 4: Extract Morphological Features (19 features)
+        features = extract_url_features(canonical_url)
 
-        # Step 4: ML Inference
+        # Step 5: Machine Learning Inference (both structured & legacy format)
+        ml_structured = model_manager.predict_phishing_structured(features)
         ml_res = model_manager.predict_phishing(features)
 
-        # Step 5: Heuristic Rule Engine
-        heuristic_res = RuleEngine.evaluate_url(clean_url)
+        # Step 6: Heuristic Rule Engine
+        heuristic_res = RuleEngine.evaluate_url(canonical_url)
+        rule_eval = heuristic_res.get("structured_result")
 
-        # Step 6: Multi-Criteria Risk Evaluation
+        # Step 7: Multi-Criteria Risk Evaluation & Decision Fusion
         risk_res = RiskEngine.calculate_risk(
             target_type="url",
-            target_value=clean_url,
+            target_value=canonical_url,
             known_intel=known_intel,
             ml_result=ml_res,
             heuristic_result=heuristic_res,
             external_intel=external_intel
         )
 
-        # Step 7: Record Detection
+        decision_result = DetectionDecisionEngine.evaluate(
+            target_identifier=canonical_url,
+            input_type=InputType.URL,
+            ti_evidence=ti_evidence,
+            ml_prediction=ml_structured,
+            rule_result=rule_eval,
+            metadata={
+                "domain": domain,
+                "raw_url": str(url),
+                "threat_intel": intel_result,
+                "features": features
+            }
+        )
+
+        # Step 8: Record Detection Event if Threat Identified
         if risk_res.get("is_threat", False):
             indicator_id = None
             if known_intel and known_intel.get("found"):
@@ -192,7 +243,7 @@ class ThreatDetector:
             else:
                 indicator_id = register_indicator(
                     indicator_type="url",
-                    indicator_value=clean_url,
+                    indicator_value=canonical_url,
                     source="actis_url_scanner",
                     confidence=round(risk_res["score"] / 100.0, 2),
                     status="SUSPICIOUS" if risk_res["risk_level"] != "CRITICAL" else "CONFIRMED",
@@ -201,7 +252,7 @@ class ThreatDetector:
                 )
 
             record_detection(
-                target=clean_url,
+                target=canonical_url,
                 target_type="url",
                 final_score=risk_res["score"],
                 risk_level=risk_res["risk_level"],
@@ -214,19 +265,29 @@ class ThreatDetector:
                 indicator_id=indicator_id
             )
 
-        return {
+        final_result = {
             "target_type": "url",
-            "url": clean_url,
+            "url": canonical_url,
             "domain": domain,
             "score": risk_res["score"],
             "risk_level": risk_res["risk_level"],
             "is_threat": risk_res["is_threat"],
             "reasons": risk_res["reasons"],
             "recommended_action": risk_res["recommended_action"],
+            "confidence": decision_result.confidence,
             "ml_result": ml_res,
+            "ml_prediction": ml_structured.to_dict(),
             "heuristic_result": heuristic_res,
-            "threat_intel": intel_result
+            "threat_intel": intel_result,
+            "detection_result": decision_result.to_dict(),
+            "is_valid": True,
+            "from_cache": False
         }
+
+        # Cache canonical result in memory
+        self._url_cache[canonical_url] = final_result
+        return final_result
+
 
 
 # Global detector singleton
