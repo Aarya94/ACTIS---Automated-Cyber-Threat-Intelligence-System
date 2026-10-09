@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-10-09 10:34:45 UTC  
+**Generated:** 2026-10-09 10:35:51 UTC  
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)  
 
 This document inventories all automated test files, test classes, and test functions
@@ -12,7 +12,7 @@ recorded only after confirmed execution.
 ## Test Suite Summary
 
 - **Total Test Files:** `13`
-- **Total Discovered Test Cases:** `135`
+- **Total Discovered Test Cases:** `141`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -31,7 +31,7 @@ recorded only after confirmed execution.
 | `tests/test_risk_engine.py` | 3 tests | `PASSING` |
 | `tests/test_risk_engine_day6.py` | 8 tests | `PASSING` |
 | `tests/test_static_pe.py` | 21 tests | `PASSING` |
-| `tests/test_text_analyzer.py` | 3 tests | `PASSING` |
+| `tests/test_text_analyzer.py` | 9 tests | `PASSING` |
 | `tests/test_threat_database.py` | 3 tests | `PASSING` |
 | `tests/test_url_scanner.py` | 11 tests | `PASSING` |
 | `tests/test_week1_validation.py` | 4 tests | `PASSING` |
@@ -232,12 +232,18 @@ recorded only after confirmed execution.
 - `test_corrupted_pe_signature()`
 - `test_directory_passed_as_file()`
 
-### `tests/test_text_analyzer.py` (3 tests)
+### `tests/test_text_analyzer.py` (9 tests)
 
 **Standalone Test Functions:**
 - `test_extract_urls_multiple_formats()`
 - `test_social_engineering_detection()`
 - `test_end_to_end_message_analysis()`
+- `test_extract_urls_boundary_and_punctuation_handling()`
+- `test_message_url_canonical_deduplication()`
+- `test_100_repeated_urls_delegates_once_to_scanner()`
+- `test_message_scanner_delegates_to_common_url_scanner_path()`
+- `test_empty_none_and_no_url_messages()`
+- `test_structured_message_scan_result_contract()`
 
 ### `tests/test_threat_database.py` (3 tests)
 
