@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-10-09 12:48:36 UTC  
+**Generated:** 2026-10-09 12:51:18 UTC  
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)  
 
 This document inventories all automated test files, test classes, and test functions
@@ -11,8 +11,8 @@ recorded only after confirmed execution.
 
 ## Test Suite Summary
 
-- **Total Test Files:** `16`
-- **Total Discovered Test Cases:** `177`
+- **Total Test Files:** `17`
+- **Total Discovered Test Cases:** `186`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -31,6 +31,7 @@ recorded only after confirmed execution.
 | `tests/test_incremental_state.py` | 8 tests | `PASSING` |
 | `tests/test_malware_dataset.py` | 25 tests | `PASSING` |
 | `tests/test_protection_service_lifecycle.py` | 15 tests | `PASSING` |
+| `tests/test_protection_service_workers.py` | 9 tests | `PASSING` |
 | `tests/test_risk_engine.py` | 3 tests | `PASSING` |
 | `tests/test_risk_engine_day6.py` | 8 tests | `PASSING` |
 | `tests/test_static_pe.py` | 21 tests | `PASSING` |
@@ -228,6 +229,23 @@ recorded only after confirmed execution.
 
 **Class `TestWindowsHostBridging`:**
 - `test_scm_control_pause_continue_stop()`
+
+### `tests/test_protection_service_workers.py` (9 tests)
+
+**Class `TestServiceWorker`:**
+- `test_worker_initial_status()`
+- `test_worker_start_and_clean_stop()`
+- `test_worker_pause_and_resume()`
+- `test_worker_failure_handling()`
+
+**Class `TestWorkerManager`:**
+- `test_manager_starts_and_stops_workers()`
+- `test_manager_restart_failed_workers()`
+
+**Class `TestProtectionServiceFailureRecovery`:**
+- `test_service_degrades_when_single_worker_fails_in_pool()`
+- `test_service_fails_when_all_workers_fail()`
+- `test_service_bounded_recovery_policy()`
 
 ### `tests/test_risk_engine.py` (3 tests)
 

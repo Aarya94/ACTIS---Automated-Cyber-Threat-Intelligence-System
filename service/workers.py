@@ -280,9 +280,12 @@ class WorkerManager:
             return [w.get_status() for w in self._workers]
 
     def active_count(self) -> int:
-        """Returns the number of currently running worker threads."""
+        """Returns the number of currently active, non-failed worker threads."""
         with self._lock:
-            return sum(1 for w in self._workers if w.is_alive())
+            return sum(
+                1 for w in self._workers
+                if w.is_alive() and w.state in (WorkerState.RUNNING, WorkerState.PAUSED)
+            )
 
     def total_count(self) -> int:
         """Returns total configured workers in the pool."""
@@ -290,11 +293,14 @@ class WorkerManager:
             return len(self._workers)
 
     def all_alive(self) -> bool:
-        """Returns True if all configured workers are actively running."""
+        """Returns True if all configured workers are actively running or paused."""
         with self._lock:
             if not self._workers:
                 return False
-            return all(w.is_alive() for w in self._workers)
+            return (
+                len(self._workers) == self.worker_count
+                and all(w.is_alive() and w.state in (WorkerState.RUNNING, WorkerState.PAUSED) for w in self._workers)
+            )
 
     def is_any_failed(self) -> bool:
         """Returns True if any managed worker has entered FAILED state."""

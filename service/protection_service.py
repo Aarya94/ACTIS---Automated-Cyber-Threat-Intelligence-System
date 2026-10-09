@@ -12,7 +12,7 @@ CRITICAL ARCHITECTURAL CONSTRAINTS:
 import threading
 import time
 from datetime import datetime, timezone
-from typing import Any, Dict, Optional
+from typing import Any, Callable, Dict, Optional
 
 from service.lifecycle import ServiceState, IServiceLifecycle, ServiceLifecycleError
 from service.config import ServiceConfig, get_default_service_config
@@ -36,10 +36,12 @@ class ProtectionService(IServiceLifecycle):
         self,
         config: Optional[ServiceConfig] = None,
         orchestrator: Optional[IAnalysisOrchestrationBoundary] = None,
+        worker_task_override: Optional[Callable[[], bool]] = None,
     ):
         self.config = config or get_default_service_config()
         self.state_manager = ServiceStateManager(initial_state=ServiceState.STOPPED)
         self.dispatcher = EventDispatcher()
+        self._worker_task_override = worker_task_override
 
         # Connect analysis orchestrator handoff boundary
         self.orchestrator = orchestrator or AnalysisOrchestrationStub()
@@ -66,6 +68,9 @@ class ProtectionService(IServiceLifecycle):
         Consumes from the bounded event queue and dispatches across the analysis boundary.
         Returns True if an item was processed, False otherwise.
         """
+        if self._worker_task_override is not None:
+            return self._worker_task_override()
+
         event = self.event_queue.get(block=True, timeout=0.1)
         if event is None:
             return False
