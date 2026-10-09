@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-10-09 12:19:52 UTC  
+**Generated:** 2026-10-09 12:21:22 UTC  
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)  
 
 This document inventories all automated test files, test classes, and test functions
@@ -11,8 +11,8 @@ recorded only after confirmed execution.
 
 ## Test Suite Summary
 
-- **Total Test Files:** `14`
-- **Total Discovered Test Cases:** `154`
+- **Total Test Files:** `15`
+- **Total Discovered Test Cases:** `162`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -28,6 +28,7 @@ recorded only after confirmed execution.
 | `tests/test_detection_engine.py` | 14 tests | `PASSING` |
 | `tests/test_device_scanner.py` | 10 tests | `PASSING` |
 | `tests/test_doc_generator.py` | 20 tests | `PASSING` |
+| `tests/test_incremental_state.py` | 8 tests | `PASSING` |
 | `tests/test_malware_dataset.py` | 25 tests | `PASSING` |
 | `tests/test_risk_engine.py` | 3 tests | `PASSING` |
 | `tests/test_risk_engine_day6.py` | 8 tests | `PASSING` |
@@ -156,6 +157,18 @@ recorded only after confirmed execution.
 
 **Class `TestGeneratorCli`:**
 - `test_cli_check_mode()`
+
+### `tests/test_incremental_state.py` (8 tests)
+
+**Class `TestIncrementalScanState`:**
+- `test_file_scan_state_serialization_roundtrip()`
+- `test_sqlite_persistence_crud()`
+- `test_change_detection_new_vs_unchanged_vs_modified()`
+- `test_change_detection_removed_file()`
+- `test_change_detection_version_incompatibility()`
+- `test_state_persistence_across_manager_instances()`
+- `test_prune_missing_files()`
+- `test_device_scanner_incremental_integration_end_to_end()`
 
 ### `tests/test_malware_dataset.py` (25 tests)
 

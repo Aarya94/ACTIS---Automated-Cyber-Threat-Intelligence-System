@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-09 12:19:52 UTC  
+**Generated:** 2026-10-09 12:21:22 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`66406ce`)  
+**Current Git Branch:** `main` (`6bf9ddd`)  
 
 ---
 
@@ -110,20 +110,21 @@
 
 ## Test Status
 
-- **Total Test Files:** `14`
-- **Total Discovered Test Functions:** `154`
+- **Total Test Files:** `15`
+- **Total Discovered Test Functions:** `162`
 - **Coverage Areas:** Configuration validation, SQLite database schema & CRUD, Phishing/Malware model contracts, PE feature extraction, API backend.
 
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `66406ce`
+- **HEAD Commit:** `6bf9ddd`
 - **Working Tree:** 1 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `6bf9ddd` | Aaryan Suman | 2026-10-09 | test: add device scanner traversal and safety coverage |
 | `66406ce` | Aaryan Suman | 2026-10-09 | feat: add structured device scan result contract |
 | `e1f1011` | Aaryan Suman | 2026-10-09 | feat: integrate device scanner with existing file analysis pipeline |
 | `0a6a883` | Aaryan Suman | 2026-10-09 | feat: implement unchanged and changed file detection |
@@ -133,7 +134,6 @@
 | `5714124` | Aaryan Suman | 2026-10-09 | feat: add safe file metadata collection for device scans |
 | `2539b3a` | Aaryan Suman | 2026-10-09 | feat: harden device scanner filesystem traversal |
 | `8adbf5a` | Aaryan Suman | 2026-10-09 | docs: regenerate project status and synchronize generated documentation |
-| `00d26ff` | Aaryan Suman | 2026-10-09 | docs: synchronize architecture index and GitBook summary |
 
 ## Known Issues
 
