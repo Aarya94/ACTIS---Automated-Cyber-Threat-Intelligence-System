@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-09 12:51:18 UTC  
+**Generated:** 2026-10-09 12:52:52 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`77ba8cb`)  
+**Current Git Branch:** `main` (`721f3d3`)  
 
 ---
 
@@ -110,20 +110,21 @@
 
 ## Test Status
 
-- **Total Test Files:** `17`
-- **Total Discovered Test Functions:** `186`
+- **Total Test Files:** `18`
+- **Total Discovered Test Functions:** `201`
 - **Coverage Areas:** Configuration validation, SQLite database schema & CRUD, Phishing/Malware model contracts, PE feature extraction, API backend.
 
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `77ba8cb`
-- **Working Tree:** 3 untracked/unstaged changes
+- **HEAD Commit:** `721f3d3`
+- **Working Tree:** 1 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `721f3d3` | Aaryan Suman | 2026-10-09 | test: add worker failure and shutdown regression coverage |
 | `77ba8cb` | Aaryan Suman | 2026-10-09 | test: add protection service lifecycle coverage |
 | `2de26b4` | Aaryan Suman | 2026-10-09 | feat: harden protection service failure handling |
 | `21cb05f` | Aaryan Suman | 2026-10-09 | feat: add protection service health state |
@@ -133,7 +134,6 @@
 | `a0b8ec2` | Aaryan Suman | 2026-10-09 | feat: implement protection service state management |
 | `a9078e0` | Aaryan Suman | 2026-10-09 | feat: add ACTIS protection service lifecycle contract |
 | `ef3f627` | Aaryan Suman | 2026-10-09 | docs: record Day 8 development changelog and synchronize generated docs |
-| `99743bd` | Aaryan Suman | 2026-10-09 | docs: document device scanning and incremental analysis workflow |
 
 ## Known Issues
 

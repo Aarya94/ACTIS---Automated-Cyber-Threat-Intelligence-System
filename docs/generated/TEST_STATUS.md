@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-10-09 12:51:18 UTC  
+**Generated:** 2026-10-09 12:52:52 UTC  
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)  
 
 This document inventories all automated test files, test classes, and test functions
@@ -11,8 +11,8 @@ recorded only after confirmed execution.
 
 ## Test Suite Summary
 
-- **Total Test Files:** `17`
-- **Total Discovered Test Cases:** `186`
+- **Total Test Files:** `18`
+- **Total Discovered Test Cases:** `201`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -30,6 +30,7 @@ recorded only after confirmed execution.
 | `tests/test_doc_generator.py` | 20 tests | `PASSING` |
 | `tests/test_incremental_state.py` | 8 tests | `PASSING` |
 | `tests/test_malware_dataset.py` | 25 tests | `PASSING` |
+| `tests/test_protection_service_events.py` | 15 tests | `PASSING` |
 | `tests/test_protection_service_lifecycle.py` | 15 tests | `PASSING` |
 | `tests/test_protection_service_workers.py` | 9 tests | `PASSING` |
 | `tests/test_risk_engine.py` | 3 tests | `PASSING` |
@@ -206,6 +207,31 @@ recorded only after confirmed execution.
 - `test_get_class_distribution_raw_labels()`
 - `test_get_class_distribution_normalized_target()`
 - `test_get_class_distribution_empty_dataframe()`
+
+### `tests/test_protection_service_events.py` (15 tests)
+
+**Class `TestSecurityEventContract`:**
+- `test_valid_event_creation()`
+- `test_string_type_conversion()`
+- `test_invalid_type_raises_error()`
+- `test_missing_source_rejected()`
+- `test_missing_target_for_file_events_rejected()`
+- `test_system_events_allow_empty_target()`
+- `test_to_dict_and_from_dict_roundtrip()`
+- `test_from_dict_invalid_data_rejected()`
+
+**Class `TestSecurityEventQueue`:**
+- `test_queue_put_and_get()`
+- `test_queue_capacity_drop()`
+
+**Class `TestEventDispatcher`:**
+- `test_specific_and_wildcard_dispatch()`
+- `test_handler_error_isolation()`
+- `test_orchestrator_stub_integration()`
+
+**Class `TestProtectionServiceEndToEndIntake`:**
+- `test_end_to_end_event_intake_flow()`
+- `test_reject_event_submission_when_service_stopped()`
 
 ### `tests/test_protection_service_lifecycle.py` (15 tests)
 
