@@ -24,6 +24,12 @@ from service.workers import (
     ServiceWorker,
     WorkerManager,
 )
+from service.events import (
+    SecurityEventType,
+    SecurityEventValidationError,
+    SecurityEvent,
+    SecurityEventQueue,
+)
 
 __all__ = [
     "ServiceState",
@@ -38,4 +44,8 @@ __all__ = [
     "WorkerStatus",
     "ServiceWorker",
     "WorkerManager",
+    "SecurityEventType",
+    "SecurityEventValidationError",
+    "SecurityEvent",
+    "SecurityEventQueue",
 ]

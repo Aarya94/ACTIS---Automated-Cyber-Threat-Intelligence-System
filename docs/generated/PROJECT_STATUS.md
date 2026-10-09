@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-09 12:43:05 UTC  
+**Generated:** 2026-10-09 12:43:53 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`a0b8ec2`)  
+**Current Git Branch:** `main` (`47b0e34`)  
 
 ---
 
@@ -117,13 +117,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `a0b8ec2`
+- **HEAD Commit:** `47b0e34`
 - **Working Tree:** 2 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `47b0e34` | Aaryan Suman | 2026-10-09 | feat: add controlled protection service worker lifecycle |
 | `a0b8ec2` | Aaryan Suman | 2026-10-09 | feat: implement protection service state management |
 | `a9078e0` | Aaryan Suman | 2026-10-09 | feat: add ACTIS protection service lifecycle contract |
 | `ef3f627` | Aaryan Suman | 2026-10-09 | docs: record Day 8 development changelog and synchronize generated docs |
@@ -133,7 +134,6 @@
 | `66406ce` | Aaryan Suman | 2026-10-09 | feat: add structured device scan result contract |
 | `e1f1011` | Aaryan Suman | 2026-10-09 | feat: integrate device scanner with existing file analysis pipeline |
 | `0a6a883` | Aaryan Suman | 2026-10-09 | feat: implement unchanged and changed file detection |
-| `a380c22` | Aaryan Suman | 2026-10-09 | feat: persist incremental file scan state |
 
 ## Known Issues
 
