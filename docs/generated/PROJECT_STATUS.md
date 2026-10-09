@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-09 12:39:56 UTC  
+**Generated:** 2026-10-09 12:41:56 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`ef3f627`)  
+**Current Git Branch:** `main` (`a9078e0`)  
 
 ---
 
@@ -117,13 +117,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `ef3f627`
-- **Working Tree:** 6 untracked/unstaged changes
+- **HEAD Commit:** `a9078e0`
+- **Working Tree:** 2 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `a9078e0` | Aaryan Suman | 2026-10-09 | feat: add ACTIS protection service lifecycle contract |
 | `ef3f627` | Aaryan Suman | 2026-10-09 | docs: record Day 8 development changelog and synchronize generated docs |
 | `99743bd` | Aaryan Suman | 2026-10-09 | docs: document device scanning and incremental analysis workflow |
 | `f7c702c` | Aaryan Suman | 2026-10-09 | test: add incremental scan state regression coverage |
@@ -133,7 +134,6 @@
 | `0a6a883` | Aaryan Suman | 2026-10-09 | feat: implement unchanged and changed file detection |
 | `a380c22` | Aaryan Suman | 2026-10-09 | feat: persist incremental file scan state |
 | `2ed93f0` | Aaryan Suman | 2026-10-09 | feat: add incremental scan state contract |
-| `80407ea` | Aaryan Suman | 2026-10-09 | feat: add streaming SHA-256 file fingerprinting |
 
 ## Known Issues
 

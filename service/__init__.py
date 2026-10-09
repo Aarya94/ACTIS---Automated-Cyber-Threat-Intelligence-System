@@ -13,6 +13,11 @@ from service.config import (
     ServiceConfig,
     get_default_service_config,
 )
+from service.state import (
+    ServiceStateManager,
+    StateTransitionRecord,
+    VALID_TRANSITIONS,
+)
 
 __all__ = [
     "ServiceState",
@@ -20,4 +25,7 @@ __all__ = [
     "IServiceLifecycle",
     "ServiceConfig",
     "get_default_service_config",
+    "ServiceStateManager",
+    "StateTransitionRecord",
+    "VALID_TRANSITIONS",
 ]
