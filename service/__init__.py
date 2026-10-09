@@ -18,6 +18,12 @@ from service.state import (
     StateTransitionRecord,
     VALID_TRANSITIONS,
 )
+from service.workers import (
+    WorkerState,
+    WorkerStatus,
+    ServiceWorker,
+    WorkerManager,
+)
 
 __all__ = [
     "ServiceState",
@@ -28,4 +34,8 @@ __all__ = [
     "ServiceStateManager",
     "StateTransitionRecord",
     "VALID_TRANSITIONS",
+    "WorkerState",
+    "WorkerStatus",
+    "ServiceWorker",
+    "WorkerManager",
 ]
