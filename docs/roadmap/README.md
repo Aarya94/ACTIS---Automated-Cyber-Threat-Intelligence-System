@@ -49,7 +49,7 @@ The roadmap is strictly structured into three distinct chronological phases:
 
 ---
 
-## 2. Phase 1: Completed Foundation (Days 1–7)
+## 2. Phase 1: Completed Foundation (Days 1–8)
 
 - **Day 1: Architecture Planning & Repository Foundation** — Repository topology, safe structure validation, and non-destructive policies established.
 - **Day 2: Configuration Management** — Strongly typed `AppConfig`, environment variable validation, dynamic project path anchoring (11 passing tests).
@@ -58,8 +58,9 @@ The roadmap is strictly structured into three distinct chronological phases:
 - **Day 5: ML Contracts & Phishing Model Foundation** — 19-feature morphological Random Forest phishing model and metadata contract verification.
 - **Day 6: Detection Engine & Risk Engine Integration** — Unified `DetectionDecisionEngine` combining ML, heuristics, and threat intelligence into normalized scores with explainability.
 - **Day 7: URL & Message Scanner Hardening** — Boundary-aware link extraction, canonical deduplication, safe heuristics, and strict delegation to the canonical URL analysis pipeline.
+- **Day 8: Device Scanner + Incremental Scan State** — Safe recursive filesystem traversal, Windows junction/reparse-point loop safety, safe file metadata extraction, streaming chunked SHA-256 fingerprinting with race detection, incremental scan state tracking (`NEW_FILE`, `UNCHANGED_FILE`, `CHANGED_FILE`, `REMOVED_FILE`, `UNAVAILABLE_FILE`), SQLite persistence (`file_scan_states`), canonical analysis pipeline delegation, and cooperative cancellation.
 
-*Current Baseline Verification:* 144 automated unit and integration tests passing with 100% success rate.
+*Current Baseline Verification:* 162 automated unit and integration tests passing with 100% success rate.
 
 ---
 
@@ -77,11 +78,12 @@ Detailed design is documented in [`docs/architecture/architecture-evolution.md`]
 
 ## 4. Phase 3: Revised Roadmap Execution (Days 8–16)
 
-### Day 8: Device Scanner + Incremental Scan State
-- **Goals:** Safe user-authorized filesystem scanning, incremental scan state tracking, privacy-preserving file fingerprints (SHA-256 + mtime/size), junction/reparse-point loop protection, cancellation token support, and skipping unchanged files.
-- **Constraint:** Do NOT implement the resident Windows service yet.
+### Day 8: Device Scanner + Incremental Scan State (`COMPLETED`)
+- **Delivered:** Safe user-authorized filesystem scanning, incremental scan state tracking, privacy-preserving file fingerprints (SHA-256 + mtime/size), junction/reparse-point loop protection, cancellation token support, and skipping unchanged files.
+- **Constraint Verified:** Resident Windows Protection Service was NOT implemented today.
+- **Components:** `scanners/device_scanner.py`, `scanners/incremental_state.py`, `tests/test_device_scanner.py`, `tests/test_incremental_state.py`.
 
-### Day 9: Windows Protection Service Foundation
+### Day 9: Windows Protection Service Foundation (`PLANNED`)
 - **Goals:** Define lightweight resident service architecture, startup/resume lifecycle management, event intake loop, service-to-orchestrator queueing boundary, and state persistence.
 
 ### Day 10: Event-Driven File Protection

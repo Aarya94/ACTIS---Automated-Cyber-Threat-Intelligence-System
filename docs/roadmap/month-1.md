@@ -42,7 +42,15 @@ The ACTIS development progression is structured into:
 - Hardened `scanners/url_scanner.py`: RFC validation, canonical normalization, 19-feature vector extraction, session caching.
 - Hardened `scanners/text_analyzer.py`: Boundary-aware URL extraction, canonical deduplication, social engineering heuristics.
 - **Architectural Mandate:** Strict delegation of all URL analysis to the single canonical URL scanning path (`scan_url_logic`).
-- 144 automated unit and integration tests passing with 100% success rate.
+
+### Day 8: Device Scanner + Incremental Scan State (`COMPLETED`)
+- Built safe, user-authorized recursive filesystem traversal with Windows junction/reparse-point loop safety (`TraversalSafetyHelper`).
+- Implemented safe file metadata collection (`FileMetadata`) and streaming chunked SHA-256 fingerprinting with race-condition detection (`FileFingerprint`).
+- Built incremental scan state management (`IncrementalStateManager`, `FileScanState`) with change classification (`NEW_FILE`, `UNCHANGED_FILE`, `CHANGED_FILE`, `REMOVED_FILE`, `UNAVAILABLE_FILE`).
+- Persisted scan state to SQLite (`file_scan_states`).
+- Integrated with canonical file analysis pipeline (`scan_file` -> `ThreatDetector.analyze_file`), reusing verdicts and skipping deep analysis for unchanged files while re-analyzing modified files.
+- Returned strongly-typed `DeviceScanResult` with cooperative cancellation support (`ScanCancellationToken`).
+- 162 automated unit and integration tests passing with 100% success rate.
 
 ---
 
@@ -60,10 +68,9 @@ Introduced following the completion of Day 7, this architectural shift recognize
 
 ## 4. Revised Execution Plan: Days 8–16
 
-### Day 8: Device Scanner + Incremental Scan State
-- **Goals:** Safe user-authorized filesystem scanning, incremental scan state tracking, privacy-preserving file fingerprints (SHA-256 + mtime/size), junction/reparse-point loop protection, cancellation token support, and skipping unchanged files.
-- **Constraint:** Do NOT implement the resident Windows service yet.
-- **Components:** `scanners/device_scanner.py`, `tests/test_device_scanner.py`.
+### Day 8: Device Scanner + Incremental Scan State (`COMPLETED`)
+- Safe user-authorized filesystem scanning, incremental scan state tracking, privacy-preserving file fingerprints (SHA-256 + mtime/size), junction/reparse-point loop protection, cancellation token support, and skipping unchanged files.
+- Components: `scanners/device_scanner.py`, `scanners/incremental_state.py`, `tests/test_device_scanner.py`, `tests/test_incremental_state.py`.
 
 ### Day 9: Windows Protection Service Foundation
 - **Goals:** Define lightweight resident service architecture, startup/resume lifecycle management, event intake loop, service-to-orchestrator queueing boundary, and state persistence.

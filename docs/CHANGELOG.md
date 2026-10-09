@@ -12,6 +12,12 @@ Milestone Scope: Architecture planning, configuration management, logging infras
 
 ---
 
+### 2026-10-09 — Day 8: Device Scanner & Incremental Scan State Foundation
+
+Implemented the safe, user-authorized Device Scanner and incremental scan state infrastructure for ACTIS. Features safe recursive filesystem traversal with Windows junction/reparse-point loop avoidance (`TraversalSafetyHelper`), safe file metadata inspection (`FileMetadata`), streaming chunked SHA-256 fingerprinting with race-condition detection (`FileFingerprint`), incremental scan state tracking (`IncrementalStateManager`, `FileScanState`) across five change states (`NEW_FILE`, `UNCHANGED_FILE`, `CHANGED_FILE`, `REMOVED_FILE`, `UNAVAILABLE_FILE`), analytical model version invalidation, SQLite scan state persistence (`file_scan_states`), canonical file analysis pipeline integration (`scan_file` -> `ThreatDetector.analyze_file`), skipping deep analysis for verified unchanged files while re-analyzing modified ones, and strongly-typed `DeviceScanResult` with cooperative cancellation support (`ScanCancellationToken`). Expanded automated test suite to 162 passing tests (100% pass rate).
+
+---
+
 ### 2026-09-14 — Week 1 Day 6: Detection Engine & ML Model Integration Foundation
 
 Implemented the central analytical intelligence layer of ACTIS, establishing the structured detection decision pipeline, heterogeneous evidence models, ML prediction contracts, rule evaluation results, threat intelligence evidence representations, deterministic mathematical risk scoring with dynamic active-layer normalization, five-tier risk classification with safety overrides, internal decision confidence calculation, grounded explanation generation, and model manager integration. Expanded automated test suite to 128 passing unit tests (100% pass rate).
