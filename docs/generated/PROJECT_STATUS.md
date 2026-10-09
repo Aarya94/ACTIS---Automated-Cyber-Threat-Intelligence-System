@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-09 12:18:43 UTC  
+**Generated:** 2026-10-09 12:19:52 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`e1f1011`)  
+**Current Git Branch:** `main` (`66406ce`)  
 
 ---
 
@@ -110,20 +110,21 @@
 
 ## Test Status
 
-- **Total Test Files:** `13`
-- **Total Discovered Test Functions:** `144`
+- **Total Test Files:** `14`
+- **Total Discovered Test Functions:** `154`
 - **Coverage Areas:** Configuration validation, SQLite database schema & CRUD, Phishing/Malware model contracts, PE feature extraction, API backend.
 
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `e1f1011`
+- **HEAD Commit:** `66406ce`
 - **Working Tree:** 1 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `66406ce` | Aaryan Suman | 2026-10-09 | feat: add structured device scan result contract |
 | `e1f1011` | Aaryan Suman | 2026-10-09 | feat: integrate device scanner with existing file analysis pipeline |
 | `0a6a883` | Aaryan Suman | 2026-10-09 | feat: implement unchanged and changed file detection |
 | `a380c22` | Aaryan Suman | 2026-10-09 | feat: persist incremental file scan state |
@@ -133,7 +134,6 @@
 | `2539b3a` | Aaryan Suman | 2026-10-09 | feat: harden device scanner filesystem traversal |
 | `8adbf5a` | Aaryan Suman | 2026-10-09 | docs: regenerate project status and synchronize generated documentation |
 | `00d26ff` | Aaryan Suman | 2026-10-09 | docs: synchronize architecture index and GitBook summary |
-| `8fbf12b` | Aaryan Suman | 2026-10-09 | docs: align README with development baseline and target architecture |
 
 ## Known Issues
 

@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-10-09 12:18:43 UTC  
+**Generated:** 2026-10-09 12:19:52 UTC  
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)  
 
 This document inventories all automated test files, test classes, and test functions
@@ -11,8 +11,8 @@ recorded only after confirmed execution.
 
 ## Test Suite Summary
 
-- **Total Test Files:** `13`
-- **Total Discovered Test Cases:** `144`
+- **Total Test Files:** `14`
+- **Total Discovered Test Cases:** `154`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -26,6 +26,7 @@ recorded only after confirmed execution.
 | `tests/test_config_loading.py` | 11 tests | `PASSING` |
 | `tests/test_config_validation.py` | 11 tests | `PASSING` |
 | `tests/test_detection_engine.py` | 14 tests | `PASSING` |
+| `tests/test_device_scanner.py` | 10 tests | `PASSING` |
 | `tests/test_doc_generator.py` | 20 tests | `PASSING` |
 | `tests/test_malware_dataset.py` | 25 tests | `PASSING` |
 | `tests/test_risk_engine.py` | 3 tests | `PASSING` |
@@ -101,6 +102,20 @@ recorded only after confirmed execution.
 - `test_url_pipeline_with_local_threat_intel_match()`
 - `test_url_pipeline_with_ml_prediction_and_heuristics()`
 - `test_url_pipeline_model_unavailable_safe_fallback()`
+
+### `tests/test_device_scanner.py` (10 tests)
+
+**Class `TestDeviceScannerTraversalAndSafety`:**
+- `test_traversal_empty_directory()`
+- `test_traversal_nested_directories()`
+- `test_traversal_missing_and_invalid_path()`
+- `test_traversal_only_executables_filter()`
+- `test_traversal_reparse_point_and_symlink_safety()`
+- `test_collect_file_metadata_safe()`
+- `test_streaming_fingerprint_chunked()`
+- `test_streaming_fingerprint_oversized()`
+- `test_streaming_fingerprint_changed_during_hash()`
+- `test_scan_cooperative_cancellation()`
 
 ### `tests/test_doc_generator.py` (20 tests)
 
