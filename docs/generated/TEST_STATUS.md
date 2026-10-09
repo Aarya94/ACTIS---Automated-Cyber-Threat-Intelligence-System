@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-10-09 13:40:52 UTC  
+**Generated:** 2026-10-09 13:43:23 UTC  
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)  
 
 This document inventories all automated test files, test classes, and test functions
@@ -11,8 +11,8 @@ recorded only after confirmed execution.
 
 ## Test Suite Summary
 
-- **Total Test Files:** `20`
-- **Total Discovered Test Cases:** `223`
+- **Total Test Files:** `21`
+- **Total Discovered Test Cases:** `230`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -30,6 +30,7 @@ recorded only after confirmed execution.
 | `tests/test_doc_generator.py` | 20 tests | `PASSING` |
 | `tests/test_file_protection_burst.py` | 5 tests | `PASSING` |
 | `tests/test_file_protection_events.py` | 17 tests | `PASSING` |
+| `tests/test_file_protection_integration.py` | 7 tests | `PASSING` |
 | `tests/test_incremental_state.py` | 8 tests | `PASSING` |
 | `tests/test_malware_dataset.py` | 25 tests | `PASSING` |
 | `tests/test_protection_service_events.py` | 15 tests | `PASSING` |
@@ -202,6 +203,19 @@ recorded only after confirmed execution.
 - `test_debounce_coalesces_rapid_modifications()`
 - `test_file_deletion_cancels_pending_debounced_writes()`
 - `test_wait_until_file_stable_helper()`
+
+### `tests/test_file_protection_integration.py` (7 tests)
+
+**Class `TestFileProtectionPipelineDirect`:**
+- `test_pipeline_classifies_new_file_and_analyzes()`
+- `test_pipeline_handles_disappearing_file()`
+- `test_pipeline_handles_file_deletion_and_pruning()`
+- `test_pipeline_handles_oversized_file()`
+- `test_pipeline_unsupported_non_executables_filter()`
+- `test_pipeline_race_condition_modification_during_analysis()`
+
+**Class `TestEndToEndProtectionServiceIntegration`:**
+- `test_full_filesystem_to_analysis_pipeline_integration()`
 
 ### `tests/test_incremental_state.py` (8 tests)
 

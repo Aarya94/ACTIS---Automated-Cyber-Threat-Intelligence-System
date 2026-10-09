@@ -325,20 +325,7 @@ class ProtectionService(IServiceLifecycle):
     def _on_debounced_file_event(self, event: NormalizedFileEvent) -> None:
         """Callback invoked by FileEventDebouncer when a file event has settled."""
         try:
-            sec_event = SecurityEvent(
-                event_type=event.event_type,
-                source="filesystem_watcher",
-                target=event.path,
-                metadata={
-                    "source_type": "filesystem",
-                    "raw_path": event.raw_path,
-                    "previous_path": event.previous_path,
-                    "is_directory": event.is_directory,
-                    "coalesced_count": event.coalesced_count,
-                    "file_size": event.file_size,
-                    "debounced": True,
-                }
-            )
+            sec_event = event.to_security_event(source="filesystem_watcher")
             success = self.submit_event(sec_event)
             if not success:
                 logger.warning(
