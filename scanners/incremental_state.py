@@ -106,3 +106,61 @@ class FileScanState:
             rule_version=str(data.get("rule_version", CURRENT_RULE_VERSION)),
             detection_reasons=reasons
         )
+
+
+class IncrementalStateManager:
+    """Manages incremental file scan states backed by persistent SQLite storage."""
+
+    def __init__(self, auto_load: bool = True):
+        self._cache: Dict[str, FileScanState] = {}
+        if auto_load:
+            self.load_all()
+
+    def load_all(self) -> int:
+        """Loads all existing persistent file scan states from SQLite into cache."""
+        from reports.threat_database import get_all_file_scan_states
+        records = get_all_file_scan_states()
+        self._cache.clear()
+        for r in records:
+            state = FileScanState.from_dict(r)
+            self._cache[state.canonical_path] = state
+        return len(self._cache)
+
+    def get_state(self, canonical_path: str) -> Optional[FileScanState]:
+        """Looks up cached or persistent state for a canonical path."""
+        if canonical_path in self._cache:
+            return self._cache[canonical_path]
+        from reports.threat_database import get_file_scan_state
+        db_record = get_file_scan_state(canonical_path)
+        if db_record:
+            state = FileScanState.from_dict(db_record)
+            self._cache[canonical_path] = state
+            return state
+        return None
+
+    def record_state(self, state: FileScanState) -> None:
+        """Saves a file scan state to in-memory cache and SQLite database."""
+        from reports.threat_database import save_file_scan_state
+        self._cache[state.canonical_path] = state
+        save_file_scan_state(state.to_dict())
+
+    def remove_state(self, canonical_path: str) -> bool:
+        """Removes a state record from cache and database."""
+        from reports.threat_database import delete_file_scan_state
+        self._cache.pop(canonical_path, None)
+        return delete_file_scan_state(canonical_path)
+
+    def clear(self) -> None:
+        """Clears both cache and database records."""
+        from reports.threat_database import clear_file_scan_states
+        self._cache.clear()
+        clear_file_scan_states()
+
+    def get_cached_count(self) -> int:
+        """Returns the number of cached state entries."""
+        return len(self._cache)
+
+    def get_all_states(self) -> Dict[str, FileScanState]:
+        """Returns a copy of all loaded states."""
+        return dict(self._cache)
+

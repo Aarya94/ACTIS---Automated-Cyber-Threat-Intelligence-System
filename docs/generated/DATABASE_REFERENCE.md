@@ -1,6 +1,6 @@
 # ACTIS Database Reference
 
-**Generated:** 2026-10-09 12:07:49 UTC  
+**Generated:** 2026-10-09 12:09:40 UTC  
 **Source of Truth:** DDL Schema Analysis (`reports/threat_database.py`)  
 
 This document describes the relational database persistence subsystem for ACTIS.
@@ -93,6 +93,23 @@ ACTIS uses an embedded SQLite database configured for high concurrency and resil
 | `risk_score` | `REAL` | DEFAULT 0.0 |
 | `scanned_at` | `TEXT` | NOT NULL |
 
+### Table: `file_scan_states`
+
+| Column Name | Data Type | Constraints / Purpose |
+|---|---|---|
+| `canonical_path` | `TEXT` | PRIMARY KEY |
+| `file_size` | `INTEGER` | NOT NULL |
+| `mtime` | `REAL` | NOT NULL |
+| `sha256` | `TEXT` | NOT NULL |
+| `last_scanned_at` | `TEXT` | NOT NULL |
+| `scan_status` | `TEXT` | NOT NULL |
+| `risk_score` | `REAL` | DEFAULT 0.0 |
+| `risk_level` | `TEXT` | DEFAULT 'LOW' |
+| `analyzer_version` | `TEXT` | None |
+| `model_version` | `TEXT` | None |
+| `rule_version` | `TEXT` | None |
+| `detection_reasons` | `TEXT` | None |
+
 ---
 
 ## Indices & Performance Optimizations
@@ -103,6 +120,8 @@ ACTIS uses an embedded SQLite database configured for high concurrency and resil
 | `idx_detections_target` | `detections` | `target` | Sub-millisecond B-tree lookup |
 | `idx_detections_time` | `detections` | `detected_at` | Sub-millisecond B-tree lookup |
 | `idx_scans_time` | `scans` | `started_at` | Sub-millisecond B-tree lookup |
+| `idx_file_states_sha256` | `file_scan_states` | `sha256` | Sub-millisecond B-tree lookup |
+| `idx_file_states_mtime` | `file_scan_states` | `mtime` | Sub-millisecond B-tree lookup |
 
 ---
 

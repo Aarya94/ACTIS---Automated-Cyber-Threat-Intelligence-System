@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-09 12:07:49 UTC  
+**Generated:** 2026-10-09 12:09:40 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`80407ea`)  
+**Current Git Branch:** `main` (`2ed93f0`)  
 
 ---
 
@@ -105,8 +105,8 @@
 - **Database Engine:** SQLite 3
 - **Database Schema Source:** `reports\threat_database.py`
 - **Schema Definition Status:** `IMPLEMENTED`
-- **Tables Defined:** 5 (`threats, indicators, scans, detections, scan_items`)
-- **Indices Defined:** 4
+- **Tables Defined:** 6 (`threats, indicators, scans, detections, scan_items, file_scan_states`)
+- **Indices Defined:** 6
 
 ## Test Status
 
@@ -117,13 +117,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `80407ea`
-- **Working Tree:** 1 untracked/unstaged changes
+- **HEAD Commit:** `2ed93f0`
+- **Working Tree:** 2 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `2ed93f0` | Aaryan Suman | 2026-10-09 | feat: add incremental scan state contract |
 | `80407ea` | Aaryan Suman | 2026-10-09 | feat: add streaming SHA-256 file fingerprinting |
 | `5714124` | Aaryan Suman | 2026-10-09 | feat: add safe file metadata collection for device scans |
 | `2539b3a` | Aaryan Suman | 2026-10-09 | feat: harden device scanner filesystem traversal |
@@ -133,7 +134,6 @@
 | `7672159` | Aaryan Suman | 2026-10-09 | docs: revise ACTIS development roadmap for post-day7 evolution |
 | `fa5627e` | Aaryan Suman | 2026-10-09 | docs: update ACTIS module implementation statuses and repository structure |
 | `9dc58c2` | Aaryan Suman | 2026-10-09 | docs: update detection and risk architecture with shared threat intelligence |
-| `92cb608` | Aaryan Suman | 2026-10-09 | docs: define analysis orchestration and scanning delegation architecture |
 
 ## Known Issues
 

@@ -107,11 +107,31 @@ def initialize_database():
     );
     """)
 
+    # 6. File scan states table (Incremental Scan State)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS file_scan_states (
+        canonical_path TEXT PRIMARY KEY,
+        file_size INTEGER NOT NULL,
+        mtime REAL NOT NULL,
+        sha256 TEXT NOT NULL,
+        last_scanned_at TEXT NOT NULL,
+        scan_status TEXT NOT NULL,
+        risk_score REAL DEFAULT 0.0,
+        risk_level TEXT DEFAULT 'LOW',
+        analyzer_version TEXT,
+        model_version TEXT,
+        rule_version TEXT,
+        detection_reasons TEXT
+    );
+    """)
+
     # Indexes
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_indicators_type_val ON indicators(indicator_type, indicator_value);")
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_detections_target ON detections(target);")
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_detections_time ON detections(detected_at);")
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_scans_time ON scans(started_at);")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_file_states_sha256 ON file_scan_states(sha256);")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_file_states_mtime ON file_scan_states(mtime);")
 
     # Seed known threat indicators if empty
     cursor.execute("SELECT COUNT(*) as cnt FROM indicators;")
@@ -284,6 +304,102 @@ def register_indicator(
 
     conn.close()
     return ind_id
+
+
+def save_file_scan_state(state: Dict[str, Any]) -> None:
+    """Inserts or updates an incremental file scan state record in SQLite."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    reasons_json = json.dumps(state.get("detection_reasons", []))
+    cursor.execute("""
+    INSERT INTO file_scan_states (
+        canonical_path, file_size, mtime, sha256, last_scanned_at,
+        scan_status, risk_score, risk_level, analyzer_version,
+        model_version, rule_version, detection_reasons
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ON CONFLICT(canonical_path) DO UPDATE SET
+        file_size = excluded.file_size,
+        mtime = excluded.mtime,
+        sha256 = excluded.sha256,
+        last_scanned_at = excluded.last_scanned_at,
+        scan_status = excluded.scan_status,
+        risk_score = excluded.risk_score,
+        risk_level = excluded.risk_level,
+        analyzer_version = excluded.analyzer_version,
+        model_version = excluded.model_version,
+        rule_version = excluded.rule_version,
+        detection_reasons = excluded.detection_reasons;
+    """, (
+        str(state["canonical_path"]),
+        int(state.get("file_size", 0)),
+        float(state.get("mtime", 0.0)),
+        str(state.get("sha256", "")),
+        str(state.get("last_scanned_at", "")),
+        str(state.get("scan_status", "CLEAN")),
+        float(state.get("risk_score", 0.0)),
+        str(state.get("risk_level", "LOW")),
+        str(state.get("analyzer_version", "1.0.0")),
+        str(state.get("model_version", "rf_malware_pe_v1")),
+        str(state.get("rule_version", "pe_heuristics_v1")),
+        reasons_json
+    ))
+    conn.commit()
+    conn.close()
+
+
+def get_file_scan_state(canonical_path: str) -> Optional[Dict[str, Any]]:
+    """Retrieves stored scan state for a canonical path if present."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM file_scan_states WHERE canonical_path = ?", (str(canonical_path),))
+    row = cursor.fetchone()
+    conn.close()
+    if row:
+        d = dict(row)
+        try:
+            d["detection_reasons"] = json.loads(d["detection_reasons"])
+        except Exception:
+            d["detection_reasons"] = []
+        return d
+    return None
+
+
+def get_all_file_scan_states() -> List[Dict[str, Any]]:
+    """Retrieves all stored incremental file scan states."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM file_scan_states")
+    rows = cursor.fetchall()
+    conn.close()
+    results = []
+    for row in rows:
+        d = dict(row)
+        try:
+            d["detection_reasons"] = json.loads(d["detection_reasons"])
+        except Exception:
+            d["detection_reasons"] = []
+        results.append(d)
+    return results
+
+
+def delete_file_scan_state(canonical_path: str) -> bool:
+    """Removes a scan state record for a given canonical path."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM file_scan_states WHERE canonical_path = ?", (str(canonical_path),))
+    deleted = cursor.rowcount > 0
+    conn.commit()
+    conn.close()
+    return deleted
+
+
+def clear_file_scan_states() -> None:
+    """Clears all stored incremental file scan states."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM file_scan_states;")
+    conn.commit()
+    conn.close()
 
 
 # Initialize tables on import
