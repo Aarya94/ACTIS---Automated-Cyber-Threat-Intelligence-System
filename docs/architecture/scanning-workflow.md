@@ -20,18 +20,23 @@ This document details the operational execution patterns, data pipelines, and no
 ## 2. In-Depth Operational Workflows
 
 ### A. URL Scanning Workflow
-1. **Input Normalization**: Trims whitespace, validates RFC URL syntax, parses protocol, hostname, port, and query components.
-2. **Morphological Feature Extraction**: Computes length, symbol counts (dots, hyphens, slashes, ampersands), and sub-domain counts.
-3. **Local DB & External TI Lookup**: Hashes normalized URL and domain to check known malicious listings.
-4. **ML Inference**: Invokes the 19-feature Random Forest phishing model (`models/phishing_model.pkl`).
-5. **Rule Heuristics**: Checks for direct IP hostnames, typosquatting patterns, unencoded credentials, or excessive redirection symbols (`//`).
-6. **Risk Engine Synthesis**: Evaluates evidence layers to produce a 0–100 score and explainability report.
+1. **Input Validation & Sanitization**: Validates candidate length (<= 4096 chars), verifies supported schemes (`http`, `https`), detects illegal control characters, and handles `None`/empty inputs without application faults.
+2. **Canonical Normalization**: Lowercases scheme and hostname, removes leading/trailing whitespace and enclosing quotes/brackets, strips default ports (`:80` for HTTP, `:443` for HTTPS) while preserving non-standard ports, and retains query strings and fragments without altering destination semantics.
+3. **In-Memory Caching**: Checks session scan cache keyed by canonical URL to prevent redundant reprocessing.
+4. **Local Threat Intelligence**: Checks exact normalized URL, hostname, and parent domain against local database IOCs (`indicators` table) offline.
+5. **Morphological Feature Extraction**: Computes the exact 19 morphological features in strict schema order (`url_length`, character counts for dots, hyphens, slashes, `@`, redirection `//`, etc.) matching the trained classifier contract.
+6. **Machine Learning Inference**: Invokes the Random Forest phishing classifier (`models/phishing_model.pkl`) to generate structured prediction probabilities and confidence scores.
+7. **Safe Heuristic Rules**: Evaluates deterministic lexical indicators (raw IP hostname, suspicious TLDs, excessive subdomains, credential keywords in path, `@` destination tricks, excessive length >150 chars, percent-encoding density, non-standard service ports). Heuristics serve strictly as contributing evidence rather than sole verdict determinants.
+8. **Detection Decision Fusion**: Routes all evidence signals into `DetectionDecisionEngine`, producing a typed `DetectionResult` with confidence, five-tier risk level, and human-readable explanation.
 
 ### B. Message Scanning Workflow
-1. **Link Extraction**: Employs URL-regex patterns to discover all embedded HTTP/HTTPS URLs.
-2. **Social Engineering Heuristics**: Analyzes textual corpus for urgency cues ("immediate action required", "account suspended", "verify password", "wire transfer", "cryptocurrency wallet").
-3. **Recursive Link Analysis**: Passes all extracted links to the URL Scanner.
-4. **Combined Threat Assessment**: Returns maximum link risk score compounded by message-level social engineering probability.
+1. **Boundary-Aware URL Extraction**: Uses regex to discover URLs in text while safely stripping sentence punctuation (`.`, `,`, `;`, `!`) and outer brackets/parentheses (`(...)`, `[...]`), while preserving balanced internal parentheses (such as Wikipedia reference links).
+2. **Canonical URL Deduplication**: Normalizes extracted URLs and deduplicates repeated instances and case variants (`https://example.com` vs `HTTPS://EXAMPLE.COM`). Tracks per-URL occurrence counts.
+3. **Delegation to Canonical URL Scanner**: Iterates solely over unique canonical URLs and passes them to `scan_url_logic`. Guarantees zero duplication of model inference or threat intelligence queries.
+4. **Social Engineering Heuristics**: Analyzes textual corpus for urgency cues ("immediate action required", "account suspended"), credential solicitation ("verify password", "login credentials"), and financial lure patterns ("wire transfer", "cryptocurrency").
+5. **Message-Level Aggregation**: Combines maximum URL threat score with social engineering probability into a structured `MessageScanResult`.
+6. **Privacy-Preserving Audit**: Retains structural counts and risk indicators without permanently logging or transmitting private communication content.
+
 
 ### C. File & Static PE Scanning Workflow
 1. **Size Verification**: Validates file size against `MAX_FILE_SIZE_BYTES` (default 100 MB). Files exceeding the limit are parsed for streaming cryptographic hashes only to avoid memory exhaustion.

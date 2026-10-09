@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-09 10:37:05 UTC  
+**Generated:** 2026-10-09 10:37:52 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`69f5868`)  
+**Current Git Branch:** `main` (`aff874f`)  
 
 ---
 
@@ -117,13 +117,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `69f5868`
+- **HEAD Commit:** `aff874f`
 - **Working Tree:** 1 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `aff874f` | Aaryan Suman | 2026-10-09 | test: add detection pipeline regression coverage for URL analysis |
 | `69f5868` | Aaryan Suman | 2026-10-09 | test: add message scanner deduplication and delegation coverage |
 | `587600c` | Aaryan Suman | 2026-10-09 | test: add URL scanner edge case coverage |
 | `2866259` | Aaryan Suman | 2026-10-09 | feat: implement structured MessageScanResult contract |
@@ -133,7 +134,6 @@
 | `d18631f` | Aaryan Suman | 2026-10-09 | feat: expand safe lexical heuristics in rule engine |
 | `6e2bedf` | Aaryan Suman | 2026-10-09 | feat: harden URL feature extraction with contract validation |
 | `ce21a5b` | Aaryan Suman | 2026-10-09 | feat: add canonical URL normalization and domain extraction |
-| `3bae715` | Aaryan Suman | 2026-10-09 | feat: add robust URL validation and sanitization helpers |
 
 ## Known Issues
 
