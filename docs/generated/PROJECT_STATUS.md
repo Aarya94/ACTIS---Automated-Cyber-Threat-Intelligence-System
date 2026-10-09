@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-09 11:44:20 UTC  
+**Generated:** 2026-10-09 11:45:24 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`f0c3844`)  
+**Current Git Branch:** `main` (`d83d525`)  
 
 ---
 
@@ -117,13 +117,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `f0c3844`
+- **HEAD Commit:** `d83d525`
 - **Working Tree:** 1 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `d83d525` | Aaryan Suman | 2026-10-09 | docs: record post-day7 architecture breakthrough and evolution rationale |
 | `f0c3844` | Aaryan Suman | 2026-10-09 | docs: record Day 7 development changelog and synchronize generated docs |
 | `3e5c233` | Aaryan Suman | 2026-10-09 | docs: document URL and message scanning workflow |
 | `aff874f` | Aaryan Suman | 2026-10-09 | test: add detection pipeline regression coverage for URL analysis |
@@ -133,7 +134,6 @@
 | `d594413` | Aaryan Suman | 2026-10-09 | feat: add canonical URL deduplication to message analysis |
 | `434d148` | Aaryan Suman | 2026-10-09 | feat: harden message URL extraction and boundary parsing |
 | `eae3a35` | Aaryan Suman | 2026-10-09 | feat: integrate URL scanner with DetectionDecisionEngine |
-| `d18631f` | Aaryan Suman | 2026-10-09 | feat: expand safe lexical heuristics in rule engine |
 
 ## Known Issues
 
