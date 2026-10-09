@@ -5,8 +5,8 @@ cues (urgency, credential prompts), and routes URLs through the unified URL scan
 """
 
 import re
-from typing import Dict, Any, List
-from scanners.url_scanner import scan_url_logic
+from typing import Dict, Any, List, Tuple, Optional, Union
+from scanners.url_scanner import scan_url_logic, normalize_url
 from config.config import get_logger
 
 logger = get_logger("TextAnalyzer")
@@ -127,32 +127,72 @@ class TextAnalyzer:
         }
 
     @classmethod
+    def extract_canonical_urls(cls, text: Any) -> Tuple[List[str], Dict[str, int]]:
+        """
+        Extracts raw URLs, converts each to its canonical normalized form,
+        and deduplicates them while maintaining occurrence counts.
+        Returns (ordered_unique_canonical_urls, occurrence_counts_dict).
+        """
+        raw_list = cls.extract_raw_urls(text)
+        canonical_unique: List[str] = []
+        counts: Dict[str, int] = {}
+
+        for raw_u in raw_list:
+            canonical = normalize_url(raw_u)
+            if not canonical:
+                continue
+            if canonical not in counts:
+                counts[canonical] = 1
+                canonical_unique.append(canonical)
+            else:
+                counts[canonical] += 1
+
+        return canonical_unique, counts
+
+    @classmethod
     def analyze_message(cls, text: str, check_external: bool = False) -> Dict[str, Any]:
         """
-        Parses text, checks social-engineering cues, and passes every extracted URL
-        through the central URL scanning pipeline.
+        Parses text, evaluates social-engineering cues, deduplicates URLs to canonical
+        representations, and delegates analysis to the common URL scanner logic.
         """
-        if not text or not text.strip():
+        if not text or not isinstance(text, str) or not text.strip():
             return {
                 "urls_found": [],
                 "url_count": 0,
-                "social_engineering": {},
+                "total_url_count": 0,
+                "unique_url_count": 0,
+                "social_engineering": {
+                    "se_score": 0,
+                    "has_urgency": False,
+                    "urgency_indicators": [],
+                    "has_credential_request": False,
+                    "credential_indicators": [],
+                    "has_financial_lure": False,
+                    "financial_indicators": []
+                },
                 "url_results": [],
+                "threat_urls_count": 0,
                 "overall_risk_level": "LOW",
-                "overall_score": 0,
+                "overall_score": 0.0,
+                "is_suspicious_message": False,
                 "summary": "No text provided."
             }
 
-        extracted_urls = cls.extract_urls(text)
+        canonical_urls, url_counts = cls.extract_canonical_urls(text)
+        total_raw_count = sum(url_counts.values())
         se_analysis = cls.evaluate_social_engineering(text)
 
         url_results = []
         max_url_score = 0.0
         threat_urls_count = 0
 
-        for url in extracted_urls:
+        # Scan each UNIQUE canonical URL exactly once
+        for url in canonical_urls:
             res = scan_url_logic(url, check_external=check_external)
-            url_results.append(res)
+            res_annotated = dict(res)
+            res_annotated["occurrence_count"] = url_counts.get(url, 1)
+            url_results.append(res_annotated)
+
             if res.get("is_threat", False):
                 threat_urls_count += 1
             if res.get("score", 0) > max_url_score:
@@ -160,7 +200,7 @@ class TextAnalyzer:
 
         # Combine text cues and URL risk
         combined_score = max_url_score
-        if se_analysis["se_score"] > 30 and extracted_urls:
+        if se_analysis["se_score"] > 30 and canonical_urls:
             combined_score = min(100.0, combined_score + (se_analysis["se_score"] * 0.3))
 
         if combined_score >= 80:
@@ -173,8 +213,10 @@ class TextAnalyzer:
             overall_level = "LOW"
 
         return {
-            "urls_found": extracted_urls,
-            "url_count": len(extracted_urls),
+            "urls_found": canonical_urls,
+            "url_count": len(canonical_urls),
+            "total_url_count": total_raw_count,
+            "unique_url_count": len(canonical_urls),
             "social_engineering": se_analysis,
             "url_results": url_results,
             "threat_urls_count": threat_urls_count,
@@ -182,6 +224,7 @@ class TextAnalyzer:
             "overall_risk_level": overall_level,
             "is_suspicious_message": (combined_score >= 35)
         }
+
 
 
 def analyze_text_cli():

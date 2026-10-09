@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-09 10:28:49 UTC  
+**Generated:** 2026-10-09 10:30:29 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`eae3a35`)  
+**Current Git Branch:** `main` (`434d148`)  
 
 ---
 
@@ -117,13 +117,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `eae3a35`
+- **HEAD Commit:** `434d148`
 - **Working Tree:** 1 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `434d148` | Aaryan Suman | 2026-10-09 | feat: harden message URL extraction and boundary parsing |
 | `eae3a35` | Aaryan Suman | 2026-10-09 | feat: integrate URL scanner with DetectionDecisionEngine |
 | `d18631f` | Aaryan Suman | 2026-10-09 | feat: expand safe lexical heuristics in rule engine |
 | `6e2bedf` | Aaryan Suman | 2026-10-09 | feat: harden URL feature extraction with contract validation |
@@ -133,7 +134,6 @@
 | `bfbb6ee` | Aaryan Suman | 2026-09-14 | docs: document detection engine workflow |
 | `e1e3821` | Aaryan Suman | 2026-09-14 | test: add risk engine edge case coverage |
 | `56307dd` | Aaryan Suman | 2026-09-14 | test: add detection engine validation suite |
-| `93aff4d` | Aaryan Suman | 2026-09-14 | feat: implement unified detection decision engine |
 
 ## Known Issues
 
