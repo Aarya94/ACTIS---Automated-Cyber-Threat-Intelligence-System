@@ -41,6 +41,11 @@ from service.windows_host import (
     WindowsServiceHost,
     create_windows_host,
 )
+from service.file_normalizer import (
+    normalize_filesystem_path,
+    NormalizedFileEvent,
+    FilesystemEventNormalizer,
+)
 
 __all__ = [
     "ServiceState",
@@ -66,4 +71,7 @@ __all__ = [
     "ProtectionService",
     "WindowsServiceHost",
     "create_windows_host",
+    "normalize_filesystem_path",
+    "NormalizedFileEvent",
+    "FilesystemEventNormalizer",
 ]
