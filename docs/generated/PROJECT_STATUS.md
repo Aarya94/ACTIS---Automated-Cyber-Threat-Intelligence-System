@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-09 10:37:52 UTC  
+**Generated:** 2026-10-09 10:40:06 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`aff874f`)  
+**Current Git Branch:** `main` (`3e5c233`)  
 
 ---
 
@@ -117,13 +117,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `aff874f`
-- **Working Tree:** 1 untracked/unstaged changes
+- **HEAD Commit:** `3e5c233`
+- **Working Tree:** 6 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `3e5c233` | Aaryan Suman | 2026-10-09 | docs: document URL and message scanning workflow |
 | `aff874f` | Aaryan Suman | 2026-10-09 | test: add detection pipeline regression coverage for URL analysis |
 | `69f5868` | Aaryan Suman | 2026-10-09 | test: add message scanner deduplication and delegation coverage |
 | `587600c` | Aaryan Suman | 2026-10-09 | test: add URL scanner edge case coverage |
@@ -133,7 +134,6 @@
 | `eae3a35` | Aaryan Suman | 2026-10-09 | feat: integrate URL scanner with DetectionDecisionEngine |
 | `d18631f` | Aaryan Suman | 2026-10-09 | feat: expand safe lexical heuristics in rule engine |
 | `6e2bedf` | Aaryan Suman | 2026-10-09 | feat: harden URL feature extraction with contract validation |
-| `ce21a5b` | Aaryan Suman | 2026-10-09 | feat: add canonical URL normalization and domain extraction |
 
 ## Known Issues
 
