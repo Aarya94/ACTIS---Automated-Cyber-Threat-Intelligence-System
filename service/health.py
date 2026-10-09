@@ -30,6 +30,7 @@ class ServiceHealth:
     last_transition_time: str
     restart_count: int
     worker_details: List[Dict[str, Any]]
+    filesystem_monitoring: Optional[Dict[str, Any]] = None
 
     def to_dict(self) -> Dict[str, Any]:
         """Serializes health report to a clean dictionary."""

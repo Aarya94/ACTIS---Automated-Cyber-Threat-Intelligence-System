@@ -165,6 +165,11 @@ class ServiceConfig:
     auto_restart_workers: bool = True
     max_restart_attempts: int = 3
     restart_cooldown_seconds: float = 1.0
+    monitored_paths: List[str] = field(default_factory=list)
+    debounce_delay_seconds: float = 1.0
+    max_file_size_bytes: int = 100 * 1024 * 1024
+    enable_file_monitoring: bool = False
+    filter_temporary_files: bool = True
 
     def to_dict(self, mask_secrets: bool = True) -> Dict[str, Any]:
         return {
@@ -178,6 +183,11 @@ class ServiceConfig:
             "auto_restart_workers": self.auto_restart_workers,
             "max_restart_attempts": self.max_restart_attempts,
             "restart_cooldown_seconds": self.restart_cooldown_seconds,
+            "monitored_paths": list(self.monitored_paths),
+            "debounce_delay_seconds": self.debounce_delay_seconds,
+            "max_file_size_bytes": self.max_file_size_bytes,
+            "enable_file_monitoring": self.enable_file_monitoring,
+            "filter_temporary_files": self.filter_temporary_files,
         }
 
 

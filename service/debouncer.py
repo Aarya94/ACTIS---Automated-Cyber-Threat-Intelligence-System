@@ -62,6 +62,15 @@ class FileEventDebouncer:
         self._events_emitted = 0
         self._events_dropped_unstable = 0
 
+    def start(self) -> None:
+        """Starts or resets the debouncer to active state."""
+        with self._lock:
+            self._is_stopped = False
+
+    def submit(self, event: NormalizedFileEvent) -> None:
+        """Alias for add_event."""
+        self.add_event(event)
+
     def add_event(self, event: NormalizedFileEvent) -> None:
         """
         Ingests a normalized filesystem event into the debounce pipeline.

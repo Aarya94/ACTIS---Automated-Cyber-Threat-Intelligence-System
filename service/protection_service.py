@@ -12,7 +12,8 @@ CRITICAL ARCHITECTURAL CONSTRAINTS:
 import threading
 import time
 from datetime import datetime, timezone
-from typing import Any, Callable, Dict, Optional
+from pathlib import Path
+from typing import Any, Callable, Dict, List, Optional
 
 from service.lifecycle import ServiceState, IServiceLifecycle, ServiceLifecycleError
 from service.config import ServiceConfig, get_default_service_config
@@ -21,6 +22,10 @@ from service.workers import WorkerManager
 from service.events import SecurityEvent, SecurityEventQueue, SecurityEventType
 from service.dispatcher import EventDispatcher, IAnalysisOrchestrationBoundary, AnalysisOrchestrationStub
 from service.health import ServiceHealth
+from scanners.file_watcher import FilesystemEventSource, FilesystemEvent
+from service.file_normalizer import FilesystemEventNormalizer, NormalizedFileEvent
+from service.file_filter import FileEventFilter, FileFilterPolicy
+from service.debouncer import FileEventDebouncer
 from config.config import get_logger
 
 logger = get_logger("ProtectionService")
@@ -56,6 +61,18 @@ class ProtectionService(IServiceLifecycle):
             worker_name_prefix=f"{self.config.service_name}-Worker",
             on_worker_error=self._on_worker_error,
         )
+
+        # Filesystem event monitoring components
+        self.monitored_paths: List[str] = list(getattr(self.config, "monitored_paths", []))
+        self.file_event_source: Optional[FilesystemEventSource] = None
+        self.file_normalizer = FilesystemEventNormalizer()
+        self.file_filter = FileEventFilter(
+            policy=FileFilterPolicy(
+                filter_temporary_files=getattr(self.config, "filter_temporary_files", True),
+                monitored_roots=self.monitored_paths,
+            )
+        )
+        self.file_debouncer: Optional[FileEventDebouncer] = None
 
         self._lock = threading.Lock()
         self._start_time: Optional[float] = None
@@ -188,6 +205,11 @@ class ProtectionService(IServiceLifecycle):
                     reason="Workers successfully initialized and started"
                 )
                 logger.info(f"ACTIS Protection Service '{self.config.service_name}' is now RUNNING.")
+
+                # Start filesystem monitoring if enabled and paths configured
+                if getattr(self.config, "enable_file_monitoring", False) and self.monitored_paths:
+                    self.start_filesystem_monitoring()
+
                 return True
 
             except Exception as start_err:
@@ -227,6 +249,9 @@ class ProtectionService(IServiceLifecycle):
             except ServiceLifecycleError:
                 # If already FAILED or in another state, proceed with resource cleanup
                 pass
+
+            # Gracefully stop filesystem monitoring first
+            self.stop_filesystem_monitoring()
 
             # Gracefully stop workers
             workers_clean = self.worker_manager.stop_workers(timeout_per_worker=shutdown_timeout)
@@ -295,6 +320,117 @@ class ProtectionService(IServiceLifecycle):
         """Returns True if the service is actively in RUNNING or PAUSED state."""
         return self.state_manager.current_state in (ServiceState.RUNNING, ServiceState.PAUSED)
 
+    # --- Filesystem Monitoring Integration ---
+
+    def _on_debounced_file_event(self, event: NormalizedFileEvent) -> None:
+        """Callback invoked by FileEventDebouncer when a file event has settled."""
+        try:
+            sec_event = SecurityEvent(
+                event_type=event.event_type,
+                source="filesystem_watcher",
+                target=event.path,
+                metadata={
+                    "source_type": "filesystem",
+                    "raw_path": event.raw_path,
+                    "previous_path": event.previous_path,
+                    "is_directory": event.is_directory,
+                    "coalesced_count": event.coalesced_count,
+                    "file_size": event.file_size,
+                    "debounced": True,
+                }
+            )
+            success = self.submit_event(sec_event)
+            if not success:
+                logger.warning(
+                    f"Failed to submit debounced file event {sec_event.event_id} for "
+                    f"'{event.path}' (queue full or service not running)."
+                )
+        except Exception as ex:
+            logger.error(f"Error handling debounced file event: {ex}", exc_info=True)
+
+    def _on_raw_file_event(self, fs_event: FilesystemEvent) -> None:
+        """Pipeline entry point for raw OS filesystem events from FilesystemEventSource."""
+        try:
+            normalized = self.file_normalizer.normalize(fs_event)
+            is_allowed, reason = self.file_filter.filter_event(normalized)
+            if not is_allowed:
+                return
+
+            if self.file_debouncer is not None:
+                self.file_debouncer.submit(normalized)
+        except Exception as ex:
+            logger.error(f"Error filtering/normalizing raw filesystem event: {ex}", exc_info=True)
+
+    def start_filesystem_monitoring(self, paths: Optional[List[str]] = None) -> bool:
+        """
+        Starts filesystem event monitoring on specified or configured paths.
+        Validates target directories, initializes normalizer, filter, debouncer,
+        and safely feeds settled events into the service queue.
+        """
+        target_paths = list(paths) if paths is not None else list(self.monitored_paths)
+        if not target_paths:
+            logger.info("No paths configured for filesystem monitoring.")
+            return False
+
+        valid_paths: List[str] = []
+        for p in target_paths:
+            try:
+                p_obj = Path(p)
+                if p_obj.exists() and p_obj.is_dir():
+                    valid_paths.append(str(p_obj.resolve()))
+                else:
+                    logger.warning(f"Configured monitoring path does not exist or is not a directory: '{p}'")
+            except Exception as ex:
+                logger.warning(f"Invalid path '{p}': {ex}")
+
+        if not valid_paths:
+            logger.warning("No valid directories available to monitor.")
+            return False
+
+        self.monitored_paths = valid_paths
+
+        # Safely shut down any active watcher or debouncer before reconfiguring
+        self.stop_filesystem_monitoring()
+
+        # Start debouncer
+        self.file_debouncer = FileEventDebouncer(
+            debounce_seconds=getattr(self.config, "debounce_delay_seconds", 1.0),
+            on_stable_event=self._on_debounced_file_event,
+        )
+        self.file_debouncer.start()
+
+        # Start filesystem event source
+        self.file_event_source = FilesystemEventSource(
+            paths=valid_paths,
+            on_event=self._on_raw_file_event,
+            recursive=True,
+        )
+        started = self.file_event_source.start()
+        if started:
+            logger.info(f"Filesystem monitoring started on {len(valid_paths)} path(s): {valid_paths}")
+            return True
+        else:
+            logger.error("Failed to start FilesystemEventSource.")
+            return False
+
+    def stop_filesystem_monitoring(self) -> None:
+        """Safely stops filesystem watcher and flushes debouncer."""
+        if self.file_event_source is not None:
+            try:
+                self.file_event_source.stop()
+            except Exception as ex:
+                logger.error(f"Error stopping FilesystemEventSource: {ex}")
+            finally:
+                self.file_event_source = None
+
+        if self.file_debouncer is not None:
+            try:
+                self.file_debouncer.stop()
+            except Exception as ex:
+                logger.error(f"Error stopping FileEventDebouncer: {ex}")
+            finally:
+                self.file_debouncer = None
+
     # --- Event Intake Boundary ---
 
     def submit_event(self, event: SecurityEvent) -> bool:
@@ -327,6 +463,14 @@ class ProtectionService(IServiceLifecycle):
             total_count = len(worker_statuses)
             is_healthy = (current_state == ServiceState.RUNNING and alive_count == total_count)
 
+            fs_info = {
+                "active": self.file_event_source is not None and self.file_event_source.is_running,
+                "monitored_paths": list(self.monitored_paths),
+                "debouncer_stats": self.file_debouncer.get_stats() if self.file_debouncer else None,
+                "filter_stats": self.file_filter.get_stats() if self.file_filter else None,
+                "normalizer_stats": self.file_normalizer.get_stats() if self.file_normalizer else None,
+            }
+
             return ServiceHealth(
                 state=current_state.value,
                 is_running=self.is_running(),
@@ -344,4 +488,5 @@ class ProtectionService(IServiceLifecycle):
                 last_transition_time=self.state_manager.last_transition_time,
                 restart_count=self._restart_count,
                 worker_details=[w.to_dict() for w in worker_statuses],
+                filesystem_monitoring=fs_info,
             )

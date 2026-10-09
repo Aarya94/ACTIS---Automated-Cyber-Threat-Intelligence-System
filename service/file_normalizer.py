@@ -85,8 +85,14 @@ class FilesystemEventNormalizer:
     Translates raw FilesystemEvent objects from watchdog into NormalizedFileEvent instances.
     """
 
-    @staticmethod
-    def normalize(raw_event: FilesystemEvent) -> Optional[NormalizedFileEvent]:
+    def __init__(self):
+        self._normalized_count = 0
+
+    def get_stats(self) -> Dict[str, Any]:
+        """Returns telemetry on normalization activity."""
+        return {"normalized_count": self._normalized_count}
+
+    def normalize(self, raw_event: FilesystemEvent) -> Optional[NormalizedFileEvent]:
         """
         Normalizes a raw FilesystemEvent.
         Returns NormalizedFileEvent or None if event cannot be safely normalized.
@@ -122,6 +128,7 @@ class FilesystemEventNormalizer:
             logger.debug(f"Ignored unknown raw filesystem event type: '{raw_event.event_type}'")
             return None
 
+        self._normalized_count += 1
         return NormalizedFileEvent(
             event_type=canonical_type,
             path=normalized_path,

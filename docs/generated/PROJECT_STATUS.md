@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-09 13:21:55 UTC  
+**Generated:** 2026-10-09 13:27:58 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`2ab558f`)  
+**Current Git Branch:** `main` (`72b2eba`)  
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `2ab558f`
-- **Working Tree:** 1 untracked/unstaged changes
+- **HEAD Commit:** `72b2eba`
+- **Working Tree:** 5 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `72b2eba` | Aaryan Suman | 2026-10-09 | feat: add bounded protection event queue |
 | `2ab558f` | Aaryan Suman | 2026-10-09 | feat: implement filesystem event debouncing |
 | `603d9cc` | Aaryan Suman | 2026-10-09 | feat: add filesystem event filtering |
 | `3f5c507` | Aaryan Suman | 2026-10-09 | feat: normalize ACTIS filesystem events |
@@ -140,7 +141,6 @@
 | `cb8de71` | Aaryan Suman | 2026-10-09 | test: add security event boundary validation coverage |
 | `721f3d3` | Aaryan Suman | 2026-10-09 | test: add worker failure and shutdown regression coverage |
 | `77ba8cb` | Aaryan Suman | 2026-10-09 | test: add protection service lifecycle coverage |
-| `2de26b4` | Aaryan Suman | 2026-10-09 | feat: harden protection service failure handling |
 
 ## Known Issues
 
