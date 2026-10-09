@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-09 11:50:08 UTC  
+**Generated:** 2026-10-09 11:51:26 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`9dc58c2`)  
+**Current Git Branch:** `main` (`fa5627e`)  
 
 ---
 
@@ -117,13 +117,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `9dc58c2`
+- **HEAD Commit:** `fa5627e`
 - **Working Tree:** 2 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `fa5627e` | Aaryan Suman | 2026-10-09 | docs: update ACTIS module implementation statuses and repository structure |
 | `9dc58c2` | Aaryan Suman | 2026-10-09 | docs: update detection and risk architecture with shared threat intelligence |
 | `92cb608` | Aaryan Suman | 2026-10-09 | docs: define analysis orchestration and scanning delegation architecture |
 | `8e7b996` | Aaryan Suman | 2026-10-09 | docs: define ACTIS protection service boundary and event intake layer |
@@ -133,7 +134,6 @@
 | `3e5c233` | Aaryan Suman | 2026-10-09 | docs: document URL and message scanning workflow |
 | `aff874f` | Aaryan Suman | 2026-10-09 | test: add detection pipeline regression coverage for URL analysis |
 | `69f5868` | Aaryan Suman | 2026-10-09 | test: add message scanner deduplication and delegation coverage |
-| `587600c` | Aaryan Suman | 2026-10-09 | test: add URL scanner edge case coverage |
 
 ## Known Issues
 

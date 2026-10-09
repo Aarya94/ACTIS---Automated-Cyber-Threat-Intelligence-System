@@ -1,122 +1,97 @@
-# ACTIS Roadmap — Month 1: Foundation (Weeks 1 – 4)
+# ACTIS Roadmap — Foundation & Evolution (Days 1 – 16)
 
-**Milestone Version**: `v0.1.0 — Foundation`
-
-Month 1 establishes the bedrock of ACTIS: architecture governance, configuration infrastructure, logging, local threat database contracts, the 19-feature URL phishing classifier, safe static PE feature extraction, heuristic rule engines, the 15-feature Windows PE malware model, and the initial detection fusion pipeline.
-
----
-
-## Week 1: Architecture, Configuration, Data & Model Foundations
-
-### Day 1: Architecture Planning & Repository Foundation
-- **Goal**: Define approved ACTIS system architecture and initialize repository structure.
-- **Tasks**: Draft `docs/architecture/`, define component topology, configure `.gitignore` for secrets and binaries.
-- **Expected Output**: Architectural documents, initial directory scaffold, clean `.gitignore`.
-- **Files/Components**: `docs/architecture/`, `tools/validate_structure.py`, `README.md`.
-- **Validation**: `python tools/validate_structure.py`.
-- **Dependencies**: None.
-- **Not Included**: ML model training, scanner implementations, live database initialization.
-
-### Day 2: Configuration Management (Current Completed Baseline)
-- **Goal**: Implement centralized, type-safe configuration with typed environment variable parsing and validation.
-- **Tasks**: Build `config/settings.py`, `config/env_loader.py`, `config/paths.py`, `config/defaults.py`, `config/validator.py`, `.env.example`.
-- **Expected Output**: Strongly-typed `AppConfig`, path resolver, 11 automated config tests, comprehensive documentation.
-- **Files/Components**: `config/`, `tests/test_config_loading.py`, `tests/test_config_validation.py`, `docs/configuration.md`.
-- **Validation**: `pytest tests/test_config_*.py` (100% pass).
-- **Dependencies**: Day 1 repository structure.
-- **Not Included**: Live threat intelligence syncing, database queries.
-
-### Day 3: Logging Infrastructure & Audit Trails
-- **Goal**: Establish enterprise structured logging, file rotation, and audit trail records.
-- **Tasks**: Build rotating file handlers, structured JSON log formatters, audit trail loggers in `config/logger.py`.
-- **Expected Output**: Structured logging utility supporting console and rotating file logs (`logs/actis.log`).
-- **Files/Components**: `config/logger.py`, `tests/test_logger.py`.
-- **Validation**: `pytest tests/test_logger.py`.
-- **Dependencies**: Day 2 configuration paths.
-- **Not Included**: Real-time dashboard log streaming.
-
-### Day 4: Database Contracts & Schema Planning
-- **Goal**: Define and initialize SQLite schemas for indicators, threats, scans, and detections.
-- **Tasks**: Create normalized tables (`threats`, `indicators`, `scans`, `detections`, `scan_items`), index definition, foreign keys.
-- **Expected Output**: `reports/threat_database.py` with thread-safe SQLite connection context managers.
-- **Files/Components**: `reports/threat_database.py`, `tests/test_threat_database.py`.
-- **Validation**: `pytest tests/test_threat_database.py`.
-- **Dependencies**: Day 2 database paths.
-- **Not Included**: Cloud database synchronization, ORMs.
-
-### Day 5: ML Contracts & Phishing Model Foundation
-- **Goal**: Establish feature schema contracts and integrate the 19-feature Random Forest phishing model.
-- **Tasks**: Formalize `models/phishing_model_metadata.json`, create `detection_engine/model_manager.py` schema validators.
-- **Expected Output**: Working ML inference runtime predicting phishing probability from 19 URL morphological features.
-- **Files/Components**: `detection_engine/model_manager.py`, `models/phishing_model_metadata.json`.
-- **Validation**: Verify prediction against synthetic test feature vectors.
-- **Dependencies**: Day 2 model paths.
-- **Not Included**: Windows PE binary analysis, online URL lookups.
-
-### Day 6: Initial Validation Suite Expansion
-- **Goal**: Implement end-to-end unit and integration validation for Week 1 components.
-- **Tasks**: Author `tests/run_week1_tests.py` covering directory structure, config load, DB creation, and ML metadata contracts.
-- **Expected Output**: Unified Week 1 validation runner.
-- **Files/Components**: `tests/run_week1_tests.py`, `tests/test_week1_validation.py`.
-- **Validation**: `python tests/run_week1_tests.py` passing 100%.
-- **Dependencies**: Days 1–5 implementations.
-- **Not Included**: Complex scanner workflows.
-
-### Day 7: Week 1 Review, Cleanup & Documentation
-- **Goal**: Audit Week 1 deliverables, verify changelog integrity, tag internal milestone `v0.1.0-w1`.
-- **Tasks**: Run full regression test suite, verify clean Git state, update `docs/CHANGELOG.md`.
-- **Expected Output**: Fully verified Week 1 foundation.
-- **Files/Components**: `docs/CHANGELOG.md`, `docs/generated/PROJECT_STATUS.md`.
-- **Validation**: Clean `git status`, all tests passing.
-- **Dependencies**: Days 1–6.
-- **Not Included**: Any Week 2 code.
+**Milestone Version**: `v0.1.0 — Foundation & Evolution`  
+**Status**: Authoritative Execution Plan  
 
 ---
 
-## Week 2: Static File Analysis & PE Feature Extraction
+## 1. Roadmap Architecture Overview
 
-### Days 8–10: Safe Read-Only Binary File Processing
-- **Goal**: Build file streaming hashing and entropy calculation routines.
-- **Tasks**: Implement chunked SHA-256 and MD5 hashing, byte frequency distribution, and Shannon entropy computation.
-- **Files/Components**: `scanners/file_feature_extractor.py`.
-- **Not Included**: Live process execution, dynamic debugging.
-
-### Days 11–13: PE Structural Header & Section Extraction
-- **Goal**: Extract 15 static PE header features from Windows binaries using `pefile`.
-- **Tasks**: Parse COFF headers, Optional headers, section tables, and import directories safely in memory.
-- **Files/Components**: `scanners/file_feature_extractor.py`, `tests/test_static_pe.py`.
-- **Not Included**: Malware model training (scheduled for Week 4).
-
-### Day 14: Week 2 Review & Integration Validation
-- **Goal**: Validate static PE feature extraction on benign and non-PE test samples.
-- **Files/Components**: `tests/test_static_pe.py`.
+The ACTIS development progression is structured into:
+1. **COMPLETED: Days 1–7** (Architecture, Configuration, Logging, SQLite Database, Phishing ML, Unified Detection Engine, URL & Message Scanner Hardening).
+2. **CURRENT BREAKTHROUGH: Post-Day-7 Architectural Evolution** (Transition from scanner collection to an event-driven Windows protection platform).
+3. **NEXT: Days 8–16** (Targeted implementation of the event-driven platform).
 
 ---
 
-## Week 3: Ingestion Scanners & Heuristic Rules
+## 2. Completed Foundation: Days 1–7
 
-### Days 15–17: URL Scanner & Text Message Analyzer
-- **Goal**: Build URL normalization, regex link extraction, and social engineering urgency detection.
-- **Files/Components**: `scanners/url_scanner.py`, `scanners/text_analyzer.py`.
+### Day 1: Architecture Planning & Repository Foundation (`COMPLETED`)
+- Defined approved ACTIS system architecture and initialized repository structure.
+- Established strict read-only security boundaries and `.gitignore` hygiene.
 
-### Days 18–20: Rule-Based Heuristic Engine & Risk Engine
-- **Goal**: Implement deterministic heuristic rules (PE injection APIs, packers, unescaped IPs) and dynamic weight risk fusion.
-- **Files/Components**: `detection_engine/rule_engine.py`, `detection_engine/risk_engine.py`.
+### Day 2: Configuration Management (`COMPLETED`)
+- Built strongly-typed `AppConfig`, path resolver, environment loader, and constraint validator.
+- 11 unit tests passing under `pytest`.
 
-### Day 21: Week 3 Integration Review
-- **Goal**: Verify evidence fusion across rules, preliminary scores, and risk bands.
+### Day 3: Logging Infrastructure & Audit Trails (`COMPLETED`)
+- Established enterprise structured logging, rotating file handlers, and credential sanitization in `config/logger.py`.
+
+### Day 4: Database Contracts & Schema Planning (`COMPLETED`)
+- Defined SQLite WAL-mode tables (`threats`, `indicators`, `scans`, `detections`, `scan_items`) in `reports/threat_database.py`.
+
+### Day 5: ML Contracts & Phishing Model Foundation (`COMPLETED`)
+- Formalized 19-feature morphological Random Forest phishing model contract (`models/phishing_model_metadata.json`).
+- Built schema enforcement in `detection_engine/model_manager.py`.
+
+### Day 6: Unified Detection Decision Engine & Risk Fusion (`COMPLETED`)
+- Built `DetectionDecisionEngine` combining ML, heuristics, and threat intelligence into normalized scores.
+- Implemented dynamic weight normalization, confidence scoring, and itemized explainability.
+
+### Day 7: URL & Message Scanner Hardening (`COMPLETED`)
+- Hardened `scanners/url_scanner.py`: RFC validation, canonical normalization, 19-feature vector extraction, session caching.
+- Hardened `scanners/text_analyzer.py`: Boundary-aware URL extraction, canonical deduplication, social engineering heuristics.
+- **Architectural Mandate:** Strict delegation of all URL analysis to the single canonical URL scanning path (`scan_url_logic`).
+- 144 automated unit and integration tests passing with 100% success rate.
 
 ---
 
-## Week 4: Malware Model & Detection Pipeline Validation
+## 3. Post-Day-7 Architectural Breakthrough
 
-### Days 22–24: Windows PE Malware Model Integration
-- **Goal**: Integrate the 15-feature Windows PE Random Forest classifier (`models/malware_model.pkl`).
-- **Files/Components**: `models/malware_model_metadata.json`, `detection_engine/model_manager.py`.
+Introduced following the completion of Day 7, this architectural shift recognizes that **ACTIS cannot remain merely a collection of independent scanners**. Scanners and sensors are input providers; the platform is evolving into a Windows-oriented, event-driven cyber protection platform featuring:
+- A lightweight resident **Protection Service**
+- An **Event/Input Layer** translating stimuli into typed security events
+- A centralized **Analysis Orchestrator** standardizing feature extraction and model execution
+- Shared **Threat Intelligence** infrastructure
+- The **Detection Engine** as the multi-criteria intelligence core
+- The **Risk Engine** providing evidence-driven, explainable classifications
 
-### Days 25–27: End-to-End Detection Orchestration
-- **Goal**: Unify scanners, models, rules, and risk engine in `detection_engine/threat_detector.py`.
-- **Files/Components**: `detection_engine/threat_detector.py`.
+---
 
-### Day 28: Month 1 Milestone Audit (`v0.1.0`)
-- **Goal**: Complete regression test suite, verify zero leaks/untracked files, cut milestone tag `v0.1.0`.
+## 4. Revised Execution Plan: Days 8–16
+
+### Day 8: Device Scanner + Incremental Scan State
+- **Goals:** Safe user-authorized filesystem scanning, incremental scan state tracking, privacy-preserving file fingerprints (SHA-256 + mtime/size), junction/reparse-point loop protection, cancellation token support, and skipping unchanged files.
+- **Constraint:** Do NOT implement the resident Windows service yet.
+- **Components:** `scanners/device_scanner.py`, `tests/test_device_scanner.py`.
+
+### Day 9: Windows Protection Service Foundation
+- **Goals:** Define lightweight resident service architecture, startup/resume lifecycle management, event intake loop, service-to-orchestrator queueing boundary, and state persistence.
+- **Components:** `service/protection_service.py`, `service/event_queue.py`.
+
+### Day 10: Event-Driven File Protection
+- **Goals:** File creation and modification event hooks (`watchdog`), write-stability debounce filtering, task enqueuing, and automatic handoff to the Analysis Orchestrator for new/modified files.
+- **Components:** `scanners/file_watcher.py`, `service/file_event_handler.py`.
+
+### Day 11: Online Threat Intelligence
+- **Goals:** External threat intelligence connectors (VirusTotal v3), safe read-only API client abstractions, rate-limiting, timeout controls, and normalized reputation results.
+- **Components:** `threat_intelligence/api_clients.py`, `threat_intelligence/threat_lookup.py`.
+
+### Day 12: Central ACTIS Threat Intelligence
+- **Goals:** Central ACTIS Threat Intelligence REST API, client-server synchronization protocol, federated sharing of verified indicators, and state machine transition enforcement (`CONFIRMED`, `SUSPICIOUS`, `CANDIDATE`).
+- **Components:** `backend/api.py`, `threat_intelligence/sync_manager.py`.
+
+### Day 13: Dashboard + Notification Layer
+- **Goals:** Streamlit cybersecurity command center UI, detection visualization, scan history queries, telemetry charts, and native Windows desktop alert notifications.
+- **Components:** `dashboard/app.py`, `notifications/notifier.py`.
+
+### Day 14: AI Security Assistant
+- **Goals:** Offline-grounded natural language security assistant, plain-English detection explanations, security state summarization, operating strictly through controlled SQLite read interfaces with **NO unrestricted OS shell access**.
+- **Components:** `assistant/security_assistant.py`.
+
+### Day 15: Security Hardening + Broad Threat Coverage Testing
+- **Goals:** Security boundary verification, false positive rate auditing, malformed input stress-testing, adversarial sample evaluation, privacy review, and end-to-end reliability benchmarks.
+- **Components:** `tests/test_adversarial_security.py`, `tests/test_privacy_safeguards.py`.
+
+### Day 16: Final Integration + Demo + Release
+- **Goals:** Complete system integration, reproducible deployment verification, documentation finalization, demonstration scripts, and milestone release preparation.
