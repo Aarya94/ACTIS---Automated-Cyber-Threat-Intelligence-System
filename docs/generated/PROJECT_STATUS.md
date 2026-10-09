@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-09 10:23:07 UTC  
+**Generated:** 2026-10-09 10:24:35 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`ce21a5b`)  
+**Current Git Branch:** `main` (`6e2bedf`)  
 
 ---
 
@@ -117,13 +117,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `ce21a5b`
+- **HEAD Commit:** `6e2bedf`
 - **Working Tree:** 1 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `6e2bedf` | Aaryan Suman | 2026-10-09 | feat: harden URL feature extraction with contract validation |
 | `ce21a5b` | Aaryan Suman | 2026-10-09 | feat: add canonical URL normalization and domain extraction |
 | `3bae715` | Aaryan Suman | 2026-10-09 | feat: add robust URL validation and sanitization helpers |
 | `2bf4946` | Aaryan Suman | 2026-09-14 | docs: record Day 6 development changelog and synchronize generated docs |
@@ -133,7 +134,6 @@
 | `93aff4d` | Aaryan Suman | 2026-09-14 | feat: implement unified detection decision engine |
 | `bb84daa` | Aaryan Suman | 2026-09-14 | feat: add model manager abstraction interface |
 | `ef7d2e2` | Aaryan Suman | 2026-09-14 | feat: add detection explanation and confidence calculation |
-| `f9482ae` | Aaryan Suman | 2026-09-14 | feat: add risk classification thresholds and override logic |
 
 ## Known Issues
 

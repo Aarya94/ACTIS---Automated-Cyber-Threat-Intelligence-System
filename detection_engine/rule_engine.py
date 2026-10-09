@@ -204,18 +204,39 @@ class RuleEngine:
     """Evaluates deterministic security heuristics on URLs and file metadata."""
 
     @classmethod
-    def evaluate_url(cls, url: str) -> Dict[str, Any]:
-        """Runs heuristic checks on a URL string."""
+    def evaluate_url(cls, url: Any) -> Dict[str, Any]:
+        """Runs deterministic heuristic checks on a URL string."""
         matches: List[RuleMatch] = []
 
-        if not url.startswith(("http://", "https://")):
-            url_to_parse = "http://" + url
-        else:
-            url_to_parse = url
+        if not url or not isinstance(url, str):
+            structured = RuleEvaluationResult(
+                target_identifier=str(url or ""),
+                target_type=RuleTargetType.URL,
+                matches=[],
+                total_score=0.0
+            )
+            return {
+                "score": 0,
+                "heuristic_score": 0,
+                "rules_triggered": [],
+                "reasons": [],
+                "structured_result": structured
+            }
 
-        parsed = urlparse(url_to_parse)
+        url_str = url.strip()
+        if not url_str.startswith(("http://", "https://")):
+            url_to_parse = "http://" + url_str
+        else:
+            url_to_parse = url_str
+
+        try:
+            parsed = urlparse(url_to_parse)
+        except Exception:
+            parsed = urlparse("http://invalid-url")
+
         hostname = (parsed.hostname or "").lower()
-        path = parsed.path.lower()
+        path = (parsed.path or "").lower()
+        query = (parsed.query or "").lower()
 
         # 1. IP address in hostname
         try:
@@ -269,14 +290,14 @@ class RuleEngine:
             ))
 
         # 5. '@' character in URL (basic authentication trick)
-        if "@" in url:
+        if "@" in url_str:
             matches.append(RuleMatch(
                 rule_id="RULE_URL_AT_SYMBOL",
                 rule_name="At-Symbol Destination Obfuscation",
                 severity=RuleSeverity.HIGH,
                 score_contribution=30.0,
                 explanation="URL contains '@' character, frequently used to mislead browser destination.",
-                evidence_detail={"raw_url": url}
+                evidence_detail={"raw_url": url_str}
             ))
 
         # 6. Excessive hyphens in domain
@@ -301,12 +322,46 @@ class RuleEngine:
                 evidence_detail={"path": path}
             ))
 
+        # 8. Excessive URL length
+        if len(url_str) > 150:
+            matches.append(RuleMatch(
+                rule_id="RULE_URL_EXCESSIVE_LENGTH",
+                rule_name="Excessive URL Length",
+                severity=RuleSeverity.LOW,
+                score_contribution=15.0,
+                explanation=f"URL is unusually long ({len(url_str)} characters), which may obscure destination.",
+                evidence_detail={"length": len(url_str)}
+            ))
+
+        # 9. Suspicious encoded characters
+        encoded_count = url_str.count("%")
+        if encoded_count >= 3:
+            matches.append(RuleMatch(
+                rule_id="RULE_URL_SUSPICIOUS_ENCODING",
+                rule_name="Suspicious Percent Encoding",
+                severity=RuleSeverity.LOW,
+                score_contribution=15.0,
+                explanation=f"URL contains repeated percent-encoded sequences ({encoded_count} tokens).",
+                evidence_detail={"percent_count": encoded_count}
+            ))
+
+        # 10. Non-standard port
+        if parsed.port and parsed.port not in (80, 443, 8080, 8443):
+            matches.append(RuleMatch(
+                rule_id="RULE_URL_SUSPICIOUS_PORT",
+                rule_name="Non-Standard Service Port",
+                severity=RuleSeverity.MEDIUM,
+                score_contribution=20.0,
+                explanation=f"URL directs traffic to non-standard service port {parsed.port}.",
+                evidence_detail={"port": parsed.port}
+            ))
+
         total_score = min(100.0, sum(m.score_contribution for m in matches))
         reasons = [m.explanation for m in matches]
         rules_triggered = [m.rule_id for m in matches]
 
         structured = RuleEvaluationResult(
-            target_identifier=url,
+            target_identifier=url_str,
             target_type=RuleTargetType.URL,
             matches=matches,
             total_score=total_score
@@ -319,6 +374,7 @@ class RuleEngine:
             "reasons": reasons,
             "structured_result": structured
         }
+
 
     @classmethod
     def evaluate_pe_file(cls, static_info: Dict[str, Any]) -> Dict[str, Any]:
