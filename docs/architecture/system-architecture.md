@@ -154,19 +154,24 @@ Following the Day 7 milestone, ACTIS evolved beyond a collection of independent 
 ## Layered Component Breakdown
 
 ### 1. Windows Resident Layer (`ACTIS Protection Service`)
-- **Status:** `PLANNED` (Targeted for Day 9).
+- **Status:** `IMPLEMENTED` (Completed in Day 9 Foundation).
 - **Responsibilities:**
-  - Manages Windows background service lifecycle (startup, resume, shutdown).
-  - Handles debouncing and file write-completion detection.
-  - Enqueues security events to the Analysis Orchestrator without blocking system threads.
+  - Manages Windows resident service lifecycle (`start`, `stop`, `pause`, `resume`).
+  - Enforces deterministic state transitions (`STOPPED`, `STARTING`, `RUNNING`, `PAUSED`, `DEGRADED`, `FAILED`).
+  - Coordinates background worker pools with graceful cancellation, thread safety, and bounded recovery.
+  - Ingests canonical `SecurityEvent` objects via thread-safe bounded queue (`SecurityEventQueue`).
+  - Dispatches security events to the Analysis Orchestrator without executing detection or ML logic inside the service layer.
+  - Provides Windows Service Control Manager (SCM) host adapter (`WindowsServiceHost`).
+  - *Boundary:* Real-time filesystem monitoring hooks are deferred to Day 10.
 
 ### 2. Event & Input Layer (`scanners/`)
-- **Status:** Core Foundation `IMPLEMENTED`; Advanced Sensors `PROTOTYPE / NOT YET MILESTONE-COMPLETE`.
+- **Status:** Core Foundation & Device Scanner `IMPLEMENTED`; Advanced Sensors `PROTOTYPE / NOT YET MILESTONE-COMPLETE`.
 - **Role:** Translates raw inputs and system events into strongly-typed security event objects.
   - *URL Ingest (`url_scanner.py`):* `IMPLEMENTED` (Validates, normalizes, extracts 19 morphological features).
   - *Message Ingest (`text_analyzer.py`):* `IMPLEMENTED` (Parses links, detects urgency, deduplicates, delegates to URL scanner).
   - *Static PE Ingest (`file_feature_extractor.py`):* `IMPLEMENTED` (Extracts 15 static PE features, SHA-256, MD5, byte entropy).
-  - *Device Scanner (`device_scanner.py`):* `PROTOTYPE / NOT YET MILESTONE-COMPLETE` (Filesystem crawler; scheduled for Day 8).
+  - *Device Scanner (`device_scanner.py`):* `IMPLEMENTED` (Completed in Day 8: user-authorized recursive crawler, junction loop protection, streaming SHA-256, structured scan results).
+  - *Incremental Scan State (`incremental_state.py`):* `IMPLEMENTED` (Completed in Day 8: SQLite change classification, state persistence, skip unchanged files).
   - *File Watcher (`file_watcher.py`):* `PROTOTYPE / NOT YET MILESTONE-COMPLETE` (Filesystem change monitor; scheduled for Day 10).
   - *Clipboard Monitor (`clipboard_scanner.py`):* `PROTOTYPE / NOT YET MILESTONE-COMPLETE` (URL clipboard monitor).
 

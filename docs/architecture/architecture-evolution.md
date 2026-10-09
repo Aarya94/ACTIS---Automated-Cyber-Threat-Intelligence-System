@@ -195,10 +195,10 @@ To ensure absolute transparency and prevent misleading claims, components are ca
 | **URL Scanner Hardening (`scanners/url_scanner.py`)** | `IMPLEMENTED` | RFC validation, canonical normalization, 19-feature contract, session caching. |
 | **Message Scanner (`scanners/text_analyzer.py`)** | `IMPLEMENTED` | Boundary cleanup, canonical deduplication, strict delegation to URL scanner. |
 | **Detection Decision Engine (`detection_engine/`)** | `IMPLEMENTED` | Multi-criteria fusion, dynamic weight normalization, rule engine, confidence scoring. |
-| **Automated Test Suite (`tests/`)** | `IMPLEMENTED` | 144 automated unit and integration tests passing with 100% success rate. |
-| **Device Scanner (`scanners/device_scanner.py`)** | `PROTOTYPE / NOT YET MILESTONE-COMPLETE` | Prototype filesystem crawler; incremental state and loop hardening planned for Day 8. |
-| **Windows Protection Service (`service/`)** | `PLANNED` | Architectural boundary defined; implementation scheduled for Day 9. |
-| **Event-Driven File Watcher (`scanners/file_watcher.py`)** | `PROTOTYPE / NOT YET MILESTONE-COMPLETE` | Prototype watchdog script; event filtering and orchestrator handoff planned for Day 10. |
+| **Device Scanner (`scanners/device_scanner.py`)** | `IMPLEMENTED` | Completed in Day 8: loop safety, chunked streaming SHA-256, structured scan result, incremental state tracking. |
+| **Windows Protection Service (`service/`)** | `IMPLEMENTED` | Completed in Day 9: deterministic lifecycle, state machine, worker management, SecurityEvent contract, bounded intake queue, EventDispatcher, AnalysisOrchestrator handoff, and Windows SCM host adapter. |
+| **Automated Test Suite (`tests/`)** | `IMPLEMENTED` | 200 automated unit and integration tests passing with 100% success rate. |
+| **Event-Driven File Watcher (`scanners/file_watcher.py`)** | `PLANNED` | Prototype watchdog script exists; event filtering and orchestrator handoff planned for Day 10. |
 | **Online Threat Intelligence (`threat_intelligence/api_clients.py`)** | `PROTOTYPE / NOT YET MILESTONE-COMPLETE` | Prototype VT client; rate-limiting and normalized abstraction scheduled for Day 11. |
 | **Central ACTIS TI API (`backend/`, `threat_intelligence/sync_manager.py`)** | `PROTOTYPE / NOT YET MILESTONE-COMPLETE` | Prototype FastAPI server; federated synchronization scheduled for Day 12. |
 | **Dashboard & Notifications (`dashboard/`, `notifications/`)** | `PROTOTYPE / NOT YET MILESTONE-COMPLETE` | Streamlit and notifier prototypes; integrated UI and alerts scheduled for Day 13. |

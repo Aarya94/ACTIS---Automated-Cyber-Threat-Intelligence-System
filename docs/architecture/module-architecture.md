@@ -86,11 +86,14 @@ To maintain absolute architectural truthfulness and prevent overclaiming, every 
 ---
 
 ### 2.6 Windows Protection Service (`service/`)
-- **Status:** `PLANNED` (Targeted for Day 9)
-- **Purpose:** Lightweight Windows resident service/daemon maintaining endpoint protection state, listening for security events, debouncing write locks, and queueing jobs to the Analysis Orchestrator.
-- **Dependencies:** Windows service APIs, `config`, event queue.
-- **Allowed Operations:** Run as background service; monitor system events; queue tasks asynchronously.
-- **Forbidden Operations:** Perform heavy ML or file parsing directly inside the resident event-loop.
+- **Status:** `IMPLEMENTED` (Completed in Day 9)
+- **Purpose:** Lightweight Windows resident service foundation maintaining deterministic lifecycle (`start`, `stop`, `pause`, `resume`), worker thread coordination, bounded failure recovery, `SecurityEvent` canonical contract, bounded FIFO queue (`SecurityEventQueue`), `EventDispatcher` subscription routing, decoupled `AnalysisOrchestrationBoundary` handoff, and Windows SCM host bridge (`WindowsServiceHost`).
+- **Inputs:** `SecurityEvent` objects from input sources (CLI, tests, future scanners).
+- **Outputs:** Dispatched security events across the analysis boundary; `ServiceHealth` telemetry.
+- **Dependencies:** `config`, `service.lifecycle`, `service.state`, `service.workers`, `service.events`, `service.dispatcher`, `service.health`, `service.windows_host`.
+- **Allowed Operations:** Thread-safe state transitions; queueing events; managing worker threads; non-blocking SCM control dispatch.
+- **Forbidden Operations:** Perform heavy ML or file parsing directly inside the resident service layer; tamper with OS security controls; create stealth persistence / registry run keys.
+- **Boundary Note:** Real-time filesystem event monitoring (`watchdog` file watcher) is explicitly deferred to Day 10.
 
 ---
 
