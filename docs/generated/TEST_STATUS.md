@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-10-09 13:34:43 UTC  
+**Generated:** 2026-10-09 13:38:36 UTC  
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)  
 
 This document inventories all automated test files, test classes, and test functions
@@ -11,8 +11,8 @@ recorded only after confirmed execution.
 
 ## Test Suite Summary
 
-- **Total Test Files:** `18`
-- **Total Discovered Test Cases:** `201`
+- **Total Test Files:** `19`
+- **Total Discovered Test Cases:** `218`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -28,6 +28,7 @@ recorded only after confirmed execution.
 | `tests/test_detection_engine.py` | 14 tests | `PASSING` |
 | `tests/test_device_scanner.py` | 10 tests | `PASSING` |
 | `tests/test_doc_generator.py` | 20 tests | `PASSING` |
+| `tests/test_file_protection_events.py` | 17 tests | `PASSING` |
 | `tests/test_incremental_state.py` | 8 tests | `PASSING` |
 | `tests/test_malware_dataset.py` | 25 tests | `PASSING` |
 | `tests/test_protection_service_events.py` | 15 tests | `PASSING` |
@@ -160,6 +161,33 @@ recorded only after confirmed execution.
 
 **Class `TestGeneratorCli`:**
 - `test_cli_check_mode()`
+
+### `tests/test_file_protection_events.py` (17 tests)
+
+**Class `TestFilesystemEventSource`:**
+- `test_initialization_valid_and_invalid_paths()`
+- `test_start_and_stop_lifecycle()`
+- `test_repeated_start_stop_is_idempotent()`
+- `test_file_creation_event_detection()`
+- `test_file_modification_event_detection()`
+- `test_file_deletion_event_detection()`
+
+**Class `TestFilesystemEventNormalizer`:**
+- `test_normalize_filesystem_path()`
+- `test_normalizer_mappings()`
+- `test_normalizer_converts_to_security_event()`
+
+**Class `TestFileEventFilter`:**
+- `test_filter_directories()`
+- `test_filter_temporary_files()`
+- `test_temporary_files_allowed_when_policy_disabled()`
+- `test_filter_excluded_segments()`
+- `test_filter_monitored_roots()`
+
+**Class `TestFileEventDebouncer`:**
+- `test_debounce_coalesces_rapid_modifications()`
+- `test_file_deletion_cancels_pending_debounced_writes()`
+- `test_wait_until_file_stable_helper()`
 
 ### `tests/test_incremental_state.py` (8 tests)
 

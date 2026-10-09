@@ -85,6 +85,10 @@ class FileEventFilter:
         self._filtered_count = 0
         self._filter_reasons_count: Dict[str, int] = {r.value: 0 for r in FilterReason}
 
+    def filter_event(self, event: NormalizedFileEvent) -> Tuple[bool, FilterReason]:
+        """Alias for should_process."""
+        return self.should_process(event)
+
     def should_process(self, event: NormalizedFileEvent) -> Tuple[bool, FilterReason]:
         """
         Determines whether a normalized filesystem event should proceed to debouncing and analysis.

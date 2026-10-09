@@ -139,12 +139,22 @@ class FilesystemEventSource:
     Provides thread-safe start, stop, and status querying.
     """
 
-    def __init__(self):
+    def __init__(
+        self,
+        paths: Optional[List[str]] = None,
+        on_event: Optional[Callable[[FilesystemEvent], None]] = None,
+        recursive: bool = False,
+    ):
         self._observer: Optional[Observer] = None
         self._monitored_paths: List[Path] = []
+        if paths:
+            self._monitored_paths = [Path(p).resolve() for p in paths if Path(p).exists()]
+        self._init_paths = list(paths) if paths else []
+        self._init_on_event = on_event
+        self._init_recursive = recursive
         self._is_running = False
         self._lock = threading.Lock()
-        self._on_event_callback: Optional[Callable[[FilesystemEvent], None]] = None
+        self._on_event_callback: Optional[Callable[[FilesystemEvent], None]] = on_event
 
     @property
     def is_running(self) -> bool:
@@ -156,10 +166,16 @@ class FilesystemEventSource:
         with self._lock:
             return list(self._monitored_paths)
 
+    @property
+    def paths(self) -> List[str]:
+        """Returns string representations of configured monitored paths."""
+        with self._lock:
+            return [str(p) for p in self._monitored_paths]
+
     def start(
         self,
-        directories: List[Path],
-        recursive: bool = False,
+        directories: Optional[List[Any]] = None,
+        recursive: Optional[bool] = None,
         on_event: Optional[Callable[[FilesystemEvent], None]] = None,
     ) -> bool:
         """
@@ -171,21 +187,25 @@ class FilesystemEventSource:
                 logger.info("FilesystemEventSource is already running.")
                 return True
 
-            valid_paths = [Path(p).resolve() for p in directories if Path(p).exists()]
+            target_dirs = directories if directories is not None else self._init_paths
+            is_recursive = recursive if recursive is not None else self._init_recursive
+            event_callback = on_event or self._init_on_event or (lambda ev: None)
+
+            valid_paths = [Path(p).resolve() for p in target_dirs if Path(p).exists()]
             if not valid_paths:
                 logger.warning("FilesystemEventSource: No valid existing directories provided to monitor.")
                 return False
 
             self._monitored_paths = valid_paths
-            self._on_event_callback = on_event or (lambda ev: None)
+            self._on_event_callback = event_callback
 
             try:
                 self._observer = Observer()
                 handler = WatchdogBridgeHandler(on_event=self._on_event_callback)
 
                 for path_obj in self._monitored_paths:
-                    self._observer.schedule(handler, str(path_obj), recursive=recursive)
-                    logger.info(f"FilesystemEventSource: Scheduled monitoring on {path_obj} (recursive={recursive})")
+                    self._observer.schedule(handler, str(path_obj), recursive=is_recursive)
+                    logger.info(f"FilesystemEventSource: Scheduled monitoring on {path_obj} (recursive={is_recursive})")
 
                 self._observer.start()
                 self._is_running = True
