@@ -24,11 +24,72 @@ from config.config import (
 
 logger = get_logger("DeviceScanner")
 
+from dataclasses import dataclass, asdict
+
 # Windows file extensions of primary security interest
 ANALYZABLE_EXTENSIONS = {
     ".exe", ".dll", ".sys", ".scr", ".bat", ".cmd", ".ps1", ".vbs",
     ".js", ".wsf", ".msi", ".com", ".pif", ".cpl", ".jar", ".hta"
 }
+
+
+@dataclass
+class FileMetadata:
+    """Safe metadata representation of a discovered filesystem object."""
+    canonical_path: str
+    filename: str
+    extension: str
+    file_size: int
+    mtime: float
+    ctime: float
+    is_accessible: bool = True
+    is_oversized: bool = False
+    error: Optional[str] = None
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
+
+
+def collect_file_metadata(file_path: Path, max_size_bytes: int = MAX_FILE_SIZE_BYTES) -> FileMetadata:
+    """Safely extracts filesystem metadata for a discovered path without reading content into memory."""
+    try:
+        resolved_path = file_path.resolve()
+        canonical_str = str(resolved_path)
+    except (OSError, RuntimeError):
+        canonical_str = str(file_path)
+
+    filename = file_path.name
+    extension = file_path.suffix.lower()
+
+    try:
+        st = file_path.stat()
+        file_size = st.st_size
+        mtime = float(st.st_mtime)
+        ctime = float(getattr(st, "st_ctime", mtime))
+        is_oversized = file_size > max_size_bytes
+        return FileMetadata(
+            canonical_path=canonical_str,
+            filename=filename,
+            extension=extension,
+            file_size=file_size,
+            mtime=mtime,
+            ctime=ctime,
+            is_accessible=True,
+            is_oversized=is_oversized,
+            error=None
+        )
+    except (PermissionError, OSError, FileNotFoundError) as e:
+        return FileMetadata(
+            canonical_path=canonical_str,
+            filename=filename,
+            extension=extension,
+            file_size=0,
+            mtime=0.0,
+            ctime=0.0,
+            is_accessible=False,
+            is_oversized=False,
+            error=str(e)
+        )
 
 
 class ScanCancellationToken:
