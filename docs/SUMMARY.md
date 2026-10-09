@@ -4,7 +4,8 @@
 * [Quick Start](quickstart.md)
 
 ## 🏛️ Architecture (Source of Truth)
-* [Architecture Overview & AI Rules](architecture/README.md)
+* [Architecture Overview & Governance](architecture/README.md)
+* [Architecture Evolution & Post-Day-7 Breakthrough](architecture/architecture-evolution.md)
 * [System Architecture](architecture/system-architecture.md)
 * [Module Architecture](architecture/module-architecture.md)
 * [Project Structure](architecture/project-structure.md)
@@ -19,9 +20,9 @@
 * [Configuration Guide](configuration.md)
 * [Database & ML Contracts](contracts.md)
 
-## 📅 4-Month Development Roadmap
-* [Roadmap Overview](roadmap/README.md)
-* [Month 1: Foundation (Days 1–28)](roadmap/month-1.md)
+## 📅 Development Roadmap & Evolution
+* [Roadmap Overview & Post-Day-7 Evolution](roadmap/README.md)
+* [Foundation & Evolution (Days 1–16)](roadmap/month-1.md)
 * [Month 2: Scanners & Detection (Days 29–56)](roadmap/month-2.md)
 * [Month 3: Real-Time & Threat Intel (Days 57–84)](roadmap/month-3.md)
 * [Month 4: Productization & Release (Days 85–112)](roadmap/month-4.md)

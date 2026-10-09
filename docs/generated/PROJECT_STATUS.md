@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-09 11:52:23 UTC  
+**Generated:** 2026-10-09 11:53:19 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`7672159`)  
+**Current Git Branch:** `main` (`8fbf12b`)  
 
 ---
 
@@ -117,13 +117,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `7672159`
-- **Working Tree:** 1 untracked/unstaged changes
+- **HEAD Commit:** `8fbf12b`
+- **Working Tree:** 2 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `8fbf12b` | Aaryan Suman | 2026-10-09 | docs: align README with development baseline and target architecture |
 | `7672159` | Aaryan Suman | 2026-10-09 | docs: revise ACTIS development roadmap for post-day7 evolution |
 | `fa5627e` | Aaryan Suman | 2026-10-09 | docs: update ACTIS module implementation statuses and repository structure |
 | `9dc58c2` | Aaryan Suman | 2026-10-09 | docs: update detection and risk architecture with shared threat intelligence |
@@ -133,7 +134,6 @@
 | `d83d525` | Aaryan Suman | 2026-10-09 | docs: record post-day7 architecture breakthrough and evolution rationale |
 | `f0c3844` | Aaryan Suman | 2026-10-09 | docs: record Day 7 development changelog and synchronize generated docs |
 | `3e5c233` | Aaryan Suman | 2026-10-09 | docs: document URL and message scanning workflow |
-| `aff874f` | Aaryan Suman | 2026-10-09 | test: add detection pipeline regression coverage for URL analysis |
 
 ## Known Issues
 
