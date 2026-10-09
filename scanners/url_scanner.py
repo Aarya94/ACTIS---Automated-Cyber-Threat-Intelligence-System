@@ -148,16 +148,46 @@ def normalize_url(url: Any) -> str:
 
 
 
-def extract_url_features(url: str) -> List[int]:
+# Exact 19 feature names expected by the trained Random Forest phishing model
+PHISHING_URL_FEATURE_NAMES: List[str] = [
+    "url_length",
+    "n_dots",
+    "n_hypens",
+    "n_underline",
+    "n_slash",
+    "n_questionmark",
+    "n_equal",
+    "n_at",
+    "n_and",
+    "n_exclamation",
+    "n_space",
+    "n_tilde",
+    "n_comma",
+    "n_plus",
+    "n_asterisk",
+    "n_hastag",
+    "n_dollar",
+    "n_percent",
+    "n_redirection"
+]
+
+
+def extract_url_features(url: Any) -> List[int]:
     """
     Extracts the exact 19 morphological features in schema order
     required by the trained Random Forest phishing classifier.
+    Safely handles empty, malformed, non-string, and None inputs without crashing.
     """
+    if not url or not isinstance(url, str):
+        return [0] * len(PHISHING_URL_FEATURE_NAMES)
+
     normalized = normalize_url(url)
-    
+    if not normalized:
+        return [0] * len(PHISHING_URL_FEATURE_NAMES)
+
     # Feature 1: url_length
     url_length = len(normalized)
-    
+
     # Features 2-18: Character counts
     n_dots = normalized.count(".")
     n_hypens = normalized.count("-")
@@ -176,11 +206,14 @@ def extract_url_features(url: str) -> List[int]:
     n_hastag = normalized.count("#")
     n_dollar = normalized.count("$")
     n_percent = normalized.count("%")
-    
+
     # Feature 19: count of '//' after the protocol
-    parsed = urlparse(normalized)
-    path_query = parsed.path + (f"?{parsed.query}" if parsed.query else "")
-    n_redirection = path_query.count("//")
+    try:
+        parsed = urlparse(normalized)
+        path_query = (parsed.path or "") + (f"?{parsed.query}" if parsed.query else "") + (f"#{parsed.fragment}" if parsed.fragment else "")
+        n_redirection = path_query.count("//")
+    except Exception:
+        n_redirection = 0
 
     return [
         url_length,
@@ -203,6 +236,34 @@ def extract_url_features(url: str) -> List[int]:
         n_percent,
         n_redirection
     ]
+
+
+def extract_url_features_dict(url: Any) -> Dict[str, int]:
+    """
+    Extracts morphological features and returns a mapping from feature name to value.
+    """
+    feature_list = extract_url_features(url)
+    return dict(zip(PHISHING_URL_FEATURE_NAMES, feature_list))
+
+
+def validate_extracted_features(features: Any) -> Tuple[bool, Optional[str]]:
+    """
+    Validates that a feature vector matches the 19 morphological features schema.
+    """
+    if not isinstance(features, (list, tuple)):
+        return False, f"Expected list or tuple of features, received {type(features).__name__}."
+
+    if len(features) != len(PHISHING_URL_FEATURE_NAMES):
+        return False, f"Expected {len(PHISHING_URL_FEATURE_NAMES)} features, received {len(features)}."
+
+    for idx, val in enumerate(features):
+        if not isinstance(val, (int, float)):
+            return False, f"Feature at index {idx} ('{PHISHING_URL_FEATURE_NAMES[idx]}') is non-numeric: {val}."
+        if isinstance(val, float) and (val != val or val == float("inf") or val == float("-inf")):
+            return False, f"Feature at index {idx} ('{PHISHING_URL_FEATURE_NAMES[idx]}') contains NaN or Inf."
+
+    return True, None
+
 
 
 def scan_url_logic(url: str, check_external: bool = False) -> Dict[str, Any]:
