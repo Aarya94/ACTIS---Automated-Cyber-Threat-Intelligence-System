@@ -74,23 +74,78 @@ def is_valid_url(url: Any) -> bool:
 
 
 
-def normalize_url(url: str) -> str:
-    """Normalizes URL scheme, lowercase domain, and strips www prefix."""
+def extract_domain(url: str) -> str:
+    """
+    Safely extracts lowercase domain/hostname from a URL string, stripping 'www.' prefix and ports.
+    Returns empty string on invalid or missing domain.
+    """
+    if not url or not isinstance(url, str):
+        return ""
     clean = url.strip()
     if not clean.startswith(("http://", "https://")):
         clean = "http://" + clean
+    try:
+        parsed = urlparse(clean)
+        host = (parsed.hostname or "").lower()
+        if host.startswith("www."):
+            host = host[4:]
+        return host
+    except Exception:
+        return ""
 
-    parsed = urlparse(clean)
-    domain = (parsed.netloc or "").lower()
 
-    if domain.startswith("www."):
-        domain = domain[4:]
+def normalize_url(url: Any) -> str:
+    """
+    Normalizes URL into a canonical representation:
+    - Strips surrounding whitespace and wrapping quotes/brackets
+    - Defaults missing scheme to http://
+    - Lowercases scheme and hostname
+    - Strips www. prefix from hostname
+    - Strips default ports (80 for http, 443 for https) while preserving non-standard ports
+    - Preserves path, queries, and fragments without mutating semantic destination
+    - Returns empty string safely on None or empty input
+    """
+    if url is None or not isinstance(url, str):
+        return ""
 
-    # Reconstruct normalized URL
-    scheme = parsed.scheme.lower()
+    clean = url.strip().strip("'\"<>[]()")
+    if not clean:
+        return ""
+
+    if not clean.startswith(("http://", "https://")):
+        clean = "http://" + clean
+
+    try:
+        parsed = urlparse(clean)
+    except Exception as e:
+        logger.warning(f"Failed to parse URL '{url}': {e}")
+        return clean.strip()
+
+    scheme = (parsed.scheme or "http").lower()
+    hostname = (parsed.hostname or "").lower()
+
+    if hostname.startswith("www."):
+        hostname = hostname[4:]
+
+    # Canonical port handling
+    port = parsed.port
+    is_default_port = (scheme == "http" and port == 80) or (scheme == "https" and port == 443)
+    if port and not is_default_port:
+        netloc = f"{hostname}:{port}"
+    else:
+        netloc = hostname
+
+    # Preserve userinfo if explicitly present (rare in clean URLs, but preserved)
+    if parsed.username:
+        user_info = f"{parsed.username}:{parsed.password}@" if parsed.password else f"{parsed.username}@"
+        netloc = f"{user_info}{netloc}"
+
     path = parsed.path
     query = f"?{parsed.query}" if parsed.query else ""
-    return f"{scheme}://{domain}{path}{query}"
+    fragment = f"#{parsed.fragment}" if parsed.fragment else ""
+
+    return f"{scheme}://{netloc}{path}{query}{fragment}"
+
 
 
 def extract_url_features(url: str) -> List[int]:
