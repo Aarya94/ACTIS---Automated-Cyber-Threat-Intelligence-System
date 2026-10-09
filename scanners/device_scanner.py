@@ -48,11 +48,51 @@ class ScanCancellationToken:
         return self._cancelled
 
 
+class TraversalSafetyHelper:
+    """Provides safe filesystem traversal guardrails preventing loops, symlinks, and junctions."""
+
+    FILE_ATTRIBUTE_REPARSE_POINT = 0x0400
+
+    def __init__(self):
+        self._visited_dirs: set = set()
+
+    def reset(self):
+        self._visited_dirs.clear()
+
+    @classmethod
+    def is_reparse_point_or_symlink(cls, path: Path) -> bool:
+        """Determines if a path is a symlink, Windows junction, or reparse point."""
+        try:
+            if path.is_symlink():
+                return True
+            if hasattr(os, "lstat"):
+                st = os.lstat(str(path))
+                attrs = getattr(st, "st_file_attributes", 0)
+                if attrs and (attrs & cls.FILE_ATTRIBUTE_REPARSE_POINT):
+                    return True
+        except (PermissionError, FileNotFoundError, OSError):
+            return True
+        return False
+
+    def is_directory_already_visited(self, path: Path) -> bool:
+        """Tracks visited directory device/inode identifiers to avoid circular junctions."""
+        try:
+            st = path.stat()
+            key = (st.st_dev, st.st_ino)
+            if key in self._visited_dirs and key != (0, 0):
+                return True
+            self._visited_dirs.add(key)
+            return False
+        except (PermissionError, FileNotFoundError, OSError):
+            return False
+
+
 class DeviceScanner:
-    """Manages filesystem scan operations."""
+    """Manages safe, user-authorized filesystem scan operations."""
 
     def __init__(self):
         self.cancellation_token = ScanCancellationToken()
+        self.traversal_helper = TraversalSafetyHelper()
 
     def cancel_current_scan(self):
         """Signals the active scan to stop gracefully."""
@@ -60,44 +100,58 @@ class DeviceScanner:
 
     def _is_reparse_point_or_symlink(self, path: Path) -> bool:
         """Checks whether a path is a Windows junction, symlink, or reparse point."""
-        try:
-            if path.is_symlink():
-                return True
-            # On Windows, check for reparse point attribute (avoids infinite recursion in AppData\Application Data)
-            if hasattr(os, "stat"):
-                st = os.lstat(str(path))
-                FILE_ATTRIBUTE_REPARSE_POINT = 0x400
-                if hasattr(st, "st_file_attributes") and (st.st_file_attributes & FILE_ATTRIBUTE_REPARSE_POINT):
-                    return True
-        except Exception:
-            return True
-        return False
+        return TraversalSafetyHelper.is_reparse_point_or_symlink(path)
 
     def _discover_files(self, root_dir: Path) -> List[Path]:
         """Safely discovers files in a directory hierarchy while avoiding junction loops."""
         discovered: List[Path] = []
-        if not root_dir.exists() or not root_dir.is_dir():
+        try:
+            root_path = Path(root_dir).resolve()
+        except (OSError, RuntimeError):
+            root_path = Path(root_dir)
+
+        if not root_path.exists():
+            logger.warning(f"Scan target does not exist: {root_path}")
             return discovered
 
+        if not root_path.is_dir():
+            if root_path.is_file():
+                return [root_path]
+            return discovered
+
+        self.traversal_helper.reset()
+
         try:
-            for root, dirs, files in os.walk(str(root_dir), followlinks=False):
+            for root, dirs, files in os.walk(str(root_path), followlinks=False):
                 if self.cancellation_token.is_cancelled:
                     break
 
-                # Filter out reparse points from directory recursion
+                current_root_path = Path(root)
+
+                # Filter out reparse points and circular directory references
                 dirs_to_remove = []
-                for d in dirs:
-                    d_path = Path(root) / d
-                    if self._is_reparse_point_or_symlink(d_path):
+                for d in list(dirs):
+                    d_path = current_root_path / d
+                    if TraversalSafetyHelper.is_reparse_point_or_symlink(d_path):
                         dirs_to_remove.append(d)
+                        logger.debug(f"Skipping reparse point / junction: {d_path}")
+                    elif self.traversal_helper.is_directory_already_visited(d_path):
+                        dirs_to_remove.append(d)
+                        logger.debug(f"Skipping circular visited directory: {d_path}")
+
                 for d in dirs_to_remove:
                     dirs.remove(d)
 
                 for f in files:
                     if self.cancellation_token.is_cancelled:
                         break
-                    file_path = Path(root) / f
+                    file_path = current_root_path / f
+                    # Skip symlink files during discovery
+                    if TraversalSafetyHelper.is_reparse_point_or_symlink(file_path):
+                        logger.debug(f"Skipping symlink file: {file_path}")
+                        continue
                     discovered.append(file_path)
+
         except (PermissionError, OSError) as e:
             logger.warning(f"Access error during discovery in {root_dir}: {e}")
 
