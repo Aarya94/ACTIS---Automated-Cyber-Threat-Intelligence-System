@@ -58,7 +58,62 @@ FINANCIAL_PATTERNS = [
 ]
 
 
+from dataclasses import dataclass, field
+
+
+@dataclass
+class MessageScanResult:
+    """
+    Structured message scan result contract.
+    Aggregates message-level social-engineering indicators and per-URL threat intelligence
+    without permanently persisting sensitive communication contents.
+    """
+    total_url_count: int
+    unique_url_count: int
+    urls_found: List[str]
+    url_results: List[Dict[str, Any]]
+    threat_urls_count: int
+    social_engineering: Dict[str, Any]
+    overall_score: float
+    overall_risk_level: str
+    is_suspicious_message: bool
+    explanation_summary: List[str] = field(default_factory=list)
+    recommended_action: str = ""
+    message_length: int = 0
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Serializes the message scan result into a standard dictionary representation."""
+        return {
+            "total_url_count": self.total_url_count,
+            "unique_url_count": self.unique_url_count,
+            "url_count": self.unique_url_count,  # backward compatibility alias
+            "urls_found": list(self.urls_found),
+            "url_results": list(self.url_results),
+            "threat_urls_count": self.threat_urls_count,
+            "social_engineering": dict(self.social_engineering),
+            "overall_score": round(self.overall_score, 1),
+            "overall_risk_level": self.overall_risk_level,
+            "is_suspicious_message": self.is_suspicious_message,
+            "explanation_summary": list(self.explanation_summary),
+            "reasons": list(self.explanation_summary),  # backward compatibility alias
+            "recommended_action": self.recommended_action,
+            "message_length": self.message_length
+        }
+
+
+def generate_message_action(risk_level: str) -> str:
+    """Produces security recommendation for message analysis."""
+    actions = {
+        "CRITICAL": "DO NOT click links or supply credentials. Quarantine or report this message immediately.",
+        "HIGH": "Strong threat indicators detected in links or messaging. Verify authenticity via an independent channel.",
+        "MEDIUM": "Suspicious language or anomalous link structures observed. Exercise heightened caution.",
+        "LOW": "Standard email hygiene recommended. No high-risk threats detected."
+    }
+    return actions.get(risk_level, actions["LOW"])
+
+
 class TextAnalyzer:
+
     """Analyzes messages, emails, and notes for suspicious links and engineering cues."""
 
     @staticmethod
@@ -150,18 +205,20 @@ class TextAnalyzer:
         return canonical_unique, counts
 
     @classmethod
-    def analyze_message(cls, text: str, check_external: bool = False) -> Dict[str, Any]:
+    def analyze_message_structured(cls, text: str, check_external: bool = False) -> MessageScanResult:
         """
-        Parses text, evaluates social-engineering cues, deduplicates URLs to canonical
+        Parses text, checks social-engineering cues, deduplicates URLs to canonical
         representations, and delegates analysis to the common URL scanner logic.
+        Returns a strongly-typed MessageScanResult contract.
         """
         if not text or not isinstance(text, str) or not text.strip():
-            return {
-                "urls_found": [],
-                "url_count": 0,
-                "total_url_count": 0,
-                "unique_url_count": 0,
-                "social_engineering": {
+            return MessageScanResult(
+                total_url_count=0,
+                unique_url_count=0,
+                urls_found=[],
+                url_results=[],
+                threat_urls_count=0,
+                social_engineering={
                     "se_score": 0,
                     "has_urgency": False,
                     "urgency_indicators": [],
@@ -170,13 +227,13 @@ class TextAnalyzer:
                     "has_financial_lure": False,
                     "financial_indicators": []
                 },
-                "url_results": [],
-                "threat_urls_count": 0,
-                "overall_risk_level": "LOW",
-                "overall_score": 0.0,
-                "is_suspicious_message": False,
-                "summary": "No text provided."
-            }
+                overall_score=0.0,
+                overall_risk_level="LOW",
+                is_suspicious_message=False,
+                explanation_summary=["No message text provided."],
+                recommended_action=generate_message_action("LOW"),
+                message_length=0
+            )
 
         canonical_urls, url_counts = cls.extract_canonical_urls(text)
         total_raw_count = sum(url_counts.values())
@@ -212,18 +269,53 @@ class TextAnalyzer:
         else:
             overall_level = "LOW"
 
-        return {
-            "urls_found": canonical_urls,
-            "url_count": len(canonical_urls),
-            "total_url_count": total_raw_count,
-            "unique_url_count": len(canonical_urls),
-            "social_engineering": se_analysis,
-            "url_results": url_results,
-            "threat_urls_count": threat_urls_count,
-            "overall_score": round(combined_score, 1),
-            "overall_risk_level": overall_level,
-            "is_suspicious_message": (combined_score >= 35)
-        }
+        # Construct explanation audit trail
+        explanations: List[str] = []
+        if threat_urls_count > 0:
+            explanations.append(f"Identified {threat_urls_count} high-risk threat URL(s) in message body.")
+            for u_res in url_results:
+                if u_res.get("is_threat", False):
+                    explanations.append(f"Threat URL '{u_res.get('url')}': {'; '.join(u_res.get('reasons', [])[:2])}")
+        elif len(canonical_urls) > 0:
+            explanations.append(f"Scanned {len(canonical_urls)} link(s); no confirmed malicious URLs detected.")
+
+        if se_analysis["has_urgency"]:
+            explanations.append(f"Urgency cues detected: {', '.join(se_analysis['urgency_indicators'])}.")
+        if se_analysis["has_credential_request"]:
+            explanations.append(f"Credential lure keywords identified: {', '.join(se_analysis['credential_indicators'])}.")
+        if se_analysis["has_financial_lure"]:
+            explanations.append(f"Financial lure keywords identified: {', '.join(se_analysis['financial_indicators'])}.")
+
+        if not explanations:
+            explanations.append("Message appears benign with no detected security anomalies.")
+
+        action = generate_message_action(overall_level)
+
+        return MessageScanResult(
+            total_url_count=total_raw_count,
+            unique_url_count=len(canonical_urls),
+            urls_found=canonical_urls,
+            url_results=url_results,
+            threat_urls_count=threat_urls_count,
+            social_engineering=se_analysis,
+            overall_score=round(combined_score, 1),
+            overall_risk_level=overall_level,
+            is_suspicious_message=(combined_score >= 35),
+            explanation_summary=explanations,
+            recommended_action=action,
+            message_length=len(text)
+        )
+
+    @classmethod
+    def analyze_message(cls, text: str, check_external: bool = False) -> Dict[str, Any]:
+        """
+        Parses text, evaluates social-engineering cues, deduplicates URLs to canonical
+        representations, and delegates analysis to the common URL scanner logic.
+        Returns a dictionary representation of MessageScanResult.
+        """
+        structured = cls.analyze_message_structured(text, check_external=check_external)
+        return structured.to_dict()
+
 
 
 
