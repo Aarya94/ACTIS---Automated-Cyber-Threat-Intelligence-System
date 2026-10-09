@@ -28,6 +28,7 @@ class SecurityEventType(str, Enum):
     FILE_CREATED = "FILE_CREATED"
     FILE_MODIFIED = "FILE_MODIFIED"
     FILE_RENAMED = "FILE_RENAMED"
+    FILE_DELETED = "FILE_DELETED"
     URL_DETECTED = "URL_DETECTED"
     MESSAGE_RECEIVED = "MESSAGE_RECEIVED"
     MANUAL_SCAN = "MANUAL_SCAN"
@@ -89,6 +90,7 @@ class SecurityEvent:
             SecurityEventType.FILE_CREATED,
             SecurityEventType.FILE_MODIFIED,
             SecurityEventType.FILE_RENAMED,
+            SecurityEventType.FILE_DELETED,
             SecurityEventType.URL_DETECTED,
             SecurityEventType.MESSAGE_RECEIVED,
         }

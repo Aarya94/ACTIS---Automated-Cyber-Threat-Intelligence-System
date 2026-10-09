@@ -1,26 +1,46 @@
 """
-ACTIS Real-Time File Watcher Module
-Monitors user-selected directories for newly created/downloaded files using watchdog.
-Includes write-stability debounce, safe static analysis, and alert notification.
+ACTIS Real-Time Filesystem Event Source
+Provides safe, watchdog-based filesystem event monitoring for ACTIS.
+Observes filesystem creation, modification, move/rename, and deletion events
+and dispatches normalized events into the ACTIS Protection Service.
+
+CRITICAL ARCHITECTURAL POLICY:
+The Filesystem Event Source ONLY observes and reports filesystem changes.
+It does NOT execute files, analyze malware, delete files, quarantine files,
+or modify files directly. All analysis is orchestrated downstream.
 """
 
 import time
 import threading
+from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List, Dict, Any, Optional, Set
+from typing import Any, Callable, Dict, List, Optional, Set
 from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler, FileCreatedEvent, FileModifiedEvent
+from watchdog.events import (
+    FileSystemEventHandler,
+    FileCreatedEvent,
+    FileModifiedEvent,
+    FileMovedEvent,
+    FileDeletedEvent,
+    DirCreatedEvent,
+    DirModifiedEvent,
+    DirMovedEvent,
+    DirDeletedEvent,
+)
 
-from scanners.file_scanner import scan_file
-from notifications.notifier import notifier
 from config.config import WATCHDOG_DEBOUNCE_SECONDS, get_logger
 
 logger = get_logger("FileWatcher")
 
 
-def wait_until_file_stable(file_path: Path, timeout: float = 6.0, check_interval: float = 0.5) -> bool:
+def wait_until_file_stable(
+    file_path: Path,
+    timeout: float = 4.0,
+    check_interval: float = 0.2,
+) -> bool:
     """
-    Waits until a newly created or downloaded file stops changing size and can be opened.
+    Waits until a newly created or written file stops changing size and can be opened.
+    Ensures writing processes have released the file lock before analysis begins.
     Returns True if file is stable and readable, False on timeout or error.
     """
     deadline = time.time() + timeout
@@ -32,7 +52,7 @@ def wait_until_file_stable(file_path: Path, timeout: float = 6.0, check_interval
                 return False
 
             curr_size = file_path.stat().st_size
-            # If size has not changed since last check and can be opened for reading
+            # If size is positive and hasn't changed across interval, verify readability
             if curr_size == last_size and curr_size > 0:
                 with open(file_path, "rb") as f:
                     f.read(min(1024, curr_size))
@@ -43,125 +63,180 @@ def wait_until_file_stable(file_path: Path, timeout: float = 6.0, check_interval
 
         time.sleep(check_interval)
 
+    # Final check if file exists and has size > 0
+    try:
+        if file_path.exists() and file_path.stat().st_size > 0:
+            with open(file_path, "rb") as f:
+                f.read(min(1024, file_path.stat().st_size))
+            return True
+    except (PermissionError, OSError):
+        pass
+
     return False
 
 
-class ThreatFileEventHandler(FileSystemEventHandler):
-    """Handles file system creation and modification events for ACTIS."""
+@dataclass
+class FilesystemEvent:
+    """
+    Raw filesystem event captured by the watchdog filesystem observer.
+    """
+    event_type: str  # "created", "modified", "moved", "deleted"
+    src_path: str
+    dest_path: Optional[str] = None
+    is_directory: bool = False
+    timestamp: float = field(default_factory=time.time)
 
-    def __init__(self, callback=None):
+
+class WatchdogBridgeHandler(FileSystemEventHandler):
+    """
+    Watchdog event listener that forwards raw filesystem events to a callback.
+    Does NOT spawn unbounded worker threads; events are forwarded directly
+    to the service debouncer and bounded queue.
+    """
+
+    def __init__(self, on_event: Callable[[FilesystemEvent], None]):
         super().__init__()
-        self.callback = callback
-        self._recently_scanned: Set[str] = set()
-        self._lock = threading.Lock()
-
-    def _process_file(self, file_path_str: str):
-        path = Path(file_path_str)
-        if not path.is_file():
-            return
-
-        with self._lock:
-            if str(path) in self._recently_scanned:
-                return
-            self._recently_scanned.add(str(path))
-            if len(self._recently_scanned) > 500:
-                self._recently_scanned.clear()
-
-        # Wait for file to complete writing
-        if not wait_until_file_stable(path, timeout=WATCHDOG_DEBOUNCE_SECONDS + 3.0):
-            logger.debug(f"File did not stabilize in time: {path.name}")
-            return
-
-        logger.info(f"[Watcher] New file detected: {path.name}. Performing static analysis...")
-        try:
-            result = scan_file(path)
-            if result.get("is_threat", False):
-                logger.warning(f"[Watcher] Threat detected in new file: {path.name} ({result['risk_level']})")
-                notifier.notify_threat(
-                    target=str(path),
-                    target_type="file",
-                    risk_level=result["risk_level"],
-                    score=result["score"],
-                    reasons=result["reasons"],
-                    recommended_action=result["recommended_action"]
-                )
-
-            if self.callback:
-                self.callback(result)
-        except Exception as e:
-            logger.error(f"[Watcher] Error scanning {path.name}: {e}")
+        self._on_event = on_event
 
     def on_created(self, event):
-        if not event.is_directory:
-            # Run in separate worker thread so file events aren't blocked
-            threading.Thread(target=self._process_file, args=(event.src_path,), daemon=True).start()
+        fs_event = FilesystemEvent(
+            event_type="created",
+            src_path=event.src_path,
+            is_directory=event.is_directory,
+        )
+        self._on_event(fs_event)
 
     def on_modified(self, event):
-        if not event.is_directory:
-            threading.Thread(target=self._process_file, args=(event.src_path,), daemon=True).start()
+        fs_event = FilesystemEvent(
+            event_type="modified",
+            src_path=event.src_path,
+            is_directory=event.is_directory,
+        )
+        self._on_event(fs_event)
+
+    def on_moved(self, event):
+        dest = getattr(event, "dest_path", None)
+        fs_event = FilesystemEvent(
+            event_type="moved",
+            src_path=event.src_path,
+            dest_path=dest,
+            is_directory=event.is_directory,
+        )
+        self._on_event(fs_event)
+
+    def on_deleted(self, event):
+        fs_event = FilesystemEvent(
+            event_type="deleted",
+            src_path=event.src_path,
+            is_directory=event.is_directory,
+        )
+        self._on_event(fs_event)
 
 
-class DirectoryWatcherService:
-    """Manages background watchdog observers on selected directories."""
+class FilesystemEventSource:
+    """
+    Manages background watchdog Observer instances for user-configured directories.
+    Provides thread-safe start, stop, and status querying.
+    """
 
     def __init__(self):
-        self.observer: Optional[Observer] = None
-        self.monitored_paths: List[Path] = []
-        self.is_running = False
+        self._observer: Optional[Observer] = None
+        self._monitored_paths: List[Path] = []
+        self._is_running = False
         self._lock = threading.Lock()
+        self._on_event_callback: Optional[Callable[[FilesystemEvent], None]] = None
 
-    def start(self, directories: List[Path], on_event_callback=None) -> bool:
-        """Starts monitoring the specified directories."""
+    @property
+    def is_running(self) -> bool:
         with self._lock:
-            if self.is_running:
+            return self._is_running
+
+    @property
+    def monitored_paths(self) -> List[Path]:
+        with self._lock:
+            return list(self._monitored_paths)
+
+    def start(
+        self,
+        directories: List[Path],
+        recursive: bool = False,
+        on_event: Optional[Callable[[FilesystemEvent], None]] = None,
+    ) -> bool:
+        """
+        Starts filesystem monitoring on the specified directories.
+        Thread-safe and idempotent.
+        """
+        with self._lock:
+            if self._is_running:
+                logger.info("FilesystemEventSource is already running.")
                 return True
 
-            self.monitored_paths = [Path(p) for p in directories if Path(p).exists()]
-            if not self.monitored_paths:
-                logger.warning("No valid directories provided for file watcher.")
+            valid_paths = [Path(p).resolve() for p in directories if Path(p).exists()]
+            if not valid_paths:
+                logger.warning("FilesystemEventSource: No valid existing directories provided to monitor.")
                 return False
 
-            self.observer = Observer()
-            handler = ThreatFileEventHandler(callback=on_event_callback)
-
-            for p in self.monitored_paths:
-                try:
-                    self.observer.schedule(handler, str(p), recursive=False)
-                    logger.info(f"[Watcher] Monitoring active on: {p}")
-                except Exception as e:
-                    logger.error(f"[Watcher] Failed to monitor {p}: {e}")
+            self._monitored_paths = valid_paths
+            self._on_event_callback = on_event or (lambda ev: None)
 
             try:
-                self.observer.start()
-                self.is_running = True
-                logger.info("File watcher service started successfully.")
+                self._observer = Observer()
+                handler = WatchdogBridgeHandler(on_event=self._on_event_callback)
+
+                for path_obj in self._monitored_paths:
+                    self._observer.schedule(handler, str(path_obj), recursive=recursive)
+                    logger.info(f"FilesystemEventSource: Scheduled monitoring on {path_obj} (recursive={recursive})")
+
+                self._observer.start()
+                self._is_running = True
+                logger.info(f"FilesystemEventSource started successfully on {len(self._monitored_paths)} path(s).")
                 return True
-            except Exception as e:
-                logger.error(f"Failed to start observer: {e}")
-                self.observer = None
+            except Exception as ex:
+                logger.error(f"Failed to start FilesystemEventSource observer: {ex}", exc_info=True)
+                if self._observer:
+                    try:
+                        self._observer.stop()
+                    except Exception:
+                        pass
+                self._observer = None
+                self._is_running = False
                 return False
 
-    def stop(self):
-        """Stops the file watcher observer."""
+    def stop(self, timeout: float = 3.0) -> bool:
+        """
+        Gracefully terminates the watchdog observer and joins threads.
+        Thread-safe and idempotent.
+        """
         with self._lock:
-            if not self.is_running or not self.observer:
-                return
+            if not self._is_running or not self._observer:
+                return True
+
+            logger.info("Stopping FilesystemEventSource observer...")
             try:
-                self.observer.stop()
-                self.observer.join(timeout=3.0)
-            except Exception as e:
-                logger.error(f"Error stopping file watcher: {e}")
+                self._observer.stop()
+                self._observer.join(timeout=timeout)
+            except Exception as ex:
+                logger.error(f"Error while stopping FilesystemEventSource observer: {ex}")
             finally:
-                self.observer = None
-                self.is_running = False
-                logger.info("File watcher service stopped.")
+                self._observer = None
+                self._is_running = False
+                logger.info("FilesystemEventSource stopped.")
+
+            return True
 
     def get_status(self) -> Dict[str, Any]:
-        """Returns current operational status and monitored directories."""
-        return {
-            "is_running": self.is_running,
-            "monitored_paths": [str(p) for p in self.monitored_paths]
-        }
+        """Returns snapshot telemetry of the event source."""
+        with self._lock:
+            return {
+                "is_running": self._is_running,
+                "monitored_paths": [str(p) for p in self._monitored_paths],
+            }
 
 
+class DirectoryWatcherService(FilesystemEventSource):
+    """Backwards-compatible alias for DirectoryWatcherService."""
+    pass
+
+
+# Global singleton instance for legacy imports
 file_watcher_service = DirectoryWatcherService()
