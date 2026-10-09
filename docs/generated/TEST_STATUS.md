@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-10-09 12:47:53 UTC  
+**Generated:** 2026-10-09 12:48:36 UTC  
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)  
 
 This document inventories all automated test files, test classes, and test functions
@@ -11,8 +11,8 @@ recorded only after confirmed execution.
 
 ## Test Suite Summary
 
-- **Total Test Files:** `15`
-- **Total Discovered Test Cases:** `162`
+- **Total Test Files:** `16`
+- **Total Discovered Test Cases:** `177`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -30,6 +30,7 @@ recorded only after confirmed execution.
 | `tests/test_doc_generator.py` | 20 tests | `PASSING` |
 | `tests/test_incremental_state.py` | 8 tests | `PASSING` |
 | `tests/test_malware_dataset.py` | 25 tests | `PASSING` |
+| `tests/test_protection_service_lifecycle.py` | 15 tests | `PASSING` |
 | `tests/test_risk_engine.py` | 3 tests | `PASSING` |
 | `tests/test_risk_engine_day6.py` | 8 tests | `PASSING` |
 | `tests/test_static_pe.py` | 21 tests | `PASSING` |
@@ -204,6 +205,29 @@ recorded only after confirmed execution.
 - `test_get_class_distribution_raw_labels()`
 - `test_get_class_distribution_normalized_target()`
 - `test_get_class_distribution_empty_dataframe()`
+
+### `tests/test_protection_service_lifecycle.py` (15 tests)
+
+**Class `TestServiceStateManager`:**
+- `test_initial_state()`
+- `test_valid_transitions()`
+- `test_invalid_transition_raises_error()`
+- `test_invalid_transition_without_raise()`
+- `test_record_error_and_reset()`
+
+**Class `TestProtectionServiceLifecycle`:**
+- `test_config()`
+- `test_initial_service_state()`
+- `test_service_start_and_stop()`
+- `test_repeated_start_is_idempotent()`
+- `test_repeated_stop_is_idempotent()`
+- `test_start_after_stop()`
+- `test_pause_and_resume()`
+- `test_pause_when_stopped_fails()`
+- `test_startup_failure_transitions_to_failed()`
+
+**Class `TestWindowsHostBridging`:**
+- `test_scm_control_pause_continue_stop()`
 
 ### `tests/test_risk_engine.py` (3 tests)
 
