@@ -11,6 +11,8 @@ import hashlib
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Callable
 
+from datetime import datetime, timezone
+
 from scanners.file_scanner import scan_file
 from reports.scan_database import (
     create_scan_session,
@@ -21,6 +23,12 @@ from config.config import (
     DEFAULT_QUICK_SCAN_PATHS,
     MAX_FILE_SIZE_BYTES,
     get_logger
+)
+from scanners.incremental_state import (
+    IncrementalStateManager,
+    FileScanState,
+    FileChangeType,
+    FileScanStatus
 )
 
 logger = get_logger("DeviceScanner")
@@ -207,9 +215,10 @@ class TraversalSafetyHelper:
 class DeviceScanner:
     """Manages safe, user-authorized filesystem scan operations."""
 
-    def __init__(self):
+    def __init__(self, state_manager: Optional[IncrementalStateManager] = None):
         self.cancellation_token = ScanCancellationToken()
         self.traversal_helper = TraversalSafetyHelper()
+        self.state_manager = state_manager or IncrementalStateManager(auto_load=True)
 
     def cancel_current_scan(self):
         """Signals the active scan to stop gracefully."""
@@ -279,7 +288,8 @@ class DeviceScanner:
         scan_type: str,
         target_paths: List[Path],
         progress_callback: Optional[Callable[[Dict[str, Any]], None]] = None,
-        only_executables: bool = False
+        only_executables: bool = False,
+        use_incremental: bool = True
     ) -> Dict[str, Any]:
         """
         Executes a scan over specified path roots.
@@ -289,6 +299,7 @@ class DeviceScanner:
             target_paths: List of directories or files to scan
             progress_callback: Optional callback func receiving progress dict
             only_executables: If True, focuses on Windows executable extensions
+            use_incremental: If True, reuses previous verdict for unchanged files
         """
         self.cancellation_token.reset()
         target_desc = ", ".join(str(p) for p in target_paths[:3])
@@ -309,9 +320,11 @@ class DeviceScanner:
 
         total_files = len(all_files)
         files_scanned = 0
+        unchanged_count = 0
         threats_found = 0
         error_count = 0
         skipped_count = 0
+        inaccessible_count = 0
         threat_results: List[Dict[str, Any]] = []
 
         start_time = time.time()
@@ -327,31 +340,152 @@ class DeviceScanner:
                 skipped_count += 1
                 continue
 
-            # Check file size limit
-            try:
-                if file_path.stat().st_size > MAX_FILE_SIZE_BYTES:
-                    skipped_count += 1
-                    continue
-            except (PermissionError, OSError):
-                error_count += 1
-                continue
-
-            try:
-                result = scan_file(file_path, scan_id=scan_id)
-                files_scanned += 1
-                
-                score = result.get("score", 0.0)
-                status_label = "clean"
-                if result.get("is_threat", False):
-                    threats_found += 1
-                    threat_results.append(result)
-                    status_label = "malicious" if result.get("risk_level") == "CRITICAL" else "suspicious"
-
-                # Record individual scan item
+            # Check safe metadata
+            meta = collect_file_metadata(file_path, max_size_bytes=MAX_FILE_SIZE_BYTES)
+            if not meta.is_accessible:
+                inaccessible_count += 1
                 record_scan_item(
                     scan_id=scan_id,
                     path_or_target=str(file_path),
-                    sha256=result.get("sha256", ""),
+                    sha256="",
+                    status="inaccessible",
+                    risk_score=0.0
+                )
+                continue
+
+            if meta.is_oversized:
+                skipped_count += 1
+                record_scan_item(
+                    scan_id=scan_id,
+                    path_or_target=str(file_path),
+                    sha256="",
+                    status="skipped_oversized",
+                    risk_score=0.0
+                )
+                continue
+
+            # Incremental State Verification
+            if use_incremental:
+                change_type, prev_state, _ = self.state_manager.check_file_status(
+                    file_path,
+                    max_size_bytes=MAX_FILE_SIZE_BYTES
+                )
+                if change_type == FileChangeType.UNCHANGED_FILE and prev_state is not None:
+                    unchanged_count += 1
+                    current_iso = datetime.now(timezone.utc).isoformat()
+                    self.state_manager.mark_unchanged(prev_state, current_iso)
+
+                    if prev_state.is_threat:
+                        threats_found += 1
+                        threat_results.append({
+                            "target_type": "file",
+                            "file_path": str(file_path),
+                            "file_name": file_path.name,
+                            "sha256": prev_state.sha256,
+                            "is_threat": True,
+                            "risk_level": prev_state.risk_level,
+                            "score": prev_state.risk_score,
+                            "reasons": prev_state.detection_reasons,
+                            "from_incremental_state": True
+                        })
+
+                    record_scan_item(
+                        scan_id=scan_id,
+                        path_or_target=str(file_path),
+                        sha256=prev_state.sha256,
+                        status=prev_state.scan_status.lower(),
+                        risk_score=prev_state.risk_score
+                    )
+
+                    if progress_callback:
+                        progress_callback({
+                            "scan_id": scan_id,
+                            "scan_type": scan_type,
+                            "current_file": str(file_path),
+                            "files_scanned": files_scanned,
+                            "unchanged_count": unchanged_count,
+                            "total_files": total_files,
+                            "threats_found": threats_found,
+                            "skipped_count": skipped_count,
+                            "inaccessible_count": inaccessible_count,
+                            "error_count": error_count,
+                            "percent": round(((files_scanned + unchanged_count) / max(1, total_files)) * 100, 1),
+                            "is_cancelled": self.cancellation_token.is_cancelled
+                        })
+                    continue
+
+            # Safe fingerprinting with race-condition detection
+            fp = compute_file_fingerprint(file_path, max_size_bytes=MAX_FILE_SIZE_BYTES)
+            if fp.status == "FILE_CHANGED_DURING_HASH":
+                error_count += 1
+                logger.warning(f"File modified during hash computation: {file_path}")
+                record_scan_item(
+                    scan_id=scan_id,
+                    path_or_target=str(file_path),
+                    sha256="",
+                    status="file_changed_during_hash",
+                    risk_score=0.0
+                )
+                continue
+            elif fp.status == "INACCESSIBLE":
+                inaccessible_count += 1
+                record_scan_item(
+                    scan_id=scan_id,
+                    path_or_target=str(file_path),
+                    sha256="",
+                    status="inaccessible",
+                    risk_score=0.0
+                )
+                continue
+            elif fp.status == "SKIPPED_OVERSIZED":
+                skipped_count += 1
+                record_scan_item(
+                    scan_id=scan_id,
+                    path_or_target=str(file_path),
+                    sha256="",
+                    status="skipped_oversized",
+                    risk_score=0.0
+                )
+                continue
+
+            # Pass into canonical file analysis pipeline
+            try:
+                result = scan_file(file_path, scan_id=scan_id)
+                files_scanned += 1
+
+                score = result.get("score", 0.0)
+                is_threat = result.get("is_threat", False)
+                risk_level = result.get("risk_level", "LOW")
+                sha256_hash = result.get("sha256") or fp.sha256
+
+                if is_threat:
+                    threats_found += 1
+                    threat_results.append(result)
+                    status_label = "malicious" if risk_level == "CRITICAL" else "suspicious"
+                else:
+                    status_label = "clean"
+
+                # Persist incremental state
+                now_iso = datetime.now(timezone.utc).isoformat()
+                reasons = result.get("reasons", []) or result.get("details", {}).get("matched_rules", [])
+                new_state = FileScanState(
+                    canonical_path=meta.canonical_path,
+                    file_size=meta.file_size,
+                    mtime=meta.mtime,
+                    sha256=sha256_hash,
+                    last_scanned_at=now_iso,
+                    scan_status=status_label.upper(),
+                    risk_score=score,
+                    risk_level=risk_level,
+                    detection_reasons=reasons
+                )
+                self.state_manager.record_state(new_state)
+
+                # Record individual scan item in scan database
+                record_scan_item(
+                    scan_id=scan_id,
+                    path_or_target=str(file_path),
+                    sha256=sha256_hash,
                     status=status_label,
                     risk_score=score
                 )
@@ -370,11 +504,13 @@ class DeviceScanner:
                     "scan_type": scan_type,
                     "current_file": str(file_path),
                     "files_scanned": files_scanned,
+                    "unchanged_count": unchanged_count,
                     "total_files": total_files,
                     "threats_found": threats_found,
                     "skipped_count": skipped_count,
+                    "inaccessible_count": inaccessible_count,
                     "error_count": error_count,
-                    "percent": round((files_scanned / max(1, total_files)) * 100, 1),
+                    "percent": round(((files_scanned + unchanged_count) / max(1, total_files)) * 100, 1),
                     "is_cancelled": self.cancellation_token.is_cancelled
                 })
 
@@ -391,7 +527,7 @@ class DeviceScanner:
 
         logger.info(
             f"Scan {scan_id} {final_status} in {duration}s. "
-            f"Scanned: {files_scanned}, Threats: {threats_found}, Errors: {error_count}"
+            f"Scanned: {files_scanned}, Unchanged: {unchanged_count}, Threats: {threats_found}, Errors: {error_count}"
         )
 
         return {
@@ -400,40 +536,50 @@ class DeviceScanner:
             "status": final_status,
             "duration_seconds": duration,
             "files_scanned": files_scanned,
+            "unchanged_count": unchanged_count,
             "total_files_discovered": total_files,
             "threats_found": threats_found,
             "skipped_count": skipped_count,
+            "inaccessible_count": inaccessible_count,
             "error_count": error_count,
             "threat_details": threat_results
         }
 
-    def quick_scan(self, progress_callback: Optional[Callable] = None) -> Dict[str, Any]:
+    def quick_scan(
+        self,
+        progress_callback: Optional[Callable] = None,
+        use_incremental: bool = True
+    ) -> Dict[str, Any]:
         """Runs Quick Scan on common user persistence/drop locations."""
         valid_paths = [p for p in DEFAULT_QUICK_SCAN_PATHS if p.exists()]
         return self.run_scan(
             scan_type="quick",
             target_paths=valid_paths,
             progress_callback=progress_callback,
-            only_executables=True
+            only_executables=True,
+            use_incremental=use_incremental
         )
 
     def custom_scan(
         self,
         directory: Path,
         progress_callback: Optional[Callable] = None,
-        only_executables: bool = False
+        only_executables: bool = False,
+        use_incremental: bool = True
     ) -> Dict[str, Any]:
         """Runs Custom Scan on user-selected directory."""
         return self.run_scan(
             scan_type="custom",
             target_paths=[Path(directory)],
             progress_callback=progress_callback,
-            only_executables=only_executables
+            only_executables=only_executables,
+            use_incremental=use_incremental
         )
 
     def full_scan(
         self,
-        progress_callback: Optional[Callable] = None
+        progress_callback: Optional[Callable] = None,
+        use_incremental: bool = True
     ) -> Dict[str, Any]:
         """Runs Full System Scan on accessible system drive roots."""
         roots = [Path("C:/")]
@@ -446,7 +592,8 @@ class DeviceScanner:
             scan_type="full",
             target_paths=roots,
             progress_callback=progress_callback,
-            only_executables=True
+            only_executables=True,
+            use_incremental=use_incremental
         )
 
 

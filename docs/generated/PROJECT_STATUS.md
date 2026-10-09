@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-09 12:11:05 UTC  
+**Generated:** 2026-10-09 12:15:29 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`a380c22`)  
+**Current Git Branch:** `main` (`0a6a883`)  
 
 ---
 
@@ -117,13 +117,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `a380c22`
+- **HEAD Commit:** `0a6a883`
 - **Working Tree:** 1 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `0a6a883` | Aaryan Suman | 2026-10-09 | feat: implement unchanged and changed file detection |
 | `a380c22` | Aaryan Suman | 2026-10-09 | feat: persist incremental file scan state |
 | `2ed93f0` | Aaryan Suman | 2026-10-09 | feat: add incremental scan state contract |
 | `80407ea` | Aaryan Suman | 2026-10-09 | feat: add streaming SHA-256 file fingerprinting |
@@ -133,7 +134,6 @@
 | `00d26ff` | Aaryan Suman | 2026-10-09 | docs: synchronize architecture index and GitBook summary |
 | `8fbf12b` | Aaryan Suman | 2026-10-09 | docs: align README with development baseline and target architecture |
 | `7672159` | Aaryan Suman | 2026-10-09 | docs: revise ACTIS development roadmap for post-day7 evolution |
-| `fa5627e` | Aaryan Suman | 2026-10-09 | docs: update ACTIS module implementation statuses and repository structure |
 
 ## Known Issues
 
