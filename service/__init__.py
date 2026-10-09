@@ -46,6 +46,13 @@ from service.file_normalizer import (
     NormalizedFileEvent,
     FilesystemEventNormalizer,
 )
+from service.file_filter import (
+    FilterReason,
+    FileFilterPolicy,
+    FileEventFilter,
+    DEFAULT_TEMPORARY_PATTERNS,
+    DEFAULT_EXCLUDED_SEGMENTS,
+)
 
 __all__ = [
     "ServiceState",
@@ -74,4 +81,9 @@ __all__ = [
     "normalize_filesystem_path",
     "NormalizedFileEvent",
     "FilesystemEventNormalizer",
+    "FilterReason",
+    "FileFilterPolicy",
+    "FileEventFilter",
+    "DEFAULT_TEMPORARY_PATTERNS",
+    "DEFAULT_EXCLUDED_SEGMENTS",
 ]
