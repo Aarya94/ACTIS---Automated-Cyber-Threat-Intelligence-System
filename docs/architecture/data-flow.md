@@ -97,6 +97,13 @@ In the post-Day-7 event-driven architecture, data traverses from operating syste
 - Stores scan session timestamps, itemized evidence breakdowns, confidence ratings, and rule IDs.
 - Stored exclusively in local user application directories, protected by operating system user permissions.
 
+### 2.6 Incremental Scan States & File Fingerprints
+- **Ingestion & Metadata:** Discovered files are inspected for non-content filesystem metadata (`file_size`, `mtime`, `ctime`, accessibility) via `FileMetadata`.
+- **Change Detection:** `IncrementalStateManager` compares metadata and analytical model versions against persistent SQLite records (`file_scan_states`).
+  - **`UNCHANGED_FILE`**: If size and modification timestamps match, and analyzer/model versions are compatible (`is_version_compatible`), deep file analysis is skipped, the cached verdict is reused, and `last_scanned_at` is updated.
+  - **`NEW_FILE` / `CHANGED_FILE`**: A streaming 64 KB chunked SHA-256 fingerprint is computed with pre/post-stat race detection (`FILE_CHANGED_DURING_HASH`), followed by canonical file analysis.
+- **Privacy & Safety:** Scan states store only canonical paths, sizes, timestamps, hashes, versions, and risk verdicts. Raw file contents are never persisted.
+
 ---
 
 ## 3. Explicit Privacy Safeguards

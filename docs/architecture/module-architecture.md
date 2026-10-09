@@ -37,7 +37,8 @@ To maintain absolute architectural truthfulness and prevent overclaiming, every 
   - *URL Scanner (`url_scanner.py`):* `IMPLEMENTED` (RFC validation, canonical normalization, 19-feature vector, session cache).
   - *Text Analyzer (`text_analyzer.py`):* `IMPLEMENTED` (Boundary-aware link extraction, social engineering heuristics, canonical deduplication, strict delegation to URL scanner).
   - *PE Feature Extractor (`file_feature_extractor.py`):* `IMPLEMENTED` (Read-only static extraction of PE headers, sections, byte entropy, SHA-256, and MD5 hashes).
-  - *Device Scanner (`device_scanner.py`):* `PROTOTYPE / NOT YET MILESTONE-COMPLETE` (Prototype crawler; incremental state and junction protection scheduled for Day 8).
+  - *Device Scanner (`device_scanner.py`):* `IMPLEMENTED` (Completed in Day 8: safe recursive crawler, junction/reparse-point loop safety, safe metadata, streaming chunked SHA-256 fingerprinting with race detection, cancellation, structured `DeviceScanResult`).
+  - *Incremental Scan State (`incremental_state.py`):* `IMPLEMENTED` (Completed in Day 8: change classification for `NEW`, `UNCHANGED`, `CHANGED`, `REMOVED`, version invalidation tags, SQLite persistence).
   - *File Watcher (`file_watcher.py`):* `PROTOTYPE / NOT YET MILESTONE-COMPLETE` (Prototype watchdog script; event filtering and debounce scheduled for Day 10).
   - *Clipboard Scanner (`clipboard_scanner.py`):* `PROTOTYPE / NOT YET MILESTONE-COMPLETE` (URL clipboard monitor prototype).
 - **Role in Target Architecture:** Event and input providers. Scanners do NOT implement independent detection or risk logic; they normalize input and delegate to the Analysis Orchestrator.
@@ -75,7 +76,7 @@ To maintain absolute architectural truthfulness and prevent overclaiming, every 
 
 ### 2.5 Relational Persistence & Reporting (`reports/`)
 - **Status:** `IMPLEMENTED`
-  - *Threat Database (`threat_database.py`):* `IMPLEMENTED` (SQLite database schema with tables: `threats`, `indicators`, `scans`, `detections`, `scan_items`).
+  - *Threat Database (`threat_database.py`):* `IMPLEMENTED` (SQLite database schema with tables: `threats`, `indicators`, `scans`, `detections`, `scan_items`, `file_scan_states`).
   - *Scan Database (`scan_database.py`):* `IMPLEMENTED` (Query interfaces for scan history and telemetry).
   - *Report Generator (`report_generator.py`):* `IMPLEMENTED` (Exports scan results to JSON, CSV, and Markdown).
 - **Dependencies:** `config`, `sqlite3`, `json`, `csv`, `pathlib`.

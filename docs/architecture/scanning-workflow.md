@@ -15,7 +15,7 @@ In the post-Day-7 architecture, **scanners and sensors act strictly as event/inp
 | **URL Scanner** | Web links, query strings | `IMPLEMENTED` | Canonical normalization, 19-feature extraction, session caching, orchestrator delegation. |
 | **Message Scanner** | Plaintext, emails, chats | `IMPLEMENTED` | Boundary cleanup, social engineering urgency heuristics, deduplication, strict delegation to URL scanner. |
 | **Static PE Extractor** | Windows PE executables | `IMPLEMENTED` | Safe read-only binary parsing (`pefile`), 15 static PE features, SHA-256, MD5, byte entropy. |
-| **Device Scanner** | Filesystem trees, volumes | `PROTOTYPE / NOT YET MILESTONE-COMPLETE` | Recursive crawler with cancellation tokens and junction loop protection. Target: Day 8. |
+| **Device Scanner** | Filesystem trees, volumes | `IMPLEMENTED` | Recursive crawler with cooperative cancellation, junction/reparse-point loop safety, safe metadata, streaming chunked SHA-256 fingerprinting, incremental scan state, and canonical analysis pipeline delegation. |
 | **File Watcher** | Real-time file drops | `PROTOTYPE / NOT YET MILESTONE-COMPLETE` | Filesystem change events (`watchdog`) with write-stability debounce. Target: Day 10. |
 | **Clipboard Monitor** | Windows clipboard buffer | `PROTOTYPE / NOT YET MILESTONE-COMPLETE` | Background URL hook with strict privacy filtering. |
 
@@ -88,11 +88,18 @@ MessageScanResult Aggregation (Max Risk + SE Urgency)
 5. **Heuristic Rule Evaluation:** Flags known packer sections (`UPX0`, `UPX1`, `.aspack`), missing digital signatures, and high-risk API imports (`VirtualAllocEx`, `WriteProcessMemory`).
 6. **Malware ML Inference:** Evaluates the 15-feature Windows PE Random Forest model (`models/malware_model.pkl`).
 
-### D. Device Scanner (Crawler) — *Target: Day 8*
-1. **Scan Modes:** Quick Scan (high-risk locations: Downloads, Desktop, Temp, Startup), Custom Scan (user path), or Full Drive Scan.
-2. **Reparse Point Protection:** Tracks canonical device inodes and symbolic links to prevent infinite traversal loops caused by Windows directory junctions.
-3. **Incremental State:** Tracks file timestamps and cryptographic fingerprints to avoid rescanning unchanged files.
-4. **Cancellation Token:** Supports cooperative asynchronous interruption so users can cancel volume scans at any time.
+### D. Device Scanner & Incremental Scan State Workflow (`scanners/device_scanner.py`, `scanners/incremental_state.py`)
+1. **User-Authorized Discovery:** Scans user-specified directory, persistence paths (Quick Scan), or system drives (Full Scan).
+2. **Reparse Point & Loop Guardrails:** `TraversalSafetyHelper` detects `FILE_ATTRIBUTE_REPARSE_POINT` (0x0400) and tracks directory `(dev, ino)` pairs to prevent circular traversal and junction looping.
+3. **Safe Metadata Extraction:** `collect_file_metadata` retrieves size, timestamps (`mtime`, `ctime`), and accessibility without buffering contents.
+4. **Incremental Scan State Verification:** `IncrementalStateManager` queries persistent SQLite storage (`file_scan_states`).
+   - **`UNCHANGED_FILE`**: If size and modification timestamps match previous verified state and analytical model versions match (`is_version_compatible`), deep file analysis is skipped, the previous verdict is reused, and the scan timestamp is refreshed.
+   - **`NEW_FILE` / `CHANGED_FILE`**: Proceeds to safe analysis.
+   - **`REMOVED_FILE` / `UNAVAILABLE_FILE`**: Records state accordingly; missing files can be pruned via `prune_missing_files()`.
+5. **Streaming Chunked Fingerprinting:** Reads file in 64 KB chunks to compute SHA-256 safely. Compares file metadata before and after streaming to detect race conditions (`FILE_CHANGED_DURING_HASH`).
+6. **Canonical Pipeline Delegation:** Eligible files pass into canonical `scan_file` -> `ThreatDetector.analyze_file` (PE static extraction, heuristic rules, Random Forest ML model, risk engine, and SQLite logging).
+7. **State Persistence & Structured Reporting:** Constructs updated `FileScanState` with versioning tags, persists to SQLite, and returns a strongly-typed `DeviceScanResult`.
+8. **Cooperative Cancellation:** `ScanCancellationToken` allows callers to interrupt ongoing scans at any time without data corruption or lingering file locks.
 
 ### E. Background File Watcher — *Target: Day 10*
 1. **Event Capture:** Observes file creation and modification events via Windows filesystem hooks (`watchdog`).

@@ -44,14 +44,14 @@ ACTIS/
 | `config/` | Strongly-typed configuration schema, paths, environment loader, defaults, and validator. | **IMPLEMENTED** | Fully complete, tested, and validated as of Day 2 (11 unit tests). |
 | `reports/` | SQLite database schemas (`threat_database.py`, `scan_database.py`) and report generator. | **IMPLEMENTED** | Relational schemas, WAL mode, CRUD queries, JSON/CSV/MD exports operational. |
 | `models/` | Trained model binaries (`phishing_model.pkl`, `malware_model.pkl`) and metadata JSON schemas. | **IMPLEMENTED** | Phishing RF model integrated; malware metadata contract verified. |
-| `scanners/` | Input mechanisms (URL scanner, text analyzer, PE feature extractor). | **PARTIALLY IMPLEMENTED** | URL and message scanners hardened on Day 7; PE static extractor verified. Device crawler scheduled for Day 8; File watcher scheduled for Day 10. |
+| `scanners/` | Input mechanisms (URL scanner, text analyzer, PE feature extractor, device scanner, incremental scan state). | **PARTIALLY IMPLEMENTED** | URL and message scanners hardened on Day 7; PE static extractor verified; Device Scanner and Incremental Scan State completed on Day 8; File watcher scheduled for Day 10. |
 | `detection_engine/` | Fuses evidence from ML, heuristics, threat intelligence, and risk calculations. | **IMPLEMENTED** | Decision engine, risk engine, rule engine, threat detector unified on Day 6. |
 | `threat_intelligence/`| Local indicator lookup, external API connector, and backend sync manager. | **PARTIALLY IMPLEMENTED** | Local SQLite lookup verified; external API client (VT) and sync manager exist as prototypes. |
 | `notifications/` | Alert formatting and console/desktop dispatch (`notifier.py`). | **PROTOTYPE / NOT YET MILESTONE-COMPLETE** | Console alerts operational; native Windows desktop notifications scheduled for Day 13. |
 | `dashboard/` | Interactive Streamlit command center (`app.py`). | **PROTOTYPE / NOT YET MILESTONE-COMPLETE** | Prototype operational; production UI and scan management scheduled for Day 13. |
 | `assistant/` | Grounded security assistant (`security_assistant.py`) querying local SQLite records. | **PROTOTYPE / NOT YET MILESTONE-COMPLETE** | SQLite-grounded explainer operational; conversational interface scheduled for Day 14. |
 | `backend/` | Central FastAPI intelligence sharing API (`api.py`, `database.py`, `models.py`). | **PROTOTYPE / NOT YET MILESTONE-COMPLETE** | Prototype REST API operational; client synchronization scheduled for Day 12. |
-| `tests/` | Automated test suites (`pytest`). | **IMPLEMENTED** | 144 passing automated tests with 100% pass rate. |
+| `tests/` | Automated test suites (`pytest`). | **IMPLEMENTED** | 162 passing automated tests with 100% pass rate. |
 | `logs/` | Runtime rotating log directory (`actis.log`). | **EXISTING** | Managed by `config/logger.py` with sanitization and rotation. |
 | `docs/` | Authoritative documentation framework (`architecture/`, `roadmap/`, `generated/`). | **IMPLEMENTED** | Authoritative source of truth for ACTIS engineering. |
 

@@ -102,20 +102,21 @@ ACTIS operates under strict defensive boundaries:
 
 ## 📊 Current Implementation vs. Roadmap
 
-### Implemented Baseline Foundation (Days 1–7)
+### Implemented Baseline Foundation (Days 1–8)
 - **Configuration Management (`config/`):** Strongly-typed `AppConfig`, environment loader, path resolver, constraint validation (11 passing tests).
 - **Enterprise Logging (`config/logger.py`):** Rotating file logs, structured JSON formatters, credential sanitization.
-- **Relational Threat Database (`reports/`):** SQLite schema with WAL mode (`threats`, `indicators`, `scans`, `detections`, `scan_items`), indexed queries, JSON/CSV/Markdown report generation.
-- **Phishing Machine Learning Model (`models/`, `detection_engine/`):** 19-feature morphological Random Forest classifier with formal metadata contract validation.
-- **Static Windows PE Extraction (`scanners/file_feature_extractor.py`):** Read-only PE header and section parsing (`pefile`), Shannon byte entropy, 64 KB chunked SHA-256 and MD5 hashing (21 passing tests).
-- **URL Scanner Hardening (`scanners/url_scanner.py`):** RFC scheme validation, canonical normalization, default port stripping, 19-feature vector extraction, session caching.
-- **Message Scanner Hardening (`scanners/text_analyzer.py`):** Boundary-aware link extraction, canonical deduplication, social engineering heuristics, and strict delegation to canonical URL analysis.
-- **Detection Decision Engine (`detection_engine/`):** Multi-criteria evidence fusion, dynamic weight normalization, deterministic heuristic rules, confidence calculation, and explainability trees.
-- **Automated Test Infrastructure (`tests/`):** 144 unit and integration tests passing with 100% success rate.
+- **Relational Threat Database & Scan History (`reports/`):** SQLite schema with WAL mode (`threats`, `indicators`, `scans`, `detections`, `scan_items`, `file_scan_states`), indexed queries, JSON/CSV/Markdown report generation.
+- **Phishing Machine Learning Foundation (`models/`, `detection_engine/`):** 19-feature morphological Random Forest classifier with formal metadata contract validation.
+- **Static Windows PE Binary Analysis (`scanners/file_feature_extractor.py`):** Read-only PE header and section parsing (`pefile`), Shannon byte entropy, 64 KB chunked SHA-256 and MD5 hashing (21 passing tests).
+- **URL Analysis Hardening (`scanners/url_scanner.py`):** RFC scheme validation, canonical normalization, default port stripping, 19-feature vector extraction, session caching.
+- **Message URL Analysis (`scanners/text_analyzer.py`):** Boundary-aware link extraction, canonical deduplication, social engineering heuristics, and strict delegation to canonical URL analysis.
+- **Detection Decision & Risk Engine (`detection_engine/`):** Multi-criteria evidence fusion, dynamic weight normalization, deterministic heuristic rules, confidence calculation, and explainability trees.
+- **Device Scanner (`scanners/device_scanner.py`):** User-authorized directory and drive traversal, junction/reparse-point loop safety, safe file metadata extraction, streaming chunked SHA-256 fingerprinting with race detection, cooperative cancellation, structured `DeviceScanResult`.
+- **Incremental Scan State (`scanners/incremental_state.py`):** Deterministic change classification (`NEW_FILE`, `UNCHANGED_FILE`, `CHANGED_FILE`, `REMOVED_FILE`, `UNAVAILABLE_FILE`), analytical/model version invalidation tags, SQLite scan state persistence, and skipping deep analysis for verified unchanged files.
+- **Automated Test Infrastructure (`tests/`):** 162 unit and integration tests passing with 100% success rate.
 
-### Planned Subsystems in Target Architecture (Days 8–16)
-- **Device Scanner with Incremental State (Day 8):** Recursive crawler with reparse-point junction protection and fingerprint caching.
-- **Windows Protection Service (Day 9):** Lightweight resident background service managing endpoint state and event intake.
+### Planned Subsystems in Target Architecture (Days 9–16)
+- **Windows Protection Service Foundation (Day 9):** Lightweight resident background service managing endpoint state and event intake.
 - **Event-Driven File Protection (Day 10):** Real-time filesystem hooks (`watchdog`) with write-stability debounce filtering.
 - **Online Threat Intelligence Connectors (Day 11):** VirusTotal v3 client with rate limiting and offline fallback.
 - **Central ACTIS Threat Intelligence API (Day 12):** FastAPI federated intelligence sharing service with anti-poisoning state machine.
