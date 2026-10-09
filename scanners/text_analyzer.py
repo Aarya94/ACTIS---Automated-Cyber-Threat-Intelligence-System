@@ -11,7 +11,33 @@ from config.config import get_logger
 
 logger = get_logger("TextAnalyzer")
 
-URL_REGEX = re.compile(r"https?://[^\s<>\"]+|www\.[^\s<>\"]+")
+URL_REGEX = re.compile(r"(?:https?://|www\.)[^\s<>\"]+", re.IGNORECASE)
+
+
+def clean_url_token(raw_token: str) -> str:
+    """
+    Cleans an extracted URL token by removing surrounding punctuation,
+    unbalanced enclosing parentheses/brackets/braces, and outer quotes.
+    Preserves balanced parentheses inside URLs (e.g. Wikipedia links).
+    """
+    token = raw_token.strip()
+    while token:
+        if token[-1] in ".,;:!?'\"":
+            token = token[:-1]
+        elif token[-1] == ")" and token.count(")") > token.count("("):
+            token = token[:-1]
+        elif token[-1] == "]" and token.count("]") > token.count("["):
+            token = token[:-1]
+        elif token[-1] == "}" and token.count("}") > token.count("{"):
+            token = token[:-1]
+        else:
+            break
+
+    while token and token[0] in "\"'<([{":
+        token = token[1:]
+
+    return token.strip()
+
 
 URGENCY_PATTERNS = [
     r"\burgent\b", r"\bimmediate(ly)?\b", r"\bwithin \d+ hours?\b",
@@ -36,16 +62,38 @@ class TextAnalyzer:
     """Analyzes messages, emails, and notes for suspicious links and engineering cues."""
 
     @staticmethod
-    def extract_urls(text: str) -> List[str]:
-        """Extracts unique URLs from text content."""
-        raw_urls = URL_REGEX.findall(text)
-        cleaned = []
-        for u in raw_urls:
-            # Strip trailing punctuation often caught in regex
-            u_clean = u.rstrip(".,;:!?)'\"")
-            if u_clean and u_clean not in cleaned:
-                cleaned.append(u_clean)
-        return cleaned
+    def extract_raw_urls(text: Any) -> List[str]:
+        """
+        Extracts all raw URL occurrences from text content in order of appearance,
+        including duplicates, after boundary punctuation cleaning.
+        Safely returns empty list on empty or non-string input.
+        """
+        if not text or not isinstance(text, str):
+            return []
+
+        raw_matches = URL_REGEX.findall(text)
+        cleaned_tokens = []
+        for match in raw_matches:
+            cleaned = clean_url_token(match)
+            if cleaned:
+                cleaned_tokens.append(cleaned)
+        return cleaned_tokens
+
+    @classmethod
+    def extract_urls(cls, text: Any) -> List[str]:
+        """
+        Extracts cleaned, unique URLs from text content, preserving first-seen order.
+        Safely returns empty list on empty or non-string input.
+        """
+        raw_list = cls.extract_raw_urls(text)
+        unique_urls: List[str] = []
+        seen = set()
+        for u in raw_list:
+            if u not in seen:
+                seen.add(u)
+                unique_urls.append(u)
+        return unique_urls
+
 
     @classmethod
     def evaluate_social_engineering(cls, text: str) -> Dict[str, Any]:
