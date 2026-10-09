@@ -35,6 +35,8 @@ from service.dispatcher import (
     AnalysisOrchestrationStub,
     EventDispatcher,
 )
+from service.health import ServiceHealth
+from service.protection_service import ProtectionService
 
 __all__ = [
     "ServiceState",
@@ -56,4 +58,6 @@ __all__ = [
     "IAnalysisOrchestrationBoundary",
     "AnalysisOrchestrationStub",
     "EventDispatcher",
+    "ServiceHealth",
+    "ProtectionService",
 ]
