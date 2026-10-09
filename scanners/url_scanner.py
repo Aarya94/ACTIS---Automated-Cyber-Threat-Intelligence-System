@@ -4,11 +4,74 @@ Extracts 19 morphological features from URLs, normalizes domains,
 and routes URLs through the unified detection engine.
 """
 
-from urllib.parse import urlparse
-from typing import Dict, Any, List
+import re
+from urllib.parse import urlparse, urlunparse
+from typing import Dict, Any, List, Optional, Tuple, Union
 from config.config import get_logger
 
 logger = get_logger("URLScanner")
+
+# Constants for URL validation & normalization
+MAX_URL_LENGTH = 4096
+ALLOWED_SCHEMES = ("http", "https")
+CONTROL_CHARS_PATTERN = re.compile(r"[\x00-\x1f\x7f]")
+VALID_HOSTNAME_PATTERN = re.compile(
+    r"^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$"
+)
+IPV4_PATTERN = re.compile(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$")
+
+
+def validate_url(url: Any) -> Tuple[bool, Optional[str]]:
+    """
+    Validates a URL candidate for syntactic correctness, safe length, and valid structure.
+    Returns (is_valid, error_reason).
+    """
+    if url is None:
+        return False, "URL input is None."
+
+    if not isinstance(url, str):
+        return False, f"URL must be a string, received {type(url).__name__}."
+
+    cleaned = url.strip()
+    if not cleaned:
+        return False, "URL input is empty or whitespace only."
+
+    if len(cleaned) > MAX_URL_LENGTH:
+        return False, f"URL exceeds maximum allowed length of {MAX_URL_LENGTH} characters ({len(cleaned)} chars)."
+
+    if CONTROL_CHARS_PATTERN.search(cleaned):
+        return False, "URL contains illegal control characters or null bytes."
+
+    # Prepend scheme if missing for parsing check
+    candidate = cleaned
+    if not candidate.startswith(("http://", "https://")):
+        candidate = "http://" + candidate
+
+    try:
+        parsed = urlparse(candidate)
+    except Exception as e:
+        return False, f"URL parsing failed: {e}"
+
+    scheme = (parsed.scheme or "").lower()
+    if scheme not in ALLOWED_SCHEMES:
+        return False, f"Unsupported URL scheme '{scheme}'. Only HTTP and HTTPS are permitted."
+
+    hostname = (parsed.hostname or "").strip()
+    if not hostname:
+        return False, "URL lacks a valid hostname or domain."
+
+    # Validate hostname syntax (allow valid domain labels or IPv4 / IPv6 addresses)
+    if not (VALID_HOSTNAME_PATTERN.match(hostname) or IPV4_PATTERN.match(hostname) or "[" in hostname):
+        return False, f"Malformed hostname '{hostname}' contains invalid characters."
+
+    return True, None
+
+
+def is_valid_url(url: Any) -> bool:
+    """Convenience helper returning True if candidate URL is valid."""
+    valid, _ = validate_url(url)
+    return valid
+
 
 
 def normalize_url(url: str) -> str:
