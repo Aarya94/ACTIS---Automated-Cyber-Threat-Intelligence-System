@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-09 12:07:03 UTC  
+**Generated:** 2026-10-09 12:07:49 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`5714124`)  
+**Current Git Branch:** `main` (`80407ea`)  
 
 ---
 
@@ -117,13 +117,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `5714124`
+- **HEAD Commit:** `80407ea`
 - **Working Tree:** 1 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `80407ea` | Aaryan Suman | 2026-10-09 | feat: add streaming SHA-256 file fingerprinting |
 | `5714124` | Aaryan Suman | 2026-10-09 | feat: add safe file metadata collection for device scans |
 | `2539b3a` | Aaryan Suman | 2026-10-09 | feat: harden device scanner filesystem traversal |
 | `8adbf5a` | Aaryan Suman | 2026-10-09 | docs: regenerate project status and synchronize generated documentation |
@@ -133,7 +134,6 @@
 | `fa5627e` | Aaryan Suman | 2026-10-09 | docs: update ACTIS module implementation statuses and repository structure |
 | `9dc58c2` | Aaryan Suman | 2026-10-09 | docs: update detection and risk architecture with shared threat intelligence |
 | `92cb608` | Aaryan Suman | 2026-10-09 | docs: define analysis orchestration and scanning delegation architecture |
-| `8e7b996` | Aaryan Suman | 2026-10-09 | docs: define ACTIS protection service boundary and event intake layer |
 
 ## Known Issues
 
