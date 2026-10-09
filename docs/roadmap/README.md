@@ -89,10 +89,13 @@ Detailed design is documented in [`docs/architecture/architecture-evolution.md`]
 - **Components:** `service/lifecycle.py`, `service/state.py`, `service/workers.py`, `service/events.py`, `service/dispatcher.py`, `service/health.py`, `service/protection_service.py`, `service/windows_host.py`, `tests/test_protection_service_lifecycle.py`, `tests/test_protection_service_workers.py`, `tests/test_protection_service_events.py`.
 - **Baseline:** 200 automated unit and integration tests passing with 100% success rate.
 
-### Day 10: Event-Driven File Protection (`PLANNED`)
-- **Goals:** File creation and modification event hooks (`watchdog`), write-stability debounce filtering, task enqueuing, and automatic handoff to the Analysis Orchestrator for new/modified files.
+### Day 10: Event-Driven File Protection (`COMPLETED`)
+- **Delivered:** Real-time Windows filesystem event monitoring (`watchdog` bridge `FilesystemEventSource`), canonical path normalization (`FilesystemEventNormalizer`), temporary and editor swap file filtering (`FileEventFilter`), sliding-window debouncing (`FileEventDebouncer`), bounded event queue (`SecurityEventQueue`) with peak tracking and backpressure, incremental scan state integration (`FileProtectionPipeline`), pre/post-inspection race condition hardening, and direct delegation to the existing `ThreatDetector` static analysis pipeline.
+- **Constraint Verified:** Clipboard monitoring, online threat intelligence, notifications, and AI assistant were NOT implemented today.
+- **Components:** `scanners/file_watcher.py`, `service/file_normalizer.py`, `service/file_filter.py`, `service/debouncer.py`, `service/file_pipeline.py`, `tests/test_file_protection_events.py`, `tests/test_file_protection_burst.py`, `tests/test_file_protection_integration.py`.
+- **Baseline:** 229 automated unit and integration tests passing with 100% success rate.
 
-### Day 11: Online Threat Intelligence
+### Day 11: Online Threat Intelligence (`PLANNED`)
 - **Goals:** External threat intelligence connectors (VirusTotal v3), safe read-only API client abstractions, rate-limiting, timeout controls, and normalized reputation results.
 
 ### Day 12: Central ACTIS Threat Intelligence

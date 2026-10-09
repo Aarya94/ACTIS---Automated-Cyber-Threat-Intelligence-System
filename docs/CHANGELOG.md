@@ -10,6 +10,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 Milestone Scope: Architecture planning, configuration management, logging infrastructure, database/ML contracts, initial validation tests, and project foundations.
 
+### 2026-10-09 — Day 10: Event-Driven File Protection
+
+Implemented the event-driven file protection layer for ACTIS, connecting Windows filesystem events directly to the ACTIS Protection Service, event filtering and debouncing, Day 8 incremental scan state tracking, and the existing `ThreatDetector` static analysis and multi-criteria risk engine. Built the native Windows filesystem event monitor bridge (`FilesystemEventSource` using `watchdog.Observer`) with thread-safe lifecycle control, non-blocking callback bridge, and support for `FILE_CREATED`, `FILE_MODIFIED`, `FILE_MOVED`, and `FILE_DELETED` events. Implemented path normalization (`FilesystemEventNormalizer`) resolving canonical absolute paths, standard separators, and Windows case-folding. Created safe event filtering (`FileEventFilter`) discarding directory-only notifications, inaccessible targets, and temporary/editor swap patterns (`.tmp`, `~$*`, `.crdownload`, `.part`). Implemented time-window debouncing and duplicate suppression (`FileEventDebouncer`) coalescing burst file modifications into single logical scan requests with file-settling and size stability checks. Added high-watermark tracking and throttled backpressure logging to bounded intake queues (`SecurityEventQueue`). Integrated event processing with incremental scan state (`FileProtectionPipeline` + `IncrementalStateManager`), safely skipping deep analysis for verified unchanged files while analyzing new and modified files. Hardened the pipeline against filesystem race conditions (`compute_file_fingerprint`, stat comparison) explicitly handling `DISAPPEARED`, `INACCESSIBLE`, and `CHANGED_DURING_ANALYSIS` states. Connected verified files to the canonical `ThreatDetector` static analysis pipeline (PE header parsing, Shannon entropy, static rules, Random Forest ML, multi-criteria risk scoring, SQLite logging) without duplicating detection logic. Expanded automated test suite from 200 to 229 passing tests (100% pass rate).
+
+#### Commits
+
+| Commit | Type | Description | Files | Verification |
+|--------|------|-------------|-------|--------------|
+| `c165969` | feat | Add filesystem event source integration | `scanners/file_watcher.py` | Passed (200 tests) |
+| `3f5c507` | feat | Normalize ACTIS filesystem events | `service/file_normalizer.py`, `service/__init__.py` | Passed (200 tests) |
+| `603d9cc` | feat | Add filesystem event filtering | `service/file_filter.py`, `service/__init__.py` | Passed (200 tests) |
+| `2ab558f` | feat | Implement filesystem event debouncing | `service/debouncer.py`, `service/__init__.py` | Passed (200 tests) |
+| `72b2eba` | feat | Add bounded protection event queue | `service/events.py` | Passed (200 tests) |
+| `d0ff9d3` | feat | Integrate filesystem events with protection service | `service/protection_service.py`, `service/health.py`, `service/config.py` | Passed (200 tests) |
+| `281b380` | feat | Connect event processing with incremental scan state | `service/file_pipeline.py`, `service/__init__.py` | Passed (200 tests) |
+| `6f74ec2` | feat | Connect changed files to ACTIS analysis pipeline | `service/file_pipeline.py` | Passed (200 tests) |
+| `38debd5` | feat | Harden event processing against filesystem races | `service/file_pipeline.py`, `service/__init__.py` | Passed (200 tests) |
+| `55852db` | test | Add filesystem event and debounce coverage | `tests/test_file_protection_events.py` | Passed (217 tests) |
+| `4ce21ab` | test | Add event burst and queue stability coverage | `tests/test_file_protection_burst.py` | Passed (222 tests) |
+| `acf96f4` | test | Add event-to-analysis integration coverage | `tests/test_file_protection_integration.py` | Passed (229 tests) |
+| `0646444` | docs | Document ACTIS event-driven file protection workflow | `README.md`, `docs/architecture/*` | Passed (229 tests) |
+
 ---
 
 ### 2026-10-09 — Day 9: Windows Protection Service Foundation

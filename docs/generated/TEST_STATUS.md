@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-10-09 13:49:17 UTC  
+**Generated:** 2026-10-09 13:52:40 UTC  
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)  
 
 This document inventories all automated test files, test classes, and test functions
