@@ -53,6 +53,7 @@ from service.file_filter import (
     DEFAULT_TEMPORARY_PATTERNS,
     DEFAULT_EXCLUDED_SEGMENTS,
 )
+from service.debouncer import FileEventDebouncer
 
 __all__ = [
     "ServiceState",
@@ -86,4 +87,5 @@ __all__ = [
     "FileEventFilter",
     "DEFAULT_TEMPORARY_PATTERNS",
     "DEFAULT_EXCLUDED_SEGMENTS",
+    "FileEventDebouncer",
 ]

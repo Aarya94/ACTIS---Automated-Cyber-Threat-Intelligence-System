@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-09 13:17:31 UTC  
+**Generated:** 2026-10-09 13:18:48 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`3f5c507`)  
+**Current Git Branch:** `main` (`603d9cc`)  
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `3f5c507`
+- **HEAD Commit:** `603d9cc`
 - **Working Tree:** 2 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `603d9cc` | Aaryan Suman | 2026-10-09 | feat: add filesystem event filtering |
 | `3f5c507` | Aaryan Suman | 2026-10-09 | feat: normalize ACTIS filesystem events |
 | `c165969` | Aaryan Suman | 2026-10-09 | feat: add filesystem event source integration |
 | `368eff0` | Aaryan Suman | 2026-10-09 | docs: record Day 9 development changelog and synchronize generated docs |
@@ -140,7 +141,6 @@
 | `77ba8cb` | Aaryan Suman | 2026-10-09 | test: add protection service lifecycle coverage |
 | `2de26b4` | Aaryan Suman | 2026-10-09 | feat: harden protection service failure handling |
 | `21cb05f` | Aaryan Suman | 2026-10-09 | feat: add protection service health state |
-| `524988d` | Aaryan Suman | 2026-10-09 | feat: add service-to-analysis orchestration boundary |
 
 ## Known Issues
 
