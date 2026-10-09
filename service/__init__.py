@@ -30,6 +30,11 @@ from service.events import (
     SecurityEvent,
     SecurityEventQueue,
 )
+from service.dispatcher import (
+    IAnalysisOrchestrationBoundary,
+    AnalysisOrchestrationStub,
+    EventDispatcher,
+)
 
 __all__ = [
     "ServiceState",
@@ -48,4 +53,7 @@ __all__ = [
     "SecurityEventValidationError",
     "SecurityEvent",
     "SecurityEventQueue",
+    "IAnalysisOrchestrationBoundary",
+    "AnalysisOrchestrationStub",
+    "EventDispatcher",
 ]
