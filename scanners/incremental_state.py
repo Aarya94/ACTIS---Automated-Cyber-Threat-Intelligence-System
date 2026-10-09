@@ -7,7 +7,8 @@ model versioning tags, and incremental scan lifecycle records.
 import json
 from dataclasses import dataclass, field, asdict
 from enum import Enum
-from typing import Dict, Any, List, Optional
+from pathlib import Path
+from typing import Dict, Any, List, Optional, Tuple, Set
 
 
 class FileChangeType(str, Enum):
@@ -163,4 +164,86 @@ class IncrementalStateManager:
     def get_all_states(self) -> Dict[str, FileScanState]:
         """Returns a copy of all loaded states."""
         return dict(self._cache)
+
+    def check_file_status(
+        self,
+        file_path: Path,
+        max_size_bytes: int = 104857600,
+        require_hash_check: bool = False
+    ) -> Tuple[FileChangeType, Optional[FileScanState], Optional[Any]]:
+        """
+        Determines the change classification of a file relative to stored scan state.
+        
+        Returns:
+            (change_type, previous_state_or_none, current_metadata_or_none)
+        """
+        from scanners.device_scanner import collect_file_metadata, compute_file_fingerprint
+        try:
+            resolved_path = Path(file_path).resolve()
+            canonical_path = str(resolved_path)
+        except (OSError, RuntimeError):
+            canonical_path = str(file_path)
+
+        # 1. Check if file exists on disk
+        if not file_path.exists():
+            prev = self.get_state(canonical_path)
+            if prev:
+                return FileChangeType.REMOVED_FILE, prev, None
+            return FileChangeType.UNAVAILABLE_FILE, None, None
+
+        # 2. Collect current filesystem metadata safely
+        meta = collect_file_metadata(file_path, max_size_bytes=max_size_bytes)
+        if not meta.is_accessible:
+            prev = self.get_state(canonical_path)
+            return FileChangeType.UNAVAILABLE_FILE, prev, meta
+
+        # 3. Retrieve previous scan state
+        prev = self.get_state(canonical_path)
+        if not prev:
+            return FileChangeType.NEW_FILE, None, meta
+
+        # 4. Check version compatibility
+        if not prev.is_version_compatible():
+            return FileChangeType.CHANGED_FILE, prev, meta
+
+        # 5. Compare filesystem metadata (size and mtime)
+        if meta.file_size != prev.file_size or abs(meta.mtime - prev.mtime) > 1e-4:
+            return FileChangeType.CHANGED_FILE, prev, meta
+
+        # 6. Verify cryptographic hash identity if requested or if already hashed
+        if require_hash_check and prev.sha256:
+            fp = compute_file_fingerprint(file_path, max_size_bytes=max_size_bytes)
+            if fp.status != "OK" or fp.sha256 != prev.sha256:
+                return FileChangeType.CHANGED_FILE, prev, meta
+
+        return FileChangeType.UNCHANGED_FILE, prev, meta
+
+    def mark_unchanged(self, previous_state: FileScanState, current_scan_time: str) -> FileScanState:
+        """Updates last_scanned_at timestamp on an unchanged file and updates storage."""
+        updated = FileScanState(
+            canonical_path=previous_state.canonical_path,
+            file_size=previous_state.file_size,
+            mtime=previous_state.mtime,
+            sha256=previous_state.sha256,
+            last_scanned_at=current_scan_time,
+            scan_status=previous_state.scan_status,
+            risk_score=previous_state.risk_score,
+            risk_level=previous_state.risk_level,
+            analyzer_version=previous_state.analyzer_version,
+            model_version=previous_state.model_version,
+            rule_version=previous_state.rule_version,
+            detection_reasons=list(previous_state.detection_reasons)
+        )
+        self.record_state(updated)
+        return updated
+
+    def prune_missing_files(self, existing_paths: Set[str]) -> int:
+        """Removes states for files that no longer exist among the discovered paths."""
+        pruned_count = 0
+        canonical_existing = {str(Path(p).resolve()) if Path(p).exists() else str(p) for p in existing_paths}
+        for cached_path in list(self._cache.keys()):
+            if cached_path not in canonical_existing:
+                self.remove_state(cached_path)
+                pruned_count += 1
+        return pruned_count
 

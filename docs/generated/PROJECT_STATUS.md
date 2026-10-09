@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-09 12:09:40 UTC  
+**Generated:** 2026-10-09 12:11:05 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`2ed93f0`)  
+**Current Git Branch:** `main` (`a380c22`)  
 
 ---
 
@@ -117,13 +117,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `2ed93f0`
-- **Working Tree:** 2 untracked/unstaged changes
+- **HEAD Commit:** `a380c22`
+- **Working Tree:** 1 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `a380c22` | Aaryan Suman | 2026-10-09 | feat: persist incremental file scan state |
 | `2ed93f0` | Aaryan Suman | 2026-10-09 | feat: add incremental scan state contract |
 | `80407ea` | Aaryan Suman | 2026-10-09 | feat: add streaming SHA-256 file fingerprinting |
 | `5714124` | Aaryan Suman | 2026-10-09 | feat: add safe file metadata collection for device scans |
@@ -133,7 +134,6 @@
 | `8fbf12b` | Aaryan Suman | 2026-10-09 | docs: align README with development baseline and target architecture |
 | `7672159` | Aaryan Suman | 2026-10-09 | docs: revise ACTIS development roadmap for post-day7 evolution |
 | `fa5627e` | Aaryan Suman | 2026-10-09 | docs: update ACTIS module implementation statuses and repository structure |
-| `9dc58c2` | Aaryan Suman | 2026-10-09 | docs: update detection and risk architecture with shared threat intelligence |
 
 ## Known Issues
 
