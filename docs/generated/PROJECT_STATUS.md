@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-09 13:38:36 UTC  
+**Generated:** 2026-10-09 13:40:52 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`38debd5`)  
+**Current Git Branch:** `main` (`55852db`)  
 
 ---
 
@@ -117,20 +117,21 @@
 
 ## Test Status
 
-- **Total Test Files:** `19`
-- **Total Discovered Test Functions:** `218`
+- **Total Test Files:** `20`
+- **Total Discovered Test Functions:** `223`
 - **Coverage Areas:** Configuration validation, SQLite database schema & CRUD, Phishing/Malware model contracts, PE feature extraction, API backend.
 
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `38debd5`
-- **Working Tree:** 3 untracked/unstaged changes
+- **HEAD Commit:** `55852db`
+- **Working Tree:** 1 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `55852db` | Aaryan Suman | 2026-10-09 | test: add filesystem event and debounce coverage |
 | `38debd5` | Aaryan Suman | 2026-10-09 | feat: harden event processing against filesystem races |
 | `6f74ec2` | Aaryan Suman | 2026-10-09 | feat: connect changed files to ACTIS analysis pipeline |
 | `281b380` | Aaryan Suman | 2026-10-09 | feat: connect event processing with incremental scan state |
@@ -140,7 +141,6 @@
 | `603d9cc` | Aaryan Suman | 2026-10-09 | feat: add filesystem event filtering |
 | `3f5c507` | Aaryan Suman | 2026-10-09 | feat: normalize ACTIS filesystem events |
 | `c165969` | Aaryan Suman | 2026-10-09 | feat: add filesystem event source integration |
-| `368eff0` | Aaryan Suman | 2026-10-09 | docs: record Day 9 development changelog and synchronize generated docs |
 
 ## Known Issues
 
