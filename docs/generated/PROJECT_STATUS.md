@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-09 13:27:58 UTC  
+**Generated:** 2026-10-09 13:29:53 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`72b2eba`)  
+**Current Git Branch:** `main` (`d0ff9d3`)  
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `72b2eba`
-- **Working Tree:** 5 untracked/unstaged changes
+- **HEAD Commit:** `d0ff9d3`
+- **Working Tree:** 2 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `d0ff9d3` | Aaryan Suman | 2026-10-09 | feat: integrate filesystem events with protection service |
 | `72b2eba` | Aaryan Suman | 2026-10-09 | feat: add bounded protection event queue |
 | `2ab558f` | Aaryan Suman | 2026-10-09 | feat: implement filesystem event debouncing |
 | `603d9cc` | Aaryan Suman | 2026-10-09 | feat: add filesystem event filtering |
@@ -140,7 +141,6 @@
 | `932f05d` | Aaryan Suman | 2026-10-09 | docs: document ACTIS protection service architecture |
 | `cb8de71` | Aaryan Suman | 2026-10-09 | test: add security event boundary validation coverage |
 | `721f3d3` | Aaryan Suman | 2026-10-09 | test: add worker failure and shutdown regression coverage |
-| `77ba8cb` | Aaryan Suman | 2026-10-09 | test: add protection service lifecycle coverage |
 
 ## Known Issues
 

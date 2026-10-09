@@ -54,6 +54,11 @@ from service.file_filter import (
     DEFAULT_EXCLUDED_SEGMENTS,
 )
 from service.debouncer import FileEventDebouncer
+from service.file_pipeline import (
+    EventProcessingStatus,
+    EventProcessingResult,
+    FileProtectionPipeline,
+)
 
 __all__ = [
     "ServiceState",
@@ -88,4 +93,7 @@ __all__ = [
     "DEFAULT_TEMPORARY_PATTERNS",
     "DEFAULT_EXCLUDED_SEGMENTS",
     "FileEventDebouncer",
+    "EventProcessingStatus",
+    "EventProcessingResult",
+    "FileProtectionPipeline",
 ]
