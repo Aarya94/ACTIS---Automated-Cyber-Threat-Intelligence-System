@@ -37,6 +37,10 @@ from service.dispatcher import (
 )
 from service.health import ServiceHealth
 from service.protection_service import ProtectionService
+from service.windows_host import (
+    WindowsServiceHost,
+    create_windows_host,
+)
 
 __all__ = [
     "ServiceState",
@@ -60,4 +64,6 @@ __all__ = [
     "EventDispatcher",
     "ServiceHealth",
     "ProtectionService",
+    "WindowsServiceHost",
+    "create_windows_host",
 ]

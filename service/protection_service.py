@@ -83,12 +83,45 @@ class ProtectionService(IServiceLifecycle):
         self.state_manager.record_error(err_msg)
 
         with self._lock:
-            # Check pool state
+            # If service is stopping or stopped, ignore
+            if self.state_manager.current_state in (ServiceState.STOPPING, ServiceState.STOPPED):
+                return
+
+            # Check bounded recovery policy
+            if (
+                self.config.auto_restart_workers
+                and self._restart_count < self.config.max_restart_attempts
+            ):
+                self._restart_count += 1
+                logger.warning(
+                    f"Initiating bounded worker recovery attempt {self._restart_count}/"
+                    f"{self.config.max_restart_attempts} for worker '{worker_id}'..."
+                )
+                if self.config.restart_cooldown_seconds > 0:
+                    time.sleep(self.config.restart_cooldown_seconds)
+
+                restarted = self.worker_manager.restart_failed_workers(work_fn=self._worker_task)
+                if restarted > 0 and self.worker_manager.all_alive():
+                    logger.info(f"Worker recovery successful: {restarted} worker(s) restored.")
+                    if self.state_manager.current_state != ServiceState.RUNNING:
+                        try:
+                            self.state_manager.transition_to(
+                                ServiceState.RUNNING,
+                                reason=f"Recovered via restart attempt {self._restart_count}"
+                            )
+                        except ServiceLifecycleError:
+                            pass
+                    return
+
+            # If recovery not enabled or attempts exhausted
             alive_count = self.worker_manager.active_count()
             current_state = self.state_manager.current_state
 
             if alive_count == 0:
-                logger.critical("All workers have terminated unexpectedly. Transitioning to FAILED.")
+                logger.critical(
+                    f"All workers terminated unexpectedly (recovery attempts: "
+                    f"{self._restart_count}/{self.config.max_restart_attempts}). Transitioning to FAILED."
+                )
                 try:
                     self.state_manager.transition_to(
                         ServiceState.FAILED,

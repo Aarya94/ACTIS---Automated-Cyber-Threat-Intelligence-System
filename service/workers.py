@@ -301,6 +301,31 @@ class WorkerManager:
         with self._lock:
             return any(w.state == WorkerState.FAILED for w in self._workers)
 
+    def restart_failed_workers(self, work_fn: Optional[Callable[[], bool]] = None) -> int:
+        """
+        Replaces any failed or terminated workers with fresh worker threads.
+        Returns the count of successfully restarted workers.
+        """
+        with self._lock:
+            restarted = 0
+            updated_workers: List[ServiceWorker] = []
+            for worker in self._workers:
+                if worker.state == WorkerState.FAILED or (not worker.is_alive() and worker.state != WorkerState.STOPPED):
+                    fresh_worker = ServiceWorker(
+                        worker_id=worker.worker_id,
+                        name=worker.name,
+                        work_fn=work_fn,
+                        on_error=self.on_worker_error,
+                    )
+                    fresh_worker.start()
+                    updated_workers.append(fresh_worker)
+                    restarted += 1
+                    logger.info(f"Restarted failed worker '{worker.name}' with fresh thread.")
+                else:
+                    updated_workers.append(worker)
+            self._workers = updated_workers
+            return restarted
+
     def clear(self) -> None:
         """Clears worker references after shutdown."""
         with self._lock:
