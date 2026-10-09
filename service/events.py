@@ -13,7 +13,7 @@ import uuid
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from config.config import get_logger
 
@@ -158,10 +158,23 @@ class SecurityEventQueue:
         self._enqueued_count = 0
         self._dequeued_count = 0
         self._dropped_count = 0
+        self._peak_size = 0
+        self._cancelled = False
+        self._last_drop_log_time = 0.0
 
     @property
     def maxsize(self) -> int:
         return self._maxsize
+
+    @property
+    def is_cancelled(self) -> bool:
+        """Returns True if the queue has been cancelled."""
+        return self._cancelled
+
+    def cancel(self) -> None:
+        """Signals cancellation, rejecting subsequent put requests."""
+        with self._lock:
+            self._cancelled = True
 
     def put(
         self,
@@ -172,21 +185,34 @@ class SecurityEventQueue:
         """
         Enqueues a SecurityEvent into the queue.
         Validates event before enqueueing.
-        Returns True if enqueued, False if dropped due to capacity limits.
+        Returns True if enqueued, False if dropped due to capacity limits or cancellation.
         """
+        if self._cancelled:
+            return False
+
         event.validate()
         try:
             self._queue.put(event, block=block, timeout=timeout)
             with self._lock:
                 self._enqueued_count += 1
+                curr = self._queue.qsize()
+                if curr > self._peak_size:
+                    self._peak_size = curr
             return True
         except queue.Full:
+            import time
+            now = time.time()
             with self._lock:
                 self._dropped_count += 1
-            logger.warning(
-                f"SecurityEventQueue full ({self._queue.qsize()}/{self._maxsize}). "
-                f"Dropped event ID: {event.event_id}"
-            )
+                should_log = (now - self._last_drop_log_time) >= 2.0
+                if should_log:
+                    self._last_drop_log_time = now
+
+            if should_log:
+                logger.warning(
+                    f"SecurityEventQueue full ({self._queue.qsize()}/{self._maxsize}). "
+                    f"Dropped event ID: {event.event_id} (total dropped: {self._dropped_count})"
+                )
             return False
 
     def get(
@@ -222,7 +248,7 @@ class SecurityEventQueue:
         """Returns True if the queue is currently at capacity."""
         return self._queue.full()
 
-    def get_stats(self) -> Dict[str, int]:
+    def get_stats(self) -> Dict[str, Any]:
         """Returns snapshot telemetry of queue operations."""
         with self._lock:
             return {
@@ -231,7 +257,25 @@ class SecurityEventQueue:
                 "enqueued_count": self._enqueued_count,
                 "dequeued_count": self._dequeued_count,
                 "dropped_count": self._dropped_count,
+                "peak_size": self._peak_size,
+                "is_cancelled": self._cancelled,
             }
+
+    def drain(self, max_items: Optional[int] = None) -> List[SecurityEvent]:
+        """
+        Safely drains up to max_items events from the queue without blocking.
+        If max_items is None, drains all current events.
+        """
+        drained: List[SecurityEvent] = []
+        limit = max_items if max_items is not None else float("inf")
+        while len(drained) < limit and not self._queue.empty():
+            try:
+                item = self._queue.get_nowait()
+                self._queue.task_done()
+                drained.append(item)
+            except (queue.Empty, ValueError):
+                break
+        return drained
 
     def clear(self) -> int:
         """Drains and discards all pending items from the queue."""
