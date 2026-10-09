@@ -1,90 +1,85 @@
 # ACTIS Detection Workflow & Multi-Criteria Evidence Fusion
 
-This document details the multi-layered threat evaluation pipeline employed by ACTIS to evaluate incoming targets (URLs, messages, files) without relying on any single point of failure.
+**Authoritative Architecture Document**  
+**Milestone:** Post-Day-7 Architectural Evolution  
+**Status:** Approved Target Architecture  
+
+This document details the multi-layered threat evaluation pipeline employed by ACTIS to evaluate incoming security events without relying on any single point of failure or fragile detection mechanism.
 
 ---
 
-## The End-to-End Pipeline
+## 1. End-to-End Pipeline in the Target Architecture
+
+In the post-Day-7 architecture, target inputs flow from the **Event/Input Layer** through the **Analysis Orchestrator** into the **Detection Decision Engine**:
 
 ```text
                                   +-----------------------+
-                                  |    Target Input       |
-                                  | (URL, Message, File)  |
+                                  |   Security Event      |
+                                  | (File, URL, Message)  |
                                   +-----------+-----------+
                                               |
                                               v
                                   +-----------------------+
-                                  |    Scanner Ingest     |
-                                  | (Syntax/Header Read)  |
+                                  | Analysis Orchestrator |
+                                  | (Coordinate Analysis) |
+                                  +-----------+-----------+
+                                              |
+                        +---------------------+---------------------+
+                        |                     |                     |
+                        v                     v                     v
+            +-----------------------+ +---------------+ +-----------------------+
+            | Threat Intelligence   | | ML Inference  | |  Rule-Based Engine    |
+            |  Lookup (Local/Online)| | (RF Models)   | | (Deterministic Rules) |
+            +-----------+-----------+ +-------+-------+ +-----------+-----------+
+                        |                     |                     |
+                        +---------------------+---------------------+
+                                              |
+                                              v
+                                  +-----------------------+
+                                  | Detection Engine Core |
+                                  | (Evidence Collector)  |
                                   +-----------+-----------+
                                               |
                                               v
                                   +-----------------------+
-                                  |  Feature Extraction   |
-                                  | (Tokens, Hashes, PE)  |
-                                  +-----------+-----------+
-                                              |
-                                              v
-                                  +-----------------------+
-                                  | Threat Intelligence   |
-                                  |  Lookup (Local DB)    |
-                                  +-----------+-----------+
-                                              |
-                                              v
-                                  +-----------------------+
-                                  |  ML Model Inference   |
-                                  | (Phishing / Malware)  |
-                                  +-----------+-----------+
-                                              |
-                                              v
-                                  +-----------------------+
-                                  |  Rule-Based Engine    |
-                                  | (Heuristic Signatures)|
-                                  +-----------+-----------+
-                                              |
-                                              v
-                                  +-----------------------+
-                                  | Risk/Decision Engine  |
-                                  |  (Evidence Fusion)    |
+                                  |   Risk / Decision     |
+                                  | (Evidence Fusion,     |
+                                  |  Score, Confidence)   |
                                   +-----------+-----------+
                                               |
                                               v
                                   +-----------------------+
                                   | Threat Classification |
-                                  | (CRITICAL, HIGH, etc) |
+                                  | (CONFIRMED, SUSPICIOUS|
+                                  |  CANDIDATE, etc.)     |
                                   +-----------+-----------+
                                               |
                                               v
                                   +-----------------------+
-                                  | Persistence & Audit   |
-                                  | (SQLite Scan History) |
-                                  +-----------+-----------+
-                                              |
-                                              v
-                                  +-----------------------+
-                                  | User Notification &   |
-                                  |  Dashboard Display    |
+                                  | Persistence & Egress  |
+                                  | (SQLite, Alerts, UI,  |
+                                  |  Security Assistant)  |
                                   +-----------------------+
 ```
 
 ---
 
-## Multi-Criteria Evidence Layers
+## 2. Multi-Criteria Evidence Layers
 
-ACTIS explicitly rejects binary reliance on raw machine learning predictions. Because ML models inherently carry false-positive and false-negative margins, the Detection Engine fuses four independent analytical layers:
+ACTIS explicitly rejects binary reliance on raw machine learning predictions. Because ML models inherently carry false-positive and false-negative margins, the Detection Engine fuses four orthogonal analytical layers:
 
 | Layer | Evidence Source | Default Weight | Role & Verification |
 |---|---|---|---|
-| **Layer 1: Known Intelligence** | Local SQLite Threat DB | `0.35` | Instant deterministic match against locally verified hashes, domains, or URLs. |
-| **Layer 2: ML Inference** | Random Forest Classifiers | `0.30` | Statistical scoring based on structural feature patterns (URL morphology or PE header metrics). |
-| **Layer 3: Heuristic Rules** | Rule Engine | `0.20` | Deterministic logic: high section entropy, known packer sections (UPX), injection APIs, unescaped IPs. |
-| **Layer 4: External Enrichment**| Online TI APIs (VirusTotal) | `0.15` | External community reputation scoring (optional / offline-safe fallback). |
+| **Layer 1: Known Intelligence** | Local SQLite Threat DB | `0.35` | Deterministic match against locally verified hashes, domains, or URLs. |
+| **Layer 2: ML Inference** | Random Forest Classifiers | `0.30` | Statistical scoring based on structural feature patterns (URL morphology or PE metrics). |
+| **Layer 3: Heuristic Rules** | Rule Engine | `0.20` | Deterministic logic: high section entropy, known packer sections, injection APIs, unescaped IPs. |
+| **Layer 4: External Enrichment**| Online TI APIs (VirusTotal v3) | `0.15` | External community reputation scoring (optional / offline-safe fallback). |
 
 ---
 
-## Dynamic Weight Normalization
+## 3. Dynamic Weight Normalization
 
-When a target is novel (unseen in local threat intelligence) or when the endpoint is offline (external intelligence unavailable), the Risk Engine dynamically re-normalizes the active evidence weights:
+When a target is novel (unseen in threat intelligence) or when the endpoint operates in an offline or air-gapped environment (external intelligence unavailable), the Risk Engine dynamically re-normalizes active weights:
 
 $$\text{Active Weights Sum} = \sum_{i \in \text{Available}} W_i$$
 
@@ -96,19 +91,26 @@ This ensures that missing external feeds do not artificially suppress the risk s
 
 ---
 
-## Threat Classification Thresholds
+## 4. Threat Classification & Lifecycle States
 
-The composite score maps directly to actionable severity categories:
+### 4.1 Severity Risk Bands (0–100 Score)
+- **`CRITICAL` (80–100):** Clear malicious indicators corroborated across multiple analytical layers. Immediate user alert.
+- **`HIGH` (60–79):** Strong malicious indicators or high ML probability with corroborating heuristics.
+- **`MEDIUM` (35–59):** Suspicious structural anomalies, unverified external reports, or moderate ML probability.
+- **`LOW` (0–34):** Benign characteristics, clean threat intelligence lookups, standard binary structures.
 
-- **`CRITICAL` (80 – 100)**: Immediate high-confidence threat. High probability of weaponized malware or confirmed credential harvester. Requires immediate user alert.
-- **`HIGH` (60 – 79)**: Strong malicious indicators present (e.g. packed PE with injection APIs or high ML phishing probability).
-- **`MEDIUM` (35 – 59)**: Suspicious characteristics detected (e.g. urgent social engineering language, novel domains, anomalous section headers).
-- **`LOW` (0 – 34)**: Benign or standard characteristics. Minimal indicator overlap.
+### 4.2 Categorical Verification States
+1. **`CONFIRMED`:** A thoroughly verified malicious indicator corroborated by multiple trusted intelligence sources.
+2. **`SUSPICIOUS`:** An indicator exhibiting multiple corroborating warning signs but lacking definitive external consensus.
+3. **`CANDIDATE`:** A preliminary flag identified by ML or heuristics awaiting corroboration.
+4. **`REPORTED`:** An incoming telemetry submission pending verification.
+5. **`FALSE_POSITIVE`:** A verified benign indicator that explicitly overrides heuristic and statistical warnings.
 
 ---
 
-## Core Rule: ML Predictions Are Not Globally Confirmed Intelligence
+## 5. Confidence Calculation & Itemized Explainability
 
-A machine learning prediction (regardless of model confidence) is an **evidentiary signal**, not a verified fact.
-- ML predictions are stored locally as `CANDIDATE` or `SUSPICIOUS` detections.
-- **Under NO circumstances** does an unverified ML prediction get promoted directly to `CONFIRMED` threat intelligence or broadcast across the central sharing network without corroborating evidence or manual verification.
+Every detection decision produces:
+- **`confidence` (0.0 to 1.0):** Reflects the volume, agreement, and reliability of contributing evidence sources.
+- **`evidence_breakdown`:** An itemized tree detailing each signal: source name, raw score, normalized weight, and contributing rule IDs.
+- **`explanation`:** A human-readable summary detailing exactly what was detected and why the verdict was rendered.
