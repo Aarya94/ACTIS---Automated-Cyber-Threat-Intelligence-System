@@ -43,6 +43,7 @@ from config.settings import (
     RiskEngineConfig,
     ScannerConfig,
     ServerConfig,
+    ServiceConfig,
 )
 from config.env_loader import (
     load_environment,
@@ -77,6 +78,16 @@ from config.defaults import (
     DEFAULT_DB_TIMEOUT_SECONDS,
     DEFAULT_ENABLE_WAL,
     DEFAULT_API_TIMEOUT,
+    DEFAULT_SERVICE_NAME,
+    DEFAULT_SERVICE_DISPLAY_NAME,
+    DEFAULT_SERVICE_DESCRIPTION,
+    DEFAULT_SERVICE_WORKER_COUNT,
+    DEFAULT_SERVICE_QUEUE_MAX_SIZE,
+    DEFAULT_SERVICE_SHUTDOWN_TIMEOUT,
+    DEFAULT_SERVICE_HEALTH_CHECK_INTERVAL,
+    DEFAULT_SERVICE_AUTO_RESTART,
+    DEFAULT_SERVICE_MAX_RESTARTS,
+    DEFAULT_SERVICE_RESTART_COOLDOWN,
     create_default_config,
 )
 from config.validator import (
@@ -156,6 +167,19 @@ def load_app_config(
         port=get_int("ACTIS_SERVER_PORT", DEFAULT_PORT),
     )
 
+    service_config = ServiceConfig(
+        service_name=get_str("ACTIS_SERVICE_NAME", DEFAULT_SERVICE_NAME),
+        display_name=get_str("ACTIS_SERVICE_DISPLAY_NAME", DEFAULT_SERVICE_DISPLAY_NAME),
+        description=get_str("ACTIS_SERVICE_DESCRIPTION", DEFAULT_SERVICE_DESCRIPTION),
+        worker_count=get_int("ACTIS_SERVICE_WORKER_COUNT", DEFAULT_SERVICE_WORKER_COUNT),
+        queue_max_size=get_int("ACTIS_SERVICE_QUEUE_MAX_SIZE", DEFAULT_SERVICE_QUEUE_MAX_SIZE),
+        shutdown_timeout_seconds=get_float("ACTIS_SERVICE_SHUTDOWN_TIMEOUT", DEFAULT_SERVICE_SHUTDOWN_TIMEOUT),
+        health_check_interval_seconds=get_float("ACTIS_SERVICE_HEALTH_INTERVAL", DEFAULT_SERVICE_HEALTH_CHECK_INTERVAL),
+        auto_restart_workers=get_bool("ACTIS_SERVICE_AUTO_RESTART", DEFAULT_SERVICE_AUTO_RESTART),
+        max_restart_attempts=get_int("ACTIS_SERVICE_MAX_RESTARTS", DEFAULT_SERVICE_MAX_RESTARTS),
+        restart_cooldown_seconds=get_float("ACTIS_SERVICE_RESTART_COOLDOWN", DEFAULT_SERVICE_RESTART_COOLDOWN),
+    )
+
     cfg = AppConfig(
         app_name=APP_NAME,
         environment=active_env,
@@ -166,6 +190,7 @@ def load_app_config(
         risk=risk_config,
         scanner=scanner_config,
         server=server_config,
+        service=service_config,
     )
     validate_config(cfg, strict=False)
     return cfg

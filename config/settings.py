@@ -153,6 +153,35 @@ class ServerConfig:
 
 
 @dataclass
+class ServiceConfig:
+    """Settings for the resident Windows Protection Service foundation."""
+    service_name: str = "ACTISProtectionService"
+    display_name: str = "ACTIS Threat Protection Service"
+    description: str = "Resident background protection service for the Automated Cyber Threat Intelligence System."
+    worker_count: int = 1
+    queue_max_size: int = 1000
+    shutdown_timeout_seconds: float = 5.0
+    health_check_interval_seconds: float = 10.0
+    auto_restart_workers: bool = True
+    max_restart_attempts: int = 3
+    restart_cooldown_seconds: float = 1.0
+
+    def to_dict(self, mask_secrets: bool = True) -> Dict[str, Any]:
+        return {
+            "service_name": self.service_name,
+            "display_name": self.display_name,
+            "description": self.description,
+            "worker_count": self.worker_count,
+            "queue_max_size": self.queue_max_size,
+            "shutdown_timeout_seconds": self.shutdown_timeout_seconds,
+            "health_check_interval_seconds": self.health_check_interval_seconds,
+            "auto_restart_workers": self.auto_restart_workers,
+            "max_restart_attempts": self.max_restart_attempts,
+            "restart_cooldown_seconds": self.restart_cooldown_seconds,
+        }
+
+
+@dataclass
 class AppConfig:
     """Unified application configuration root for ACTIS."""
     app_name: str = "ACTIS"
@@ -164,6 +193,7 @@ class AppConfig:
     risk: Optional[RiskEngineConfig] = None
     scanner: Optional[ScannerConfig] = None
     server: Optional[ServerConfig] = None
+    service: Optional[ServiceConfig] = None
 
     def to_dict(self, mask_secrets: bool = True) -> Dict[str, Any]:
         """Serializes complete AppConfig into a dictionary, redacting sensitive secrets by default."""
@@ -177,4 +207,6 @@ class AppConfig:
             "risk": self.risk.to_dict(mask_secrets) if self.risk else None,
             "scanner": self.scanner.to_dict(mask_secrets) if self.scanner else None,
             "server": self.server.to_dict(mask_secrets) if self.server else None,
+            "service": self.service.to_dict(mask_secrets) if self.service else None,
         }
+

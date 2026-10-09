@@ -30,6 +30,7 @@ from config.settings import (
     RiskEngineConfig,
     ScannerConfig,
     ServerConfig,
+    ServiceConfig,
 )
 
 # Application Baseline
@@ -66,6 +67,19 @@ DEFAULT_ENABLE_WAL = True
 
 # External Threat Intel API Defaults
 DEFAULT_API_TIMEOUT = 10.0
+
+
+# Protection Service Defaults
+DEFAULT_SERVICE_NAME = "ACTISProtectionService"
+DEFAULT_SERVICE_DISPLAY_NAME = "ACTIS Threat Protection Service"
+DEFAULT_SERVICE_DESCRIPTION = "Resident background protection service for the Automated Cyber Threat Intelligence System."
+DEFAULT_SERVICE_WORKER_COUNT = 1
+DEFAULT_SERVICE_QUEUE_MAX_SIZE = 1000
+DEFAULT_SERVICE_SHUTDOWN_TIMEOUT = 5.0
+DEFAULT_SERVICE_HEALTH_CHECK_INTERVAL = 10.0
+DEFAULT_SERVICE_AUTO_RESTART = True
+DEFAULT_SERVICE_MAX_RESTARTS = 3
+DEFAULT_SERVICE_RESTART_COOLDOWN = 1.0
 
 
 def create_default_config(environment: str = DEFAULT_ENVIRONMENT) -> AppConfig:
@@ -131,6 +145,19 @@ def create_default_config(environment: str = DEFAULT_ENVIRONMENT) -> AppConfig:
         port=DEFAULT_PORT,
     )
 
+    service_config = ServiceConfig(
+        service_name=DEFAULT_SERVICE_NAME,
+        display_name=DEFAULT_SERVICE_DISPLAY_NAME,
+        description=DEFAULT_SERVICE_DESCRIPTION,
+        worker_count=DEFAULT_SERVICE_WORKER_COUNT,
+        queue_max_size=DEFAULT_SERVICE_QUEUE_MAX_SIZE,
+        shutdown_timeout_seconds=DEFAULT_SERVICE_SHUTDOWN_TIMEOUT,
+        health_check_interval_seconds=DEFAULT_SERVICE_HEALTH_CHECK_INTERVAL,
+        auto_restart_workers=DEFAULT_SERVICE_AUTO_RESTART,
+        max_restart_attempts=DEFAULT_SERVICE_MAX_RESTARTS,
+        restart_cooldown_seconds=DEFAULT_SERVICE_RESTART_COOLDOWN,
+    )
+
     return AppConfig(
         app_name=APP_NAME,
         environment=environment,
@@ -141,4 +168,5 @@ def create_default_config(environment: str = DEFAULT_ENVIRONMENT) -> AppConfig:
         risk=risk_config,
         scanner=scanner_config,
         server=server_config,
+        service=service_config,
     )

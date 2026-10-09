@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-09 12:27:59 UTC  
+**Generated:** 2026-10-09 12:39:56 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`99743bd`)  
+**Current Git Branch:** `main` (`ef3f627`)  
 
 ---
 
@@ -117,13 +117,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `99743bd`
-- **Working Tree:** 9 untracked/unstaged changes
+- **HEAD Commit:** `ef3f627`
+- **Working Tree:** 6 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `ef3f627` | Aaryan Suman | 2026-10-09 | docs: record Day 8 development changelog and synchronize generated docs |
 | `99743bd` | Aaryan Suman | 2026-10-09 | docs: document device scanning and incremental analysis workflow |
 | `f7c702c` | Aaryan Suman | 2026-10-09 | test: add incremental scan state regression coverage |
 | `6bf9ddd` | Aaryan Suman | 2026-10-09 | test: add device scanner traversal and safety coverage |
@@ -133,7 +134,6 @@
 | `a380c22` | Aaryan Suman | 2026-10-09 | feat: persist incremental file scan state |
 | `2ed93f0` | Aaryan Suman | 2026-10-09 | feat: add incremental scan state contract |
 | `80407ea` | Aaryan Suman | 2026-10-09 | feat: add streaming SHA-256 file fingerprinting |
-| `5714124` | Aaryan Suman | 2026-10-09 | feat: add safe file metadata collection for device scans |
 
 ## Known Issues
 
