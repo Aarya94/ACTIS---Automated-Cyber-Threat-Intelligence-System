@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-09 13:32:35 UTC  
+**Generated:** 2026-10-09 13:34:43 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`281b380`)  
+**Current Git Branch:** `main` (`6f74ec2`)  
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `281b380`
+- **HEAD Commit:** `6f74ec2`
 - **Working Tree:** 1 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `6f74ec2` | Aaryan Suman | 2026-10-09 | feat: connect changed files to ACTIS analysis pipeline |
 | `281b380` | Aaryan Suman | 2026-10-09 | feat: connect event processing with incremental scan state |
 | `d0ff9d3` | Aaryan Suman | 2026-10-09 | feat: integrate filesystem events with protection service |
 | `72b2eba` | Aaryan Suman | 2026-10-09 | feat: add bounded protection event queue |
@@ -140,7 +141,6 @@
 | `c165969` | Aaryan Suman | 2026-10-09 | feat: add filesystem event source integration |
 | `368eff0` | Aaryan Suman | 2026-10-09 | docs: record Day 9 development changelog and synchronize generated docs |
 | `932f05d` | Aaryan Suman | 2026-10-09 | docs: document ACTIS protection service architecture |
-| `cb8de71` | Aaryan Suman | 2026-10-09 | test: add security event boundary validation coverage |
 
 ## Known Issues
 

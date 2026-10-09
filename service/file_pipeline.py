@@ -108,6 +108,7 @@ class FileProtectionPipeline(IAnalysisOrchestrationBoundary):
         self._deleted_count = 0
         self._oversized_count = 0
         self._unsupported_count = 0
+        self._changed_during_analysis_count = 0
         self._analyzed_count = 0
         self._error_count = 0
         self._last_results: List[EventProcessingResult] = []
@@ -262,74 +263,192 @@ class FileProtectionPipeline(IAnalysisOrchestrationBoundary):
         meta: Any,
     ) -> EventProcessingResult:
         """
-        Placeholder / extension hook for analysis dispatch.
-        Overridden or wired in Commit 8 to invoke the central ACTIS analysis pipeline.
+        Executes analysis handoff while hardening against filesystem race conditions
+        (disappearance, modification during hashing, locking/inaccessibility, or changes during analysis).
         """
-        if self.analysis_fn is not None:
-            try:
-                analysis = self.analysis_fn(path_obj)
+        if self.analysis_fn is None:
+            res = EventProcessingResult(
+                event_id=event.event_id,
+                target_path=canonical_path,
+                status=EventProcessingStatus.ANALYZED,
+                change_type=change_type,
+            )
+            self._record_result(res)
+            return res
+
+        # 1. Pre-analysis fingerprinting & race-condition detection
+        from scanners.device_scanner import compute_file_fingerprint
+        fp = compute_file_fingerprint(path_obj, max_size_bytes=self.max_file_size_bytes)
+
+        if fp.status == "FILE_CHANGED_DURING_HASH":
+            with self._lock:
+                self._changed_during_analysis_count += 1
+            logger.warning(f"File '{canonical_path}' changed during hash computation.")
+            res = EventProcessingResult(
+                event_id=event.event_id,
+                target_path=canonical_path,
+                status=EventProcessingStatus.CHANGED_DURING_ANALYSIS,
+                change_type=change_type,
+                error_message="File modified or resized during cryptographic hash stream read.",
+            )
+            self._record_result(res)
+            return res
+
+        if fp.status == "INACCESSIBLE":
+            with self._lock:
+                self._inaccessible_count += 1
+            logger.warning(f"File '{canonical_path}' became inaccessible during hashing: {fp.error}")
+            res = EventProcessingResult(
+                event_id=event.event_id,
+                target_path=canonical_path,
+                status=EventProcessingStatus.INACCESSIBLE,
+                change_type=change_type,
+                error_message=fp.error or "Inaccessible during hash computation",
+            )
+            self._record_result(res)
+            return res
+
+        if fp.status == "SKIPPED_OVERSIZED":
+            with self._lock:
+                self._oversized_count += 1
+            res = EventProcessingResult(
+                event_id=event.event_id,
+                target_path=canonical_path,
+                status=EventProcessingStatus.SKIPPED_OVERSIZED,
+                change_type=change_type,
+                error_message=fp.error or "Oversized file",
+            )
+            self._record_result(res)
+            return res
+
+        # 2. Invoke analysis pipeline
+        try:
+            analysis = self.analysis_fn(path_obj)
+        except (FileNotFoundError, OSError) as e:
+            if not path_obj.exists():
                 with self._lock:
-                    self._analyzed_count += 1
-
-                is_threat = bool(analysis.get("is_threat", False))
-                risk_score = float(analysis.get("score", 0.0))
-                risk_level = str(analysis.get("risk_level", "LOW"))
-                reasons = list(analysis.get("reasons", []))
-                sha256_hash = str(analysis.get("sha256", ""))
-
-                # Update incremental scan state
-                now_iso = datetime.now(timezone.utc).isoformat()
-                file_size = getattr(meta, "file_size", 0) if meta else 0
-                mtime = getattr(meta, "mtime", 0.0) if meta else 0.0
-
-                new_state = FileScanState(
-                    canonical_path=canonical_path,
-                    file_size=file_size,
-                    mtime=mtime,
-                    sha256=sha256_hash,
-                    last_scanned_at=now_iso,
-                    scan_status=FileScanStatus.SUSPICIOUS.value if is_threat else FileScanStatus.CLEAN.value,
-                    risk_score=risk_score,
-                    risk_level=risk_level,
-                    detection_reasons=reasons,
-                )
-                self.state_manager.record_state(new_state)
-
-                res = EventProcessingResult(
-                    event_id=event.event_id,
-                    target_path=canonical_path,
-                    status=EventProcessingStatus.ANALYZED,
-                    change_type=change_type,
-                    is_threat=is_threat,
-                    risk_score=risk_score,
-                    risk_level=risk_level,
-                    detection_reasons=reasons,
-                    sha256=sha256_hash,
-                    analysis_details=analysis,
-                )
-                self._record_result(res)
-                return res
-
-            except Exception as ex:
-                with self._lock:
-                    self._error_count += 1
-                logger.error(f"Analysis failed for '{canonical_path}': {ex}", exc_info=True)
+                    self._disappeared_count += 1
+                logger.warning(f"File '{canonical_path}' disappeared during analysis invocation: {e}")
                 err_res = EventProcessingResult(
                     event_id=event.event_id,
                     target_path=canonical_path,
-                    status=EventProcessingStatus.ERROR,
+                    status=EventProcessingStatus.DISAPPEARED,
                     change_type=change_type,
-                    error_message=str(ex),
+                    error_message=f"File disappeared: {e}",
                 )
                 self._record_result(err_res)
                 return err_res
+            with self._lock:
+                self._inaccessible_count += 1
+            logger.warning(f"File '{canonical_path}' inaccessible during analysis invocation: {e}")
+            err_res = EventProcessingResult(
+                event_id=event.event_id,
+                target_path=canonical_path,
+                status=EventProcessingStatus.INACCESSIBLE,
+                change_type=change_type,
+                error_message=str(e),
+            )
+            self._record_result(err_res)
+            return err_res
+        except Exception as ex:
+            with self._lock:
+                self._error_count += 1
+            logger.error(f"Analysis failed for '{canonical_path}': {ex}", exc_info=True)
+            err_res = EventProcessingResult(
+                event_id=event.event_id,
+                target_path=canonical_path,
+                status=EventProcessingStatus.ERROR,
+                change_type=change_type,
+                error_message=str(ex),
+            )
+            self._record_result(err_res)
+            return err_res
 
-        # If no analysis_fn registered yet (foundation stage), return ready status
+        # 3. Post-analysis stability verification
+        if not path_obj.exists():
+            with self._lock:
+                self._disappeared_count += 1
+            logger.warning(f"File '{canonical_path}' disappeared after static analysis execution.")
+            res = EventProcessingResult(
+                event_id=event.event_id,
+                target_path=canonical_path,
+                status=EventProcessingStatus.DISAPPEARED,
+                change_type=change_type,
+                error_message="File disappeared after static analysis execution.",
+            )
+            self._record_result(res)
+            return res
+
+        try:
+            st_post = path_obj.stat()
+            initial_mtime = getattr(meta, "mtime", None)
+            initial_size = getattr(meta, "file_size", None)
+            if initial_mtime is not None and initial_size is not None:
+                if st_post.st_size != initial_size or abs(st_post.st_mtime - initial_mtime) > 1e-4:
+                    with self._lock:
+                        self._changed_during_analysis_count += 1
+                    logger.warning(f"File '{canonical_path}' changed on disk during analysis execution.")
+                    res = EventProcessingResult(
+                        event_id=event.event_id,
+                        target_path=canonical_path,
+                        status=EventProcessingStatus.CHANGED_DURING_ANALYSIS,
+                        change_type=change_type,
+                        error_message="File was modified on disk during static analysis execution.",
+                    )
+                    self._record_result(res)
+                    return res
+        except (PermissionError, FileNotFoundError, OSError) as e:
+            with self._lock:
+                self._inaccessible_count += 1
+            logger.warning(f"File '{canonical_path}' post-analysis stat failed: {e}")
+            res = EventProcessingResult(
+                event_id=event.event_id,
+                target_path=canonical_path,
+                status=EventProcessingStatus.INACCESSIBLE,
+                change_type=change_type,
+                error_message=f"Post-analysis stat failed: {e}",
+            )
+            self._record_result(res)
+            return res
+
+        # 4. Successful analysis & Incremental scan state update
+        with self._lock:
+            self._analyzed_count += 1
+
+        is_threat = bool(analysis.get("is_threat", False))
+        risk_score = float(analysis.get("score", 0.0))
+        risk_level = str(analysis.get("risk_level", "LOW"))
+        reasons = list(analysis.get("reasons", []))
+        sha256_hash = str(analysis.get("sha256", "")) or fp.sha256
+
+        now_iso = datetime.now(timezone.utc).isoformat()
+        file_size = getattr(meta, "file_size", 0) if meta else st_post.st_size
+        mtime = getattr(meta, "mtime", 0.0) if meta else st_post.st_mtime
+
+        new_state = FileScanState(
+            canonical_path=canonical_path,
+            file_size=file_size,
+            mtime=mtime,
+            sha256=sha256_hash,
+            last_scanned_at=now_iso,
+            scan_status=FileScanStatus.SUSPICIOUS.value if is_threat else FileScanStatus.CLEAN.value,
+            risk_score=risk_score,
+            risk_level=risk_level,
+            detection_reasons=reasons,
+        )
+        self.state_manager.record_state(new_state)
+
         res = EventProcessingResult(
             event_id=event.event_id,
             target_path=canonical_path,
             status=EventProcessingStatus.ANALYZED,
             change_type=change_type,
+            is_threat=is_threat,
+            risk_score=risk_score,
+            risk_level=risk_level,
+            detection_reasons=reasons,
+            sha256=sha256_hash,
+            analysis_details=analysis,
         )
         self._record_result(res)
         return res
@@ -383,6 +502,7 @@ class FileProtectionPipeline(IAnalysisOrchestrationBoundary):
                 "deleted_count": self._deleted_count,
                 "oversized_count": self._oversized_count,
                 "unsupported_count": self._unsupported_count,
+                "changed_during_analysis_count": self._changed_during_analysis_count,
                 "analyzed_count": self._analyzed_count,
                 "error_count": self._error_count,
                 "cached_states_count": self.state_manager.get_cached_count(),
