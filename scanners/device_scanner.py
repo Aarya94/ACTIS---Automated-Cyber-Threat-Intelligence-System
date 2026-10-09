@@ -33,7 +33,7 @@ from scanners.incremental_state import (
 
 logger = get_logger("DeviceScanner")
 
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 
 # Windows file extensions of primary security interest
 ANALYZABLE_EXTENSIONS = {
@@ -154,6 +154,46 @@ def compute_file_fingerprint(
         return FileFingerprint(sha256="", status="HASH_FAILED", error=f"Post-hash stat failed: {e}")
 
     return FileFingerprint(sha256=hasher.hexdigest(), status="OK", error=None)
+
+
+@dataclass
+class DeviceScanResult:
+    """Structured, deterministic result contract for a completed or cancelled device scan."""
+    scan_id: Optional[int]
+    scan_type: str
+    status: str  # "completed", "cancelled", "failed"
+    target_paths: List[str]
+    start_time: str
+    end_time: str
+    duration_seconds: float
+    total_files_discovered: int
+    files_scanned: int
+    unchanged_count: int
+    skipped_count: int
+    inaccessible_count: int
+    error_count: int
+    threats_found: int
+    threat_details: List[Dict[str, Any]] = field(default_factory=list)
+    skipped_reasons: Dict[str, int] = field(default_factory=dict)
+    errors: List[str] = field(default_factory=list)
+
+    @property
+    def is_cancelled(self) -> bool:
+        return self.status == "cancelled"
+
+    @property
+    def is_clean(self) -> bool:
+        return self.threats_found == 0
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Serializes the scan result to a dictionary representation."""
+        return asdict(self)
+
+    def __getitem__(self, key: str) -> Any:
+        return getattr(self, key)
+
+    def get(self, key: str, default: Any = None) -> Any:
+        return getattr(self, key, default)
 
 
 class ScanCancellationToken:
@@ -290,7 +330,7 @@ class DeviceScanner:
         progress_callback: Optional[Callable[[Dict[str, Any]], None]] = None,
         only_executables: bool = False,
         use_incremental: bool = True
-    ) -> Dict[str, Any]:
+    ) -> DeviceScanResult:
         """
         Executes a scan over specified path roots.
         
@@ -309,6 +349,9 @@ class DeviceScanner:
         scan_id = create_scan_session(scan_type, target_desc)
         logger.info(f"Starting {scan_type.upper()} scan (ID: {scan_id}) on: {target_desc}")
 
+        start_time_iso = datetime.now(timezone.utc).isoformat()
+        start_time = time.time()
+
         # Phase 1: Discovery
         all_files: List[Path] = []
         for p in target_paths:
@@ -325,9 +368,9 @@ class DeviceScanner:
         error_count = 0
         skipped_count = 0
         inaccessible_count = 0
+        skipped_reasons: Dict[str, int] = {"oversized": 0, "non_executable": 0}
+        scan_errors: List[str] = []
         threat_results: List[Dict[str, Any]] = []
-
-        start_time = time.time()
 
         # Phase 2: Analysis Loop
         for file_path in all_files:
@@ -338,12 +381,15 @@ class DeviceScanner:
             # Filter non-executable files if requested
             if only_executables and file_path.suffix.lower() not in ANALYZABLE_EXTENSIONS:
                 skipped_count += 1
+                skipped_reasons["non_executable"] = skipped_reasons.get("non_executable", 0) + 1
                 continue
 
             # Check safe metadata
             meta = collect_file_metadata(file_path, max_size_bytes=MAX_FILE_SIZE_BYTES)
             if not meta.is_accessible:
                 inaccessible_count += 1
+                if meta.error:
+                    scan_errors.append(f"Inaccessible {file_path}: {meta.error}")
                 record_scan_item(
                     scan_id=scan_id,
                     path_or_target=str(file_path),
@@ -355,6 +401,7 @@ class DeviceScanner:
 
             if meta.is_oversized:
                 skipped_count += 1
+                skipped_reasons["oversized"] = skipped_reasons.get("oversized", 0) + 1
                 record_scan_item(
                     scan_id=scan_id,
                     path_or_target=str(file_path),
@@ -419,6 +466,7 @@ class DeviceScanner:
             if fp.status == "FILE_CHANGED_DURING_HASH":
                 error_count += 1
                 logger.warning(f"File modified during hash computation: {file_path}")
+                scan_errors.append(f"File modified during hash computation: {file_path}")
                 record_scan_item(
                     scan_id=scan_id,
                     path_or_target=str(file_path),
@@ -429,6 +477,8 @@ class DeviceScanner:
                 continue
             elif fp.status == "INACCESSIBLE":
                 inaccessible_count += 1
+                if fp.error:
+                    scan_errors.append(f"Inaccessible {file_path}: {fp.error}")
                 record_scan_item(
                     scan_id=scan_id,
                     path_or_target=str(file_path),
@@ -439,6 +489,7 @@ class DeviceScanner:
                 continue
             elif fp.status == "SKIPPED_OVERSIZED":
                 skipped_count += 1
+                skipped_reasons["oversized"] = skipped_reasons.get("oversized", 0) + 1
                 record_scan_item(
                     scan_id=scan_id,
                     path_or_target=str(file_path),
@@ -492,9 +543,11 @@ class DeviceScanner:
 
             except (PermissionError, OSError) as e:
                 error_count += 1
+                scan_errors.append(f"Access error scanning {file_path}: {e}")
                 logger.debug(f"Permission/IO error scanning {file_path}: {e}")
             except Exception as e:
                 error_count += 1
+                scan_errors.append(f"Unexpected error scanning {file_path}: {e}")
                 logger.error(f"Unexpected error scanning {file_path}: {e}")
 
             # Notify progress
@@ -515,6 +568,7 @@ class DeviceScanner:
                 })
 
         duration = round(time.time() - start_time, 2)
+        end_time_iso = datetime.now(timezone.utc).isoformat()
         final_status = "cancelled" if self.cancellation_token.is_cancelled else "completed"
 
         finish_scan_session(
@@ -530,26 +584,31 @@ class DeviceScanner:
             f"Scanned: {files_scanned}, Unchanged: {unchanged_count}, Threats: {threats_found}, Errors: {error_count}"
         )
 
-        return {
-            "scan_id": scan_id,
-            "scan_type": scan_type,
-            "status": final_status,
-            "duration_seconds": duration,
-            "files_scanned": files_scanned,
-            "unchanged_count": unchanged_count,
-            "total_files_discovered": total_files,
-            "threats_found": threats_found,
-            "skipped_count": skipped_count,
-            "inaccessible_count": inaccessible_count,
-            "error_count": error_count,
-            "threat_details": threat_results
-        }
+        return DeviceScanResult(
+            scan_id=scan_id,
+            scan_type=scan_type,
+            status=final_status,
+            target_paths=[str(p) for p in target_paths],
+            start_time=start_time_iso,
+            end_time=end_time_iso,
+            duration_seconds=duration,
+            total_files_discovered=total_files,
+            files_scanned=files_scanned,
+            unchanged_count=unchanged_count,
+            skipped_count=skipped_count,
+            inaccessible_count=inaccessible_count,
+            error_count=error_count,
+            threats_found=threats_found,
+            threat_details=threat_results,
+            skipped_reasons=skipped_reasons,
+            errors=scan_errors
+        )
 
     def quick_scan(
         self,
         progress_callback: Optional[Callable] = None,
         use_incremental: bool = True
-    ) -> Dict[str, Any]:
+    ) -> DeviceScanResult:
         """Runs Quick Scan on common user persistence/drop locations."""
         valid_paths = [p for p in DEFAULT_QUICK_SCAN_PATHS if p.exists()]
         return self.run_scan(
@@ -566,7 +625,7 @@ class DeviceScanner:
         progress_callback: Optional[Callable] = None,
         only_executables: bool = False,
         use_incremental: bool = True
-    ) -> Dict[str, Any]:
+    ) -> DeviceScanResult:
         """Runs Custom Scan on user-selected directory."""
         return self.run_scan(
             scan_type="custom",
@@ -580,7 +639,7 @@ class DeviceScanner:
         self,
         progress_callback: Optional[Callable] = None,
         use_incremental: bool = True
-    ) -> Dict[str, Any]:
+    ) -> DeviceScanResult:
         """Runs Full System Scan on accessible system drive roots."""
         roots = [Path("C:/")]
         for drive_letter in ["D", "E", "F"]:
