@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-09 10:32:34 UTC  
+**Generated:** 2026-10-09 10:34:45 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`d594413`)  
+**Current Git Branch:** `main` (`2866259`)  
 
 ---
 
@@ -111,19 +111,20 @@
 ## Test Status
 
 - **Total Test Files:** `13`
-- **Total Discovered Test Functions:** `128`
+- **Total Discovered Test Functions:** `135`
 - **Coverage Areas:** Configuration validation, SQLite database schema & CRUD, Phishing/Malware model contracts, PE feature extraction, API backend.
 
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `d594413`
-- **Working Tree:** 1 untracked/unstaged changes
+- **HEAD Commit:** `2866259`
+- **Working Tree:** 2 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `2866259` | Aaryan Suman | 2026-10-09 | feat: implement structured MessageScanResult contract |
 | `d594413` | Aaryan Suman | 2026-10-09 | feat: add canonical URL deduplication to message analysis |
 | `434d148` | Aaryan Suman | 2026-10-09 | feat: harden message URL extraction and boundary parsing |
 | `eae3a35` | Aaryan Suman | 2026-10-09 | feat: integrate URL scanner with DetectionDecisionEngine |
@@ -133,7 +134,6 @@
 | `3bae715` | Aaryan Suman | 2026-10-09 | feat: add robust URL validation and sanitization helpers |
 | `2bf4946` | Aaryan Suman | 2026-09-14 | docs: record Day 6 development changelog and synchronize generated docs |
 | `bfbb6ee` | Aaryan Suman | 2026-09-14 | docs: document detection engine workflow |
-| `e1e3821` | Aaryan Suman | 2026-09-14 | test: add risk engine edge case coverage |
 
 ## Known Issues
 

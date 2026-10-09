@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-10-09 10:32:34 UTC  
+**Generated:** 2026-10-09 10:34:45 UTC  
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)  
 
 This document inventories all automated test files, test classes, and test functions
@@ -12,7 +12,7 @@ recorded only after confirmed execution.
 ## Test Suite Summary
 
 - **Total Test Files:** `13`
-- **Total Discovered Test Cases:** `128`
+- **Total Discovered Test Cases:** `135`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -33,7 +33,7 @@ recorded only after confirmed execution.
 | `tests/test_static_pe.py` | 21 tests | `PASSING` |
 | `tests/test_text_analyzer.py` | 3 tests | `PASSING` |
 | `tests/test_threat_database.py` | 3 tests | `PASSING` |
-| `tests/test_url_scanner.py` | 4 tests | `PASSING` |
+| `tests/test_url_scanner.py` | 11 tests | `PASSING` |
 | `tests/test_week1_validation.py` | 4 tests | `PASSING` |
 
 ---
@@ -246,13 +246,20 @@ recorded only after confirmed execution.
 - `test_register_and_lookup_custom_indicator()`
 - `test_scan_session_lifecycle()`
 
-### `tests/test_url_scanner.py` (4 tests)
+### `tests/test_url_scanner.py` (11 tests)
 
 **Standalone Test Functions:**
 - `test_normalize_url()`
 - `test_extract_url_features_length_and_types()`
 - `test_rule_engine_url_heuristics()`
 - `test_scan_url_logic_safe_and_phishing()`
+- `test_url_validation_valid_cases()`
+- `test_url_validation_invalid_and_hostile_cases()`
+- `test_canonical_normalization_hardening()`
+- `test_extract_domain()`
+- `test_feature_extraction_contract_and_dictionary()`
+- `test_expanded_url_heuristics()`
+- `test_scan_url_logic_safe_error_handling_and_caching()`
 
 ### `tests/test_week1_validation.py` (4 tests)
 

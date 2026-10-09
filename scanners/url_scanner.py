@@ -44,7 +44,9 @@ def validate_url(url: Any) -> Tuple[bool, Optional[str]]:
 
     # Prepend scheme if missing for parsing check
     candidate = cleaned
-    if not candidate.startswith(("http://", "https://")):
+    if not candidate.lower().startswith(("http://", "https://")):
+        if "://" in candidate or candidate.lower().startswith(("javascript:", "mailto:", "data:", "file:")):
+            return False, "Unsupported URL scheme. Only HTTP and HTTPS are permitted."
         candidate = "http://" + candidate
 
     try:
@@ -82,7 +84,7 @@ def extract_domain(url: str) -> str:
     if not url or not isinstance(url, str):
         return ""
     clean = url.strip()
-    if not clean.startswith(("http://", "https://")):
+    if not clean.lower().startswith(("http://", "https://")):
         clean = "http://" + clean
     try:
         parsed = urlparse(clean)
@@ -112,8 +114,9 @@ def normalize_url(url: Any) -> str:
     if not clean:
         return ""
 
-    if not clean.startswith(("http://", "https://")):
+    if not clean.lower().startswith(("http://", "https://")):
         clean = "http://" + clean
+
 
     try:
         parsed = urlparse(clean)
