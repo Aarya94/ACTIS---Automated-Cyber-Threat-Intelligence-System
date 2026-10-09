@@ -12,6 +12,28 @@ Milestone Scope: Architecture planning, configuration management, logging infras
 
 ---
 
+### 2026-10-09 — Day 9: Windows Protection Service Foundation
+
+Built the foundation of the ACTIS Windows Protection Service, establishing the lightweight resident protection layer introduced by the post-Day-7 architectural evolution. Implemented deterministic service lifecycle management (`start`, `stop`, `pause`, `resume`, `is_running`, `get_state`), synchronized state transitions (`STOPPED`, `STARTING`, `RUNNING`, `PAUSED`, `DEGRADED`, `FAILED`), worker pool lifecycle coordination with non-blocking queue waiting, thread cancellation, and bounded failure recovery policy (`restart_failed_workers`). Established the canonical security event intake contract (`SecurityEvent`, `SecurityEventType`, `SecurityEventQueue`), decoupling event intake from downstream analysis. Implemented the `EventDispatcher` subscription router and `AnalysisOrchestrationBoundary` handoff interface, strictly ensuring that detection, ML models, and heuristic rules remain outside the service layer. Built the Windows Service Control Manager (SCM) host bridge (`WindowsServiceHost`, `create_windows_host`) for future administrative service deployment and safe interactive/standalone console hosting. Expanded automated test suite from 162 to 200 passing tests (100% pass rate).
+
+#### Commits
+
+| Commit | Type | Description | Files | Verification |
+|--------|------|-------------|-------|--------------|
+| `a9078e0` | feat | Add ACTIS protection service lifecycle contract | `service/lifecycle.py`, `service/config.py`, `config/settings.py`, `config/defaults.py`, `config/config.py`, `service/__init__.py` | Passed (162 tests) |
+| `a0b8ec2` | feat | Implement protection service state management | `service/state.py`, `service/__init__.py` | Passed (162 tests) |
+| `47b0e34` | feat | Add controlled protection service worker lifecycle | `service/workers.py`, `service/__init__.py` | Passed (162 tests) |
+| `658a7a9` | feat | Add protection service event boundary contract | `service/events.py`, `service/__init__.py` | Passed (162 tests) |
+| `524988d` | feat | Add service-to-analysis orchestration boundary | `service/dispatcher.py`, `service/__init__.py` | Passed (162 tests) |
+| `21cb05f` | feat | Add protection service health state | `service/health.py`, `service/protection_service.py`, `service/__init__.py` | Passed (162 tests) |
+| `2de26b4` | feat | Harden protection service failure handling | `service/workers.py`, `service/protection_service.py`, `service/windows_host.py`, `service/__init__.py` | Passed (162 tests) |
+| `77ba8cb` | test | Add protection service lifecycle coverage | `tests/test_protection_service_lifecycle.py` | Passed (176 tests) |
+| `721f3d3` | test | Add worker failure and shutdown regression coverage | `tests/test_protection_service_workers.py`, `service/workers.py`, `service/protection_service.py` | Passed (185 tests) |
+| `cb8de71` | test | Add security event boundary validation coverage | `tests/test_protection_service_events.py` | Passed (200 tests) |
+| `932f05d` | docs | Document ACTIS protection service architecture | `docs/architecture/system-architecture.md`, `docs/architecture/module-architecture.md`, `docs/architecture/project-structure.md`, `docs/architecture/architecture-evolution.md`, `README.md` | Passed (200 tests) |
+
+---
+
 ### 2026-10-09 — Day 8: Device Scanner & Incremental Scan State Foundation
 
 Implemented the safe, user-authorized Device Scanner and incremental scan state infrastructure for ACTIS. Features safe recursive filesystem traversal with Windows junction/reparse-point loop avoidance (`TraversalSafetyHelper`), safe file metadata inspection (`FileMetadata`), streaming chunked SHA-256 fingerprinting with race-condition detection (`FileFingerprint`), incremental scan state tracking (`IncrementalStateManager`, `FileScanState`) across five change states (`NEW_FILE`, `UNCHANGED_FILE`, `CHANGED_FILE`, `REMOVED_FILE`, `UNAVAILABLE_FILE`), analytical model version invalidation, SQLite scan state persistence (`file_scan_states`), canonical file analysis pipeline integration (`scan_file` -> `ThreatDetector.analyze_file`), skipping deep analysis for verified unchanged files while re-analyzing modified ones, and strongly-typed `DeviceScanResult` with cooperative cancellation support (`ScanCancellationToken`). Expanded automated test suite to 162 passing tests (100% pass rate).

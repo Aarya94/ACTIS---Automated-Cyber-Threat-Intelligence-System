@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-09 12:55:21 UTC  
+**Generated:** 2026-10-09 13:00:49 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`cb8de71`)  
+**Current Git Branch:** `main` (`932f05d`)  
 
 ---
 
@@ -35,6 +35,7 @@
 | Directory / Component | Status | Files / LOC | Purpose |
 |---|---|---|---|
 | `config/` | IMPLEMENTED | 7 files / 650 LOC | Centralized configuration dataclasses, env loader, schema validator |
+| `service/` | IMPLEMENTED | 8 files / 1,200 LOC | Resident Windows Protection Service foundation, lifecycle, workers, queue, dispatcher, SCM host |
 | `reports/` | PARTIALLY IMPLEMENTED | 4 files / 446 LOC | SQLite threat intelligence database interface, schema DDL, queries |
 | `scanners/` | PARTIALLY IMPLEMENTED | 8 files / 907 LOC | URL, message, file, device, and clipboard scanner modules (scaffolded) |
 | `detection_engine/` | PARTIALLY IMPLEMENTED | 5 files / 674 LOC | Hybrid engine, rule engine, risk engine (scaffolded) |
@@ -64,7 +65,13 @@
    - Tables: `threats`, `indicators`, `scans`, `detections`, `scan_items`.
    - B-tree indexing on `(indicator_type, indicator_value)`, `target`, and `started_at`.
 4. **Automated Test Infrastructure (`tests/`):**
-   - Automated test suites passing with 100% pass rate under `pytest`.
+   - Automated test suites passing with 100% pass rate under `pytest` (200 passing tests).
+5. **Windows Protection Service Foundation (`service/`):**
+   - Resident Windows Protection Service foundation managing deterministic lifecycle (`start`, `stop`, `pause`, `resume`).
+   - State machine (`STOPPED`, `STARTING`, `RUNNING`, `PAUSED`, `DEGRADED`, `FAILED`), worker pool coordination, and bounded recovery.
+   - Canonical `SecurityEvent` schema and thread-safe bounded intake queue (`SecurityEventQueue`).
+   - `EventDispatcher` subscription router and `AnalysisOrchestrationBoundary` decoupling service from detection logic.
+   - Windows Service Control Manager (SCM) host adapter (`WindowsServiceHost`) and safe standalone execution.
 
 ## Partially Implemented Components
 
@@ -117,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `cb8de71`
-- **Working Tree:** 5 untracked/unstaged changes
+- **HEAD Commit:** `932f05d`
+- **Working Tree:** 11 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `932f05d` | Aaryan Suman | 2026-10-09 | docs: document ACTIS protection service architecture |
 | `cb8de71` | Aaryan Suman | 2026-10-09 | test: add security event boundary validation coverage |
 | `721f3d3` | Aaryan Suman | 2026-10-09 | test: add worker failure and shutdown regression coverage |
 | `77ba8cb` | Aaryan Suman | 2026-10-09 | test: add protection service lifecycle coverage |
@@ -133,7 +141,6 @@
 | `658a7a9` | Aaryan Suman | 2026-10-09 | feat: add protection service event boundary contract |
 | `47b0e34` | Aaryan Suman | 2026-10-09 | feat: add controlled protection service worker lifecycle |
 | `a0b8ec2` | Aaryan Suman | 2026-10-09 | feat: implement protection service state management |
-| `a9078e0` | Aaryan Suman | 2026-10-09 | feat: add ACTIS protection service lifecycle contract |
 
 ## Known Issues
 

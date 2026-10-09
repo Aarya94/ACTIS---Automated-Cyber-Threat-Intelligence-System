@@ -83,10 +83,13 @@ Detailed design is documented in [`docs/architecture/architecture-evolution.md`]
 - **Constraint Verified:** Resident Windows Protection Service was NOT implemented today.
 - **Components:** `scanners/device_scanner.py`, `scanners/incremental_state.py`, `tests/test_device_scanner.py`, `tests/test_incremental_state.py`.
 
-### Day 9: Windows Protection Service Foundation (`PLANNED`)
-- **Goals:** Define lightweight resident service architecture, startup/resume lifecycle management, event intake loop, service-to-orchestrator queueing boundary, and state persistence.
+### Day 9: Windows Protection Service Foundation (`COMPLETED`)
+- **Delivered:** Lightweight resident Protection Service foundation, deterministic lifecycle (`start`, `stop`, `pause`, `resume`), state transitions (`STOPPED`, `STARTING`, `RUNNING`, `PAUSED`, `DEGRADED`, `FAILED`), worker pool coordination, bounded failure recovery, canonical `SecurityEvent` schema and validation, thread-safe bounded intake queue (`SecurityEventQueue`), `EventDispatcher` subscription router, decoupled `AnalysisOrchestrationBoundary` handoff, and Windows Service Control Manager host bridge (`WindowsServiceHost`).
+- **Constraint Verified:** Real-time filesystem event monitoring (`watchdog` file watcher) was NOT implemented today and remains scheduled for Day 10.
+- **Components:** `service/lifecycle.py`, `service/state.py`, `service/workers.py`, `service/events.py`, `service/dispatcher.py`, `service/health.py`, `service/protection_service.py`, `service/windows_host.py`, `tests/test_protection_service_lifecycle.py`, `tests/test_protection_service_workers.py`, `tests/test_protection_service_events.py`.
+- **Baseline:** 200 automated unit and integration tests passing with 100% success rate.
 
-### Day 10: Event-Driven File Protection
+### Day 10: Event-Driven File Protection (`PLANNED`)
 - **Goals:** File creation and modification event hooks (`watchdog`), write-stability debounce filtering, task enqueuing, and automatic handoff to the Analysis Orchestrator for new/modified files.
 
 ### Day 11: Online Threat Intelligence

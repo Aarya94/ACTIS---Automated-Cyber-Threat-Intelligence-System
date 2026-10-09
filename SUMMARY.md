@@ -7,6 +7,7 @@
 * [Architecture Overview & AI Rules](docs/architecture/README.md)
 * [System Architecture](docs/architecture/system-architecture.md)
 * [Module Architecture](docs/architecture/module-architecture.md)
+* [Architecture Evolution & Post-Day-7 Breakthrough](docs/architecture/architecture-evolution.md)
 * [Project Structure](docs/architecture/project-structure.md)
 * [Detection Workflow](docs/architecture/detection-workflow.md)
 * [Data Flow & Privacy Boundaries](docs/architecture/data-flow.md)
