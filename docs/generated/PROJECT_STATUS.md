@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-09 11:46:34 UTC  
+**Generated:** 2026-10-09 11:48:01 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`33cf2c9`)  
+**Current Git Branch:** `main` (`8e7b996`)  
 
 ---
 
@@ -117,13 +117,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `33cf2c9`
+- **HEAD Commit:** `8e7b996`
 - **Working Tree:** 2 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `8e7b996` | Aaryan Suman | 2026-10-09 | docs: define ACTIS protection service boundary and event intake layer |
 | `33cf2c9` | Aaryan Suman | 2026-10-09 | docs: evolve ACTIS system architecture to event-driven protection model |
 | `d83d525` | Aaryan Suman | 2026-10-09 | docs: record post-day7 architecture breakthrough and evolution rationale |
 | `f0c3844` | Aaryan Suman | 2026-10-09 | docs: record Day 7 development changelog and synchronize generated docs |
@@ -133,7 +134,6 @@
 | `587600c` | Aaryan Suman | 2026-10-09 | test: add URL scanner edge case coverage |
 | `2866259` | Aaryan Suman | 2026-10-09 | feat: implement structured MessageScanResult contract |
 | `d594413` | Aaryan Suman | 2026-10-09 | feat: add canonical URL deduplication to message analysis |
-| `434d148` | Aaryan Suman | 2026-10-09 | feat: harden message URL extraction and boundary parsing |
 
 ## Known Issues
 

@@ -1,10 +1,16 @@
 # ACTIS Machine Learning Workflow & Model Contracts
 
-This document specifies the lifecycle, feature schemas, training requirements, metadata contracts, and inference rules for machine learning models deployed in ACTIS.
+**Authoritative Architecture Document**  
+**Milestone:** Post-Day-7 Architectural Evolution  
+**Status:** Approved Target Architecture  
+
+This document specifies the lifecycle, feature schemas, training requirements, metadata contracts, and inference rules for machine learning models deployed within the ACTIS analysis pipeline.
 
 ---
 
-## Machine Learning Lifecycle
+## 1. Machine Learning Integration in the Target Architecture
+
+In the post-Day-7 architecture, machine learning classifiers are **evidence contributors**, not autonomous decision-makers. They are orchestrated centrally by the **Analysis Orchestrator** and evaluated alongside Threat Intelligence and Heuristic Rules within the **Detection Engine**:
 
 ```text
                +-------------------------------------------------+
@@ -44,26 +50,32 @@ This document specifies the lifecycle, feature schemas, training requirements, m
                                        |
                                        v
                +-------------------------------------------------+
-               |       Production Inference Runtime              |
-               |     (detection_engine/model_manager.py)         |
+               |            Analysis Orchestrator                |
+               |     (Extracts features & invokes ModelManager)  |
                +-----------------------+-------------------------+
                                        |
                                        v
                +-------------------------------------------------+
-               |        Risk Engine Multi-Criteria Fusion        |
-               |           (Score Combined with TI & Rules)      |
+               |              MLPredictionResult                 |
+               |      (Probabilities, confidence, label)         |
+               +-----------------------+-------------------------+
+                                       |
+                                       v
+               +-------------------------------------------------+
+               |            Detection Decision Engine            |
+               |    (Fused with Local TI, Rules, & External TI)  |
                +-------------------------------------------------+
 ```
 
 ---
 
-## 1. Phishing URL Detection Model
+## 2. Phishing URL Detection Model
 
-- **Algorithm**: `RandomForestClassifier` (Scikit-Learn)
-- **Artifact Path**: `models/phishing_model.pkl`
-- **Metadata Contract**: `models/phishing_model_metadata.json`
-- **Dataset**: `data/phishing_dataset.csv` (100,077 URL samples)
-- **Observed Metrics**: Test Accuracy: ~88.78%, Test ROC-AUC: 95.35%
+- **Algorithm:** `RandomForestClassifier` (Scikit-Learn)
+- **Artifact Path:** `models/phishing_model.pkl`
+- **Metadata Contract:** `models/phishing_model_metadata.json`
+- **Dataset:** `data/phishing_dataset.csv` (100,077 URL samples)
+- **Status:** `IMPLEMENTED` & Integrated with Day 7 hardened pipeline.
 
 ### Morphological Feature Vector (19 Ordered Features)
 
@@ -93,13 +105,13 @@ The scanner and inference engine must provide features in this **exact ordered s
 
 ---
 
-## 2. Windows PE Malware Detection Model
+## 3. Windows PE Malware Detection Model
 
-- **Algorithm**: `RandomForestClassifier(n_estimators=150)` (Scikit-Learn)
-- **Artifact Path**: `models/malware_model.pkl`
-- **Metadata Contract**: `models/malware_model_metadata.json`
-- **Dataset**: `data/malware_dataset.csv` (62,485 Windows PE samples: 41,323 benign / 21,162 malicious)
-- **Observed Metrics**: Test Accuracy: 99.65%, Test ROC-AUC: 99.94%
+- **Algorithm:** `RandomForestClassifier(n_estimators=150)` (Scikit-Learn)
+- **Artifact Path:** `models/malware_model.pkl`
+- **Metadata Contract:** `models/malware_model_metadata.json`
+- **Dataset:** `data/malware_dataset.csv` (62,485 Windows PE samples: 41,323 benign / 21,162 malicious)
+- **Status:** Baseline model artifact and metadata contract verified; integration scheduled for Days 8–10.
 
 ### Static PE Header Feature Vector (15 Ordered Features)
 
@@ -118,15 +130,17 @@ Extracted in memory from file binary bytes using `pefile` without execution:
 | 8 | `ResMinSize` | Minimum resource section size |
 | 9 | `ResourceSize` | Cumulative byte size of Resource section |
 | 10 | `NumberOfSections` | Section count in Section Table (e.g. `.text`, `.data`) |
-| 11 | `Characteristics` | Binary flag flags (DLL, Executable, 32-bit, Large Address) |
+| 11 | `Characteristics` | Binary flags (DLL, Executable, 32-bit, Large Address) |
 | 12 | `MinorSubsystemVersion` | Subsystem minor version |
 | 13 | `SizeOfImage` | Total memory footprint when binary is mapped to memory |
 | 14 | `Subsystem` | Target execution environment (e.g. GUI vs Console) |
 
 ---
 
-## Strict Contract Verification Rules
+## 4. Strict Operational Rules for ML Inference
 
-1. **Metadata Enforcement**: `model_manager.py` verifies the incoming feature dictionary against `*_model_metadata.json` before performing prediction. Missing features trigger explicit warnings; mismatched feature dimensions raise exceptions.
-2. **Never Execute Live Binaries**: Feature extraction is strictly static. Binaries are parsed as byte structures. No process spawning, thread injection, or debugging API is ever invoked.
-3. **No Dynamic Weights Modification**: Models are static artifacts loaded at startup. Runtime tuning occurs solely through the multi-criteria Risk Engine weights.
+1. **ML Is Evidence, Not Verdict:** An ML prediction alone **never** transitions a target to `CONFIRMED`. Statistical probability is fused with threat intelligence and heuristic rules.
+2. **Metadata Contract Enforcement:** `model_manager.py` verifies incoming feature vectors against `*_model_metadata.json` before calling `predict_proba()`. Mismatched dimensions raise controlled exceptions.
+3. **Strictly In-Memory Static Extraction:** Binaries and URLs are evaluated as static structures. No binary execution, debugging, or network connections occur during feature extraction.
+4. **Deterministic Feature Ordering:** Extraction routines guarantee consistent, deterministic feature vector sequence.
+5. **Safe Fallback on Failure:** When a model artifact is unavailable or evaluation fails, the pipeline logs an observable warning and falls back to deterministic heuristic and threat intelligence evaluation without crashing.
