@@ -1,83 +1,107 @@
 # ACTIS Data Flow & Privacy Boundaries
 
-This document defines how data objects traverse ACTIS, how sensitive telemetry is handled, and the strict privacy boundaries enforced throughout the system.
+**Authoritative Architecture Document**  
+**Milestone:** Post-Day-7 Architectural Evolution  
+**Status:** Approved Target Architecture  
 
 ---
 
-## Data Ingestion & Transformation Lifecycle
+## 1. Event-Driven Data Flow Lifecycle
+
+In the post-Day-7 event-driven architecture, data traverses from operating system stimuli through the resident protection layer into the centralized analysis orchestrator, detection engine, and persistence layers:
 
 ```text
-  [User Space]                     [ACTIS Engine]                     [Persistence / Egress]
-  
-  Raw URL / Clipboard ----------> Morphological Extraction ----------> Feature Vector (19 floats)
-                                                                               |
-  Raw Text / Message -----------> Regex & Urgency Parser -----------> Extracted Links & Heuristics
-                                                                               |
-  Local File -------------------> Binary Stream (Read-Only) ---------> SHA-256 / MD5 Hash
-                                 PE Header Parser (pefile) ---------> Structural Metadata (15 floats)
-                                                                               |
-                                                                               v
-                                                                   Detection Orchestrator
-                                                                               |
-                                    +------------------------------------------+
-                                    |
-                                    v
-                            [Evaluation Pipeline]
-                            - Local SQLite DB Lookup
-                            - ML Random Forest Inference
-                            - Rule Heuristic Evaluation
-                            - Normalized Risk Engine
-                                    |
-                                    v
-                            [Composite Detection Object]
-                            - Target Identifier (Hash/URL)
-                            - Risk Score (0-100) & Severity
-                            - Detailed Evidence Breakdown Tree
-                                    |
-                                    +--------------------+---------------------+
-                                    |                                         |
-                                    v                                         v
-                         [Local Storage]                         [Optional Central Sync]
-                         - reports/threat_database.db             - Central FastAPI Endpoint
-                           (scans, detections, items)               (Canonical Indicators ONLY:
-                         - Sanitized Report Exporter                 SHA-256, URL, Domain)
-                           (JSON, CSV, Markdown)
+  [Windows OS / User Space]
+             │
+             ▼
+  ┌────────────────────────────────────────────────────────┐
+  │         ACTIS Protection Service (Resident)            │
+  │ - System event intake & debouncing                     │
+  │ - File-write completion stability verification         │
+  │ - Non-blocking event queueing                          │
+  └──────────────────────────┬─────────────────────────────┘
+                             │
+                             ▼
+  ┌────────────────────────────────────────────────────────┐
+  │                 Event / Input Layer                    │
+  │ - FileSecurityEvent    (Path, timestamp, trigger)      │
+  │ - UrlSecurityEvent     (Normalized URL, source)        │
+  │ - MessageSecurityEvent (Extracted links, urgency)      │
+  │ - OnDemandScanEvent    (Target path, recursive flag)   │
+  └──────────────────────────┬─────────────────────────────┘
+                             │
+                             ▼
+  ┌────────────────────────────────────────────────────────┐
+  │                 Analysis Orchestrator                  │
+  │ - Canonical URL Normalization & Feature Extraction     │
+  │ - Safe Read-Only Static PE Inspection & Byte Entropy   │
+  │ - Hash Computation (SHA-256, MD5)                      │
+  └─────────────┬───────────────────────────┬──────────────┘
+                │                           │
+                ▼                           ▼
+  ┌───────────────────────────┐ ┌──────────────────────────┐
+  │ Threat Intelligence Layer │ │  Analytical Inference    │
+  │ - Local SQLite Database   │ │ - Phishing RF Model      │
+  │ - Online TI (Optional VT) │ │ - Malware PE RF Model    │
+  │ - Central ACTIS TI Sync   │ │ - Deterministic Rules    │
+  └─────────────┬─────────────┘ └───────────┬──────────────┘
+                │                           │
+                └─────────────┬─────────────┘
+                              │
+                              ▼
+  ┌────────────────────────────────────────────────────────┐
+  │            Detection & Decision Engine                 │
+  │ - Multi-Criteria Evidence Fusion                       │
+  │ - Dynamic Weight Normalization                         │
+  │ - Categorical State Classification                     │
+  │   (CONFIRMED, SUSPICIOUS, CANDIDATE, FALSE_POSITIVE)   │
+  └───────────────────────────┬────────────────────────────┘
+                              │
+                              ▼
+  ┌────────────────────────────────────────────────────────┐
+  │             Persistence & User Presentation            │
+  │ - Local SQLite Database (threats, scans, detections)   │
+  │ - Audit Exporters (JSON, CSV, Markdown)                │
+  │ - User Desktop Alerts & Streamlit Command Dashboard    │
+  │ - Grounded AI Security Assistant Explanations          │
+  └────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Data Objects in Motion
+## 2. Data Objects in Motion
 
-### 1. URLs & Domains
-- **Ingestion**: Acquired via direct CLI arguments, dashboard text boxes, clipboard polling, or message parser extraction.
-- **Normalization**: Stripped of trailing slashes, normalized to lowercase schemes/hostnames, fragments removed.
-- **Privacy Boundary**: Internal company Intranet URLs (e.g. `http://localhost`, `192.168.*`, `.internal`) are handled locally and flagged as private IP spaces.
+### 2.1 File Security Events & Executables
+- **Ingestion:** Generated when a file is created, downloaded, modified, or queued by an on-demand scan.
+- **Debounce & Stabilization:** The Protection Service applies write-stability checks (e.g. verifying file handles are released) before dispatching the event.
+- **Inspection:** Inspected strictly in read-only binary mode (`open(path, 'rb')`). Cryptographic hashes (SHA-256, MD5), byte entropy distributions, and static PE headers are parsed entirely in memory.
+- **Privacy Boundary:** **ACTIS NEVER uploads complete user files or documents to any external server or third-party API.** Only cryptographic hashes (SHA-256/MD5) are queried externally. Personal documents (PDFs, Word documents, spreadsheets, images) are never exfiltrated.
 
-### 2. Text Messages & Communications
-- **Ingestion**: Raw text supplied directly by the user to the Message Scanner.
-- **Processing**: Regex extracts embedded HTTP/HTTPS links. Heuristic dictionaries calculate urgency and credential solicitation metrics.
-- **Privacy Boundary**: **Raw message content is NEVER persisted to the threat database or transmitted externally.** Only extracted URLs and computed suspicion scores are stored in scan telemetry.
+### 2.2 URL Security Events & Domains
+- **Ingestion:** Acquired via direct user query, clipboard URL hook, or extracted from messages/documents.
+- **Normalization:** Enforces canonical lowercase scheme and hostname, removes default ports (80, 443), strips trailing punctuation and balanced boundary delimiters, while preserving meaningful query parameters and path structures.
+- **Privacy Boundary:** Local and private network IP ranges (e.g., `127.0.0.1`, `localhost`, `10.*`, `192.168.*`) are recognized locally and never queried against external threat feeds.
 
-### 3. Files & Executables
-- **Ingestion**: Targeted via path selection, background file watcher notifications, or device directory crawler.
-- **Processing**: Inspected statically in read-only binary mode (`open(path, 'rb')`). Cryptographic hashes (SHA-256, MD5) and PE header attributes are computed entirely in memory.
-- **Privacy Boundary**: **ACTIS NEVER uploads complete personal user files to any server or external API.** Only cryptographic hashes (SHA-256/MD5) are used for external threat reputation lookups. Personal documents (PDFs, Word documents, images, spreadsheets) are NEVER uploaded or exposed to third-party endpoints.
+### 2.3 Message Security Events & Communications
+- **Ingestion:** Plaintext messages, emails, or chat transcripts submitted by the user.
+- **Processing:** Analyzed in-memory for social engineering urgency patterns and embedded web links. Extracted URLs are canonically deduplicated and passed to the Analysis Orchestrator.
+- **Privacy Boundary:** **Raw message text is NEVER stored in the database or transmitted externally.** Only extracted URLs and computed suspicion metrics are preserved in local audit telemetry.
 
-### 4. Indicators of Compromise (IoCs)
-- **Ingestion**: Extracted from confirmed threats, external feeds, or administrative ingestion.
-- **Types**: `sha256`, `md5`, `url`, `domain`, `ip`.
-- **Validation**: Enforced syntax validation (hexadecimal regex for hashes, standard RFC validation for IP addresses and URLs).
+### 2.4 Indicators of Compromise (IoCs)
+- **Ingestion:** Extracted from confirmed local detections, external feeds, or administrative synchronization.
+- **Types:** `sha256`, `md5`, `url`, `domain`, `ip`.
+- **Validation:** Strict syntactic validation (hexadecimal hashes, RFC-compliant hostnames and IPs).
 
-### 5. Detection Records & Scan History
+### 2.5 Detection Records & Telemetry
 - Persisted locally in SQLite (`scans`, `detections`, `scan_items`).
-- Stores scan timestamps, files scanned, detected threat types, and itemized evidence breakdowns.
-- Excluded from Git tracking and protected with operating system user-level permissions.
+- Stores scan session timestamps, itemized evidence breakdowns, confidence ratings, and rule IDs.
+- Stored exclusively in local user application directories, protected by operating system user permissions.
 
 ---
 
-## Explicit Privacy & Data Protection Safeguards
+## 3. Explicit Privacy Safeguards
 
-1. **Zero Full-File Uploads**: Neither the local client nor the central backend ever transmits or accepts full user executable binaries or document payloads.
-2. **Offline-First Functionality**: ACTIS operates with 100% functionality in air-gapped or offline environments. External API enrichment is strictly an optional layer.
-3. **No Keylogging or Screen Capture**: ACTIS does not install keyboard hooks, collect keystrokes, or take screen captures. The clipboard scanner examines only text matching URL syntax.
-4. **Credential Isolation**: Local `.env` files and API keys are strictly excluded from logging, reports, and Git commits.
+1. **Zero Full-File Uploads:** Neither the local client nor the central threat sharing backend ever transmits, accepts, or stores user binaries or document payloads.
+2. **Offline-First Functionality:** ACTIS operates with complete detection fidelity in fully offline or air-gapped environments. External reputation feeds are strictly an optional secondary enrichment layer.
+3. **No Keylogging or Screen Capture:** ACTIS does not hook keyboard drivers, record keystrokes, capture screens, or monitor user input. The clipboard sensor inspects strictly text that matches standard URL syntax.
+4. **Credential Isolation:** `.env` credentials, API tokens, and local secret keys are strictly excluded from logging, audit reports, and repository version control.
