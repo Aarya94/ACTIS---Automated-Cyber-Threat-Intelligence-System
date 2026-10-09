@@ -30,6 +30,18 @@ from config.config import get_logger
 logger = get_logger("FileProtectionPipeline")
 
 
+ANALYZABLE_EXTENSIONS = {".exe", ".dll", ".sys", ".scr", ".ocx", ".cpl", ".drv"}
+
+
+def default_file_analysis(path: Path) -> Dict[str, Any]:
+    """
+    Default file analysis delegate using the canonical ACTIS single file scanner
+    which feeds FileFeatureExtractor, RuleEngine, ModelManager, and RiskEngine.
+    """
+    from scanners.file_scanner import scan_file
+    return scan_file(path)
+
+
 class EventProcessingStatus(str, Enum):
     """Execution status resulting from processing a filesystem security event."""
     ANALYZED = "ANALYZED"
@@ -79,10 +91,13 @@ class FileProtectionPipeline(IAnalysisOrchestrationBoundary):
         state_manager: Optional[IncrementalStateManager] = None,
         max_file_size_bytes: int = 100 * 1024 * 1024,
         analysis_fn: Optional[Callable[[Path], Dict[str, Any]]] = None,
+        only_executables: bool = False,
     ):
         self.state_manager = state_manager or IncrementalStateManager(auto_load=True)
         self.max_file_size_bytes = max_file_size_bytes
-        self.analysis_fn = analysis_fn
+        self.analysis_fn = analysis_fn or default_file_analysis
+        self.only_executables = only_executables
+        self.name = "FileProtectionPipeline"
 
         self._lock = threading.Lock()
         self._events_processed = 0
@@ -92,6 +107,7 @@ class FileProtectionPipeline(IAnalysisOrchestrationBoundary):
         self._inaccessible_count = 0
         self._deleted_count = 0
         self._oversized_count = 0
+        self._unsupported_count = 0
         self._analyzed_count = 0
         self._error_count = 0
         self._last_results: List[EventProcessingResult] = []
@@ -209,7 +225,22 @@ class FileProtectionPipeline(IAnalysisOrchestrationBoundary):
             self._record_result(result)
             return result
 
-        # 7. Changed or new file: requires analysis handoff
+        # 7. Check non-executable filter if only_executables policy is active
+        if self.only_executables and path_obj.suffix.lower() not in ANALYZABLE_EXTENSIONS:
+            with self._lock:
+                self._unsupported_count += 1
+            logger.info(f"File '{canonical_path}' skipped: non-executable extension ({path_obj.suffix}).")
+            result = EventProcessingResult(
+                event_id=event.event_id,
+                target_path=canonical_path,
+                status=EventProcessingStatus.SKIPPED_UNSUPPORTED,
+                change_type=change_type,
+                error_message=f"File extension '{path_obj.suffix}' skipped under only_executables policy.",
+            )
+            self._record_result(result)
+            return result
+
+        # 8. Changed or new file: requires analysis handoff
         with self._lock:
             self._new_or_changed_count += 1
 
@@ -351,6 +382,7 @@ class FileProtectionPipeline(IAnalysisOrchestrationBoundary):
                 "inaccessible_count": self._inaccessible_count,
                 "deleted_count": self._deleted_count,
                 "oversized_count": self._oversized_count,
+                "unsupported_count": self._unsupported_count,
                 "analyzed_count": self._analyzed_count,
                 "error_count": self._error_count,
                 "cached_states_count": self.state_manager.get_cached_count(),

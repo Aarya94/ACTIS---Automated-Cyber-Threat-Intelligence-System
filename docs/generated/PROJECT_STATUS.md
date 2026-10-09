@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-09 13:29:53 UTC  
+**Generated:** 2026-10-09 13:32:35 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`d0ff9d3`)  
+**Current Git Branch:** `main` (`281b380`)  
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `d0ff9d3`
-- **Working Tree:** 2 untracked/unstaged changes
+- **HEAD Commit:** `281b380`
+- **Working Tree:** 1 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `281b380` | Aaryan Suman | 2026-10-09 | feat: connect event processing with incremental scan state |
 | `d0ff9d3` | Aaryan Suman | 2026-10-09 | feat: integrate filesystem events with protection service |
 | `72b2eba` | Aaryan Suman | 2026-10-09 | feat: add bounded protection event queue |
 | `2ab558f` | Aaryan Suman | 2026-10-09 | feat: implement filesystem event debouncing |
@@ -140,7 +141,6 @@
 | `368eff0` | Aaryan Suman | 2026-10-09 | docs: record Day 9 development changelog and synchronize generated docs |
 | `932f05d` | Aaryan Suman | 2026-10-09 | docs: document ACTIS protection service architecture |
 | `cb8de71` | Aaryan Suman | 2026-10-09 | test: add security event boundary validation coverage |
-| `721f3d3` | Aaryan Suman | 2026-10-09 | test: add worker failure and shutdown regression coverage |
 
 ## Known Issues
 
