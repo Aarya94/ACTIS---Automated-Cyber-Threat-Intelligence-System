@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-10 13:24:51 UTC  
+**Generated:** 2026-10-10 13:25:27 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`b22965f`)  
+**Current Git Branch:** `main` (`5e6e55f`)  
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `b22965f`
-- **Working Tree:** 2 untracked/unstaged changes
+- **HEAD Commit:** `5e6e55f`
+- **Working Tree:** 1 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `5e6e55f` | Aaryan Suman | 2026-10-10 | feat(dashboard): integrate grounded security assistant with session history and native markdown |
 | `b22965f` | Aaryan Suman | 2026-10-10 | feat(assistant): implement grounded security assistant with evidence breakdown and read-only boundaries |
 | `a9f1dd4` | Aaryan Suman | 2026-10-10 | docs: update roadmap and project structure for Days 12 and 13 |
 | `3cfeb30` | Aaryan Suman | 2026-10-10 | docs: document central threat intelligence architecture, boundaries, and contracts |
@@ -140,7 +141,6 @@
 | `d7fcfed` | Aaryan Suman | 2026-10-10 | test: cover central threat intelligence api authentication and synchronization |
 | `9abcfda` | Aaryan Suman | 2026-10-10 | feat: add central actis feed adapter and client synchronization |
 | `6f7995c` | Aaryan Suman | 2026-10-10 | feat: implement central threat intelligence api and candidate contribution state machine |
-| `5b12719` | Aaryan Suman | 2026-10-10 | docs: document scheduled threat intelligence synchronization and sync status |
 
 ## Known Issues
 
