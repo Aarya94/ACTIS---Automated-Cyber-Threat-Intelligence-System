@@ -15,6 +15,7 @@
 * [Threat Intelligence Workflow](docs/architecture/threat-intelligence-workflow.md)
 * [Machine Learning Workflow](docs/architecture/ml-workflow.md)
 * [Security Boundaries](docs/architecture/security-boundaries.md)
+* [ACTIS Threat Intelligence Integration Architecture](docs/architecture/reference/actis-threat-intelligence-integration.md)
 
 ## ⚙️ Configuration & Contracts
 * [Configuration Guide](docs/configuration.md)

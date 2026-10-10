@@ -122,7 +122,7 @@ ACTIS operates under strict defensive boundaries:
 - **Automated Test Infrastructure (`tests/`):** 229 unit and integration tests passing with 100% success rate.
 
 ### Planned Subsystems in Target Architecture (Days 11–16)
-- **Online Threat Intelligence Connectors (Day 11):** VirusTotal v3 client with rate limiting and offline fallback.
+- **Online Threat Intelligence Connectors (Day 11):** VirusTotal v3 client with rate limiting and offline fallback. (Reference: [Threat Intelligence Integration Architecture](docs/architecture/reference/actis-threat-intelligence-integration.md)).
 - **Central ACTIS Threat Intelligence API (Day 12):** FastAPI federated intelligence sharing service with anti-poisoning state machine.
 - **Command Dashboard & Desktop Alerts (Day 13):** Streamlit user console and native Windows toast notifications.
 - **AI Security Assistant (Day 14):** Safe, offline-grounded natural language security explainer.

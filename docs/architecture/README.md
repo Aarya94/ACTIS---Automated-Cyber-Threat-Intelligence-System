@@ -40,6 +40,7 @@ This directory serves as the **permanent, authoritative source of truth** for th
 | [`ml-workflow.md`](./ml-workflow.md) | Feature extraction, model contracts, training pipelines, and inference schemas. |
 | [`scanning-workflow.md`](./scanning-workflow.md) | Operational pipelines for input providers (URL, message, file, device, file watcher, clipboard). |
 | [`security-boundaries.md`](./security-boundaries.md) | Non-negotiable security boundaries, read-only guarantees, and safety controls. |
+| [`reference/actis-threat-intelligence-integration.md`](./reference/actis-threat-intelligence-integration.md) | Architectural reference & proposed integration design for threat intelligence, provider adapters, response validation, normalized evidence, and risk integration. |
 
 ---
 
