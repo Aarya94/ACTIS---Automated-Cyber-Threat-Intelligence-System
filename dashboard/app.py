@@ -44,6 +44,7 @@ from reports.scan_database import (
 from reports.report_generator import ReportGenerator
 from notifications.notifier import notifier
 from threat_intelligence.sync_manager import sync_manager
+from threat_intelligence import threat_sync_service, threat_sync_scheduler
 from assistant.security_assistant import security_assistant
 
 # Branding Assets
@@ -650,7 +651,7 @@ elif menu == "Threat Intelligence":
     st.title("🔍 Threat Intelligence Repository")
     st.markdown("Local indicators database (SQLite). Search, explore, or register verified IOCs.")
 
-    tab1, tab2, tab3 = st.tabs(["Search Indicators", "Browse All Indicators", "Add New Indicator"])
+    tab1, tab2, tab3, tab4 = st.tabs(["Search Indicators", "Browse All Indicators", "Add New Indicator", "Feed Synchronization"])
 
     with tab1:
         st.subheader("Indicator Query")
@@ -696,6 +697,49 @@ elif menu == "Threat Intelligence":
                     threat_name=new_threat
                 )
                 st.success(f"Registered indicator #{ind_id} successfully.")
+
+    with tab4:
+        st.subheader("Upstream Threat Feed Synchronization")
+        st.markdown("Automated import of verified IOCs from upstream feeds (URLhaus, AbuseIPDB, VirusTotal) into local SQLite.")
+
+        latest_run = threat_sync_service.get_latest_sync_run()
+        feed_statuses = threat_sync_service.get_all_feed_statuses()
+
+        col_st1, col_st2, col_st3 = st.columns(3)
+        with col_st1:
+            st_val = latest_run.get("overall_status", "NEVER_SYNCED") if latest_run else "NEVER_SYNCED"
+            st.metric("Latest Sync Status", st_val)
+        with col_st2:
+            tot_ins = latest_run.get("total_inserted", 0) if latest_run else 0
+            st.metric("Total Records Inserted", tot_ins)
+        with col_st3:
+            tot_upd = latest_run.get("total_updated", 0) if latest_run else 0
+            st.metric("Total Records Updated", tot_upd)
+
+        st.markdown("#### Registered Upstream Feeds")
+        if feed_statuses:
+            df_feeds = pd.DataFrame(feed_statuses)
+            display_cols = [c for c in ["provider", "status", "records_received", "records_inserted", "records_updated", "records_rejected", "last_attempt", "error_category"] if c in df_feeds.columns]
+            st.dataframe(df_feeds[display_cols], use_container_width=True, hide_index=True)
+        else:
+            st.info("No provider synchronization history recorded yet.")
+
+        st.markdown("---")
+        col_btn, col_sched = st.columns([1, 2])
+        with col_btn:
+            if st.button("🔄 Sync Threat Feeds Now"):
+                with st.spinner("Synchronizing upstream threat feeds..."):
+                    sync_res = threat_sync_service.sync_all()
+                    if sync_res.overall_status.value in ("SUCCESS", "PARTIAL_SUCCESS"):
+                        st.success(f"Sync completed ({sync_res.overall_status.value}): {sync_res.total_records_inserted} inserted, {sync_res.total_records_updated} updated.")
+                    else:
+                        st.error(f"Sync failed ({sync_res.overall_status.value}).")
+                    st.rerun()
+
+        with col_sched:
+            sched_status = "🟢 Active" if threat_sync_scheduler.is_running else "⚪ Dormant (Manual Mode)"
+            st.caption(f"Scheduler Status: **{sched_status}** | Run Interval: **{threat_sync_scheduler.interval // 3600}h**")
+
 
 
 # -------------------------------------------------------------
