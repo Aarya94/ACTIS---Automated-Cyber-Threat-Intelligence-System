@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-10-10 11:28:16 UTC  
+**Generated:** 2026-10-10 11:40:28 UTC  
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)  
 
 This document inventories all automated test files, test classes, and test functions
@@ -11,8 +11,8 @@ recorded only after confirmed execution.
 
 ## Test Suite Summary
 
-- **Total Test Files:** `24`
-- **Total Discovered Test Cases:** `268`
+- **Total Test Files:** `25`
+- **Total Discovered Test Cases:** `280`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -44,6 +44,7 @@ recorded only after confirmed execution.
 | `tests/test_threat_database.py` | 3 tests | `PASSING` |
 | `tests/test_threat_intel_pipeline.py` | 11 tests | `PASSING` |
 | `tests/test_threat_providers.py` | 21 tests | `PASSING` |
+| `tests/test_unified_architecture.py` | 12 tests | `PASSING` |
 | `tests/test_url_scanner.py` | 11 tests | `PASSING` |
 | `tests/test_week1_validation.py` | 4 tests | `PASSING` |
 
@@ -467,6 +468,22 @@ recorded only after confirmed execution.
 - `test_private_ip_boundary_enforced()`
 - `test_public_ip_malicious()`
 - `test_public_ip_clean()`
+
+### `tests/test_unified_architecture.py` (12 tests)
+
+**Standalone Test Functions:**
+- `test_file_analysis_contract_symmetry()`
+- `test_url_analysis_contract_symmetry()`
+- `test_message_analysis_ingestion()`
+- `test_handle_security_event_file_created()`
+- `test_handle_security_event_url_accessed()`
+- `test_handle_security_event_message_received()`
+- `test_handle_security_event_disappeared_file()`
+- `test_single_file_scanner_delegation()`
+- `test_url_scanner_logic_delegation()`
+- `test_text_analyzer_delegates_urls_to_scanner()`
+- `test_orchestrator_invalid_url_isolation()`
+- `test_orchestrator_nonexistent_file_isolation()`
 
 ### `tests/test_url_scanner.py` (11 tests)
 

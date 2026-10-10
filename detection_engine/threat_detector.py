@@ -67,12 +67,30 @@ class ThreatDetector:
         # Step 3: Heuristic Rule Engine
         heuristic_res = RuleEngine.evaluate_pe_file(static_info)
 
-        # Step 4: Machine Learning Inference (if PE binary)
+        # Step 4: Machine Learning Inference (both structured & legacy format)
+        from detection_engine.decision_engine import DetectionDecisionEngine
+        from detection_engine.detection_contract import InputType
+        from detection_engine.ml_prediction_contract import MLPredictionResult, MLModelType
+        from detection_engine.threat_intel_contract import ThreatIntelEvidence, IndicatorType
+
+        ml_structured = MLPredictionResult.unavailable(
+            model_name="windows_pe_malware_rf",
+            model_type=MLModelType.WINDOWS_PE_MALWARE,
+            reason="Not a PE executable or missing feature vector."
+        )
         ml_res = {"available": False, "probability": 0.0, "is_malware": False}
         if static_info.get("is_pe", False) and static_info.get("ml_feature_vector"):
+            ml_structured = model_manager.predict_malware_structured(static_info["ml_feature_vector"])
             ml_res = model_manager.predict_malware(static_info["ml_feature_vector"])
 
-        # Step 5: Multi-Criteria Risk Evaluation
+        rule_eval = heuristic_res.get("structured_result")
+        ti_evidence = intel_result.get("primary_evidence") or ThreatIntelEvidence.from_local_intel(
+            intel=known_intel,
+            indicator=sha256,
+            indicator_type=IndicatorType.SHA256
+        )
+
+        # Step 5: Multi-Criteria Risk Evaluation & Decision Fusion
         risk_res = RiskEngine.calculate_risk(
             target_type="file",
             target_value=str(path),
@@ -80,6 +98,21 @@ class ThreatDetector:
             ml_result=ml_res,
             heuristic_result=heuristic_res,
             external_intel=external_intel
+        )
+
+        decision_result = DetectionDecisionEngine.evaluate(
+            target_identifier=str(path),
+            input_type=InputType.PE_BINARY if static_info.get("is_pe", False) else InputType.FILE,
+            ti_evidence=ti_evidence,
+            ml_prediction=ml_structured,
+            rule_result=rule_eval,
+            metadata={
+                "sha256": sha256,
+                "file_name": path.name,
+                "file_size": static_info.get("file_size", 0),
+                "is_pe": static_info.get("is_pe", False),
+                "threat_intel": intel_result,
+            }
         )
 
         # Step 6: Log Detection Event if Threat Identified
@@ -129,9 +162,12 @@ class ThreatDetector:
             "is_threat": risk_res["is_threat"],
             "reasons": risk_res["reasons"],
             "recommended_action": risk_res["recommended_action"],
+            "confidence": decision_result.confidence,
             "ml_result": ml_res,
+            "ml_prediction": ml_structured.to_dict(),
             "heuristic_result": heuristic_res,
             "threat_intel": intel_result,
+            "detection_result": decision_result.to_dict(),
             "static_info": static_info,
             "from_cache": False
         }
@@ -141,6 +177,18 @@ class ThreatDetector:
             self._hash_cache[sha256] = final_result
 
         return final_result
+
+    def analyze_message(
+        self,
+        text: str,
+        check_external: bool = False
+    ) -> Dict[str, Any]:
+        """
+        Executes security analysis on message text, extracting embedded links,
+        evaluating social engineering cues, and delegating each link to URL analysis.
+        """
+        from scanners.text_analyzer import TextAnalyzer
+        return TextAnalyzer.analyze_message(text, check_external=check_external)
 
     def analyze_url(
         self,

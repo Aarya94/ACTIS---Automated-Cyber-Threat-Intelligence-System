@@ -47,6 +47,8 @@ from detection_engine.model_manager import (
     model_manager,
 )
 from detection_engine.decision_engine import DetectionDecisionEngine
+from detection_engine.threat_detector import ThreatDetector, threat_detector
+from detection_engine.orchestrator import AnalysisOrchestrator, analysis_orchestrator
 
 __all__ = [
     "DetectionResult",
@@ -81,4 +83,9 @@ __all__ = [
     "ModelManager",
     "model_manager",
     "DetectionDecisionEngine",
+    "ThreatDetector",
+    "threat_detector",
+    "AnalysisOrchestrator",
+    "analysis_orchestrator",
 ]
+
