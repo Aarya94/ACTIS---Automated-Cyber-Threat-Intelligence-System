@@ -100,7 +100,21 @@ Detailed design is documented in [`docs/architecture/architecture-evolution.md`]
 - **Baseline:** 229 automated unit and integration tests passing with 100% success rate.
 
 ### Day 11: Online Threat Intelligence (`PLANNED`)
-- **Goals:** External threat intelligence connectors (VirusTotal v3), safe read-only API client abstractions, rate-limiting, timeout controls, and normalized reputation results.
+- **Architectural Reference:** [`docs/architecture/reference/actis-threat-intelligence-integration.md`](../architecture/reference/actis-threat-intelligence-integration.md) (Authoritative design specification for local-first lookups, external provider adapters, response validation, normalized evidence signals, and risk engine integration).
+- **Milestone Scope:**
+  - Provider adapter abstraction (`BaseThreatClient`)
+  - Selected external provider integrations (VirusTotal v3, planned URLhaus & AbuseIPDB)
+  - Indicator validation and canonical normalization (SHA-256 hashes, URLs, domains, public IPs)
+  - Local-first lookup sequence against SQLite indicators before remote querying
+  - External lookup dispatch when appropriate and policy permits
+  - Defensive response validation (schema checking, HTTP status handling, outage resilience)
+  - Strict bounded timeouts (≤ 5s) and rate-limit controls
+  - Evidence normalization into canonical `ThreatIntelEvidence` / `EvidenceSignal` containers
+  - Source attribution and provenance tracking (distinguishing raw provider counts from ACTIS risk)
+  - Detection Decision Engine and Risk Engine integration preserving dynamic weight normalization
+  - Privacy safeguards (credential isolation, private IP shielding, zero full-file uploads)
+  - Comprehensive unit/integration test suites and documentation verification
+
 
 ### Day 12: Central ACTIS Threat Intelligence
 - **Goals:** Central ACTIS Threat Intelligence REST API, client-server synchronization protocol, federated sharing of verified indicators, and state machine transition enforcement (`CONFIRMED`, `SUSPICIOUS`, `CANDIDATE`).

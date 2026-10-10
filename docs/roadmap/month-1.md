@@ -85,8 +85,21 @@ Introduced following the completion of Day 7, this architectural shift recognize
 - **Baseline:** 229 automated unit and integration tests passing with 100% success rate.
 
 ### Day 11: Online Threat Intelligence (`PLANNED`)
-- **Goals:** External threat intelligence connectors (VirusTotal v3), safe read-only API client abstractions, rate-limiting, timeout controls, and normalized reputation results.
-- **Components:** `threat_intelligence/api_clients.py`, `threat_intelligence/threat_lookup.py`.
+- **Architectural Reference:** [`docs/architecture/reference/actis-threat-intelligence-integration.md`](../architecture/reference/actis-threat-intelligence-integration.md) (Design specification for local-first queries, provider adapters, response validation, normalized evidence, and risk integration).
+- **Milestone Scope:**
+  - Provider adapter abstraction (`BaseThreatClient`)
+  - Selected external provider integrations (VirusTotal v3, planned URLhaus & AbuseIPDB)
+  - Indicator validation and canonical normalization
+  - Local-first lookup sequence against SQLite indicators before external querying
+  - External lookup where appropriate and policy permits
+  - Defensive response validation (timeouts, rate limits, schema checks, outage handling)
+  - Strict bounded timeouts (≤ 5s) and rate-limiting controls
+  - Evidence normalization into `ThreatIntelEvidence` / `EvidenceSignal` contracts
+  - Source attribution and provenance preservation
+  - Detection and risk engine integration without altering existing scoring contracts
+  - Privacy safeguards (credential isolation, private IP shielding, zero full-file uploads)
+  - Automated tests and documentation
+- **Components:** `threat_intelligence/api_clients.py`, `threat_intelligence/threat_lookup.py`, `detection_engine/threat_intel_contract.py`.
 
 ### Day 12: Central ACTIS Threat Intelligence
 - **Goals:** Central ACTIS Threat Intelligence REST API, client-server synchronization protocol, federated sharing of verified indicators, and state machine transition enforcement (`CONFIRMED`, `SUSPICIOUS`, `CANDIDATE`).

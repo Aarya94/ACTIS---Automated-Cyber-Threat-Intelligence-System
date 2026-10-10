@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-10 10:53:01 UTC  
+**Generated:** 2026-10-10 10:54:02 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`69cfd40`)  
+**Current Git Branch:** `main` (`d3bf83c`)  
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `69cfd40`
-- **Working Tree:** 1 untracked/unstaged changes
+- **HEAD Commit:** `d3bf83c`
+- **Working Tree:** 2 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `d3bf83c` | Aaryan Suman | 2026-10-10 | docs: document IOC lookup and evidence flow |
 | `69cfd40` | Aaryan Suman | 2026-10-10 | docs: add ACTIS threat intelligence integration reference |
 | `6434480` | Aaryan Suman | 2026-10-10 | test: add branding assets integrity and path resolution tests |
 | `cebffe7` | Aaryan Suman | 2026-10-10 | docs: document ACTIS branding asset conventions |
@@ -140,7 +141,6 @@
 | `4b087b2` | Aaryan Suman | 2026-10-09 | docs: record Day 10 development changelog and synchronize generated docs |
 | `0646444` | Aaryan Suman | 2026-10-09 | docs: document ACTIS event-driven file protection workflow |
 | `acf96f4` | Aaryan Suman | 2026-10-09 | test: add event-to-analysis integration coverage |
-| `4ce21ab` | Aaryan Suman | 2026-10-09 | test: add event burst and queue stability coverage |
 
 ## Known Issues
 
