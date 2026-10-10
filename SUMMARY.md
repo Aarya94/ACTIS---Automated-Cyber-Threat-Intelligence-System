@@ -5,6 +5,7 @@
 
 ## 🏛️ Architecture (Source of Truth)
 * [Architecture Overview & AI Rules](docs/architecture/README.md)
+* [Unified Architecture (Core + Extensions)](docs/architecture/unified-architecture.md)
 * [System Architecture](docs/architecture/system-architecture.md)
 * [Module Architecture](docs/architecture/module-architecture.md)
 * [Architecture Evolution & Post-Day-7 Breakthrough](docs/architecture/architecture-evolution.md)

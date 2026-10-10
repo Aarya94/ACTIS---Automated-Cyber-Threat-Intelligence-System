@@ -10,6 +10,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 Milestone Scope: Architecture planning, configuration management, logging infrastructure, database/ML contracts, initial validation tests, and project foundations.
 
+### 2026-10-10 — Unified ACTIS Architecture Adoption & Validation
+
+Adopted and validated the authoritative Unified ACTIS Architecture, establishing the Core + Extensions model across the repository without unnecessary rewrites. Conducted a complete repository audit verifying previous milestones (Days 1–11: 267 baseline tests passing). Unified structured detection contracts across input modalities by ensuring `ThreatDetector.analyze_file()` evaluates the canonical `DetectionDecisionEngine` and exports structured `DetectionResult` metadata, matching `analyze_url()`. Introduced the formal `AnalysisOrchestrator` (`detection_engine/orchestrator.py`) implementing `IAnalysisOrchestrationBoundary` to serve as the single authoritative pipeline coordinator for file, URL, and message scanning, as well as Windows Protection Service security events. Created `docs/architecture/unified-architecture.md` specifying Core vs Extension boundaries, structured contracts, evidence provenance, and verified component status. Added 12 dedicated compliance and integration tests (`tests/test_unified_architecture.py`) verifying multi-modal ingestion, contract symmetry, event handoffs, scanner delegation, and failure isolation, expanding the test suite to 279 passing tests (0 failures).
+
+#### Commits
+
+| Commit | Type | Description | Files | Verification |
+|--------|------|-------------|-------|--------------|
+| `8060ed5` | feat | Adopt unified analysis orchestrator and symmetric detection contracts | `detection_engine/orchestrator.py`, `detection_engine/threat_detector.py`, `detection_engine/__init__.py` | Passed (279 tests) |
+| `e8e523b` | test | Add validation suite for unified architecture compliance | `tests/test_unified_architecture.py` | Passed (279 tests) |
+
+---
+
 ### 2026-10-10 — Day 11: Online Threat Intelligence Integration
 
 Implemented a fully working, tested external threat-intelligence lookup pipeline integrating seamlessly with existing ACTIS analysis, detection, and risk-assessment infrastructure. Built the extensible provider abstraction (`BaseThreatClient`) with indicator capability reporting, configurable bounded HTTP timeouts, sliding-window rate-limiting, and secret-masked representation (`***`). Implemented comprehensive client adapters for **VirusTotal v3** (SHA-256 hashes, URLs, domains with 4 req/min throttling), **URLhaus API v1** (malicious URLs and payload SHA-256 hashes with JSON payload encoding), and **AbuseIPDB API v2** (IPv4 and IPv6 public address reputation scoring). Built strict defensive indicator validation (`indicator_validator.py`) with canonical normalization, URL fragment stripping, and strict RFC 1918 private/loopback/link-local IP shielding to prevent enterprise network leakage. Developed a thread-safe, TTL-based threat intelligence cache (`ThreatIntelligenceCache`) that rejects caching transient network failures or timeouts. Implemented a 9-stage local-first threat lookup orchestrator (`ThreatLookup`) that prioritizes local SQLite indicator databases before querying external feeds, tracks 8 explicit outcome states (`FOUND_MALICIOUS`, `FOUND_SUSPICIOUS`, `FOUND_BENIGN`, `NOT_FOUND`, `PROVIDER_UNAVAILABLE`, `REQUEST_TIMEOUT`, `INVALID_RESPONSE`, `QUERY_SKIPPED`), and provides multi-provider aggregation with conflict resolution (`aggregate_findings`). Integrated normalized external intelligence into `ThreatDetector` and `RiskEngine` without altering existing scoring contracts or introducing duplicate risk engines. Expanded the automated test suite from 229 to 267 passing tests (100% pass rate) with zero live network dependencies (100% mocked transport).

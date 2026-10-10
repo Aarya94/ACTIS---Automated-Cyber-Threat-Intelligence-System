@@ -30,6 +30,7 @@ This directory serves as the **permanent, authoritative source of truth** for th
 
 | Document | Focus |
 |---|---|
+| [`unified-architecture.md`](./unified-architecture.md) | **Authoritative Specification:** Unified Core + Extensions architecture, canonical contracts, failure isolation, and implementation status matrix. |
 | [`architecture-evolution.md`](./architecture-evolution.md) | Detailed analysis of the post-Day-7 architectural breakthrough and transition to an event-driven platform. |
 | [`system-architecture.md`](./system-architecture.md) | High-level system topology, resident protection layer, orchestrator, and threat-sharing network. |
 | [`module-architecture.md`](./module-architecture.md) | Responsibilities, inputs, outputs, dependencies, and constraints for each module. |
