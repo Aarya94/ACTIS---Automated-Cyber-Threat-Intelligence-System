@@ -243,7 +243,62 @@ Upstream Feeds (URLhaus Recent URLs, AbuseIPDB Blacklist)
 
 ---
 
-## 6. Windows Monitoring Subsystem Architecture
+## 6. Central Threat Intelligence Service & Secure Synchronization
+
+The Central Threat Intelligence Service (`backend/`) extends the unified architecture by enabling ACTIS endpoint nodes to synchronize verified threat intelligence and contribute candidate detections through a hardened REST API.
+
+```
+External Upstream Feeds (URLhaus, AbuseIPDB)
+                   │
+                   ▼
+       Central ACTIS Backend API (/api/v1)
+        [FastAPI + HMAC Auth + SQLite Central DB]
+                   │
+         ┌─────────┴─────────┐
+         ▼                   ▲
+   GET /api/v1/sync/pull     │ POST /api/v1/contributions
+   (Batch indicator pull)    │ (Candidate submission only)
+         │                   │
+         ▼                   │
+    CentralACTISFeedAdapter  │
+         │                   │
+         ▼                   │
+  Local Threat Database (SQLite) ── (Contribute verified local alerts)
+         │
+         ▼
+  ThreatLookup / Detection Pipeline
+```
+
+### Versioned API Contracts (`/api/v1`)
+
+| Endpoint | Method | Role | Description |
+|----------|--------|------|-------------|
+| `/api/v1/health` | GET | Public | Service health, database status, indicator count, and system uptime. |
+| `/api/v1/client/info` | GET | Authenticated | Token verification, client identity, assigned roles, and rate limit. |
+| `/api/v1/indicators/{type}/{value}` | GET | `read` | Point lookup for normalized indicator with provenance and review status. |
+| `/api/v1/indicators` | GET | `read` | Bounded pagination query with filtering by status, threat type, and min confidence. |
+| `/api/v1/sync/pull` | POST | `read` | Bulk incremental synchronization pull for client fleet updates. |
+| `/api/v1/contributions` | POST | `contribute` | Submits candidate indicator report into review queue (anti-poisoning enforced). |
+| `/api/v1/admin/indicators/{id}/review` | POST | `admin` | Administrative verification (`APPROVE`, `REJECT`) promoting candidate records. |
+
+### Authentication & Authorization Model
+- **Token Verification**: Supports `Bearer <token>` in `Authorization` header and `X-ACTIS-API-Key`. Credentials are authenticated in constant time using `hmac.compare_digest` to prevent timing attacks.
+- **Role-Based Authorization**: Granular roles (`read`, `contribute`, `admin`). Endpoints reject requests lacking appropriate scopes with HTTP 403.
+- **Rate Limiting**: In-memory sliding-window limiter enforcing client-specific requests-per-minute (RPM) quotas (60–300 RPM default). Returns HTTP 429 when exceeded.
+- **Defensive Shielding**: All queries, pulls, and submissions validate syntax and enforce RFC 1918 / RFC 5737 private and loopback IP rejection (`is_safe_public_ip`) to prevent internal network leakage.
+
+### Anti-Poisoning Candidate State Machine
+- Submissions via `/api/v1/contributions` are strictly stored with `status="CANDIDATE"`, `review_status="PENDING"`, and `source_type="CLIENT_CONTRIBUTION"`.
+- Contributing clients cannot self-promote indicators to `CONFIRMED`.
+- Only authorized operators with the `admin` role can review and transition candidate records to `CONFIRMED` / `APPROVED`.
+
+### Failure & Outage Isolation
+- **100% Local Autonomy**: The client `CentralACTISFeedAdapter` traps network timeouts, connection errors, HTTP 429, and HTTP 401 failures into categorized `ProviderSyncResult` telemetry.
+- **Zero Impact on Scanning**: Outages of the central service do NOT block or degrade local scanning, file monitoring, or detection pipelines. Local SQLite lookups continue seamlessly.
+
+---
+
+## 7. Windows Monitoring Subsystem Architecture
 
 The Windows Protection Service (`service.WindowsProtectionService` and `service.FileProtectionPipeline`) runs as a dedicated, event-driven subsystem:
 
@@ -281,7 +336,7 @@ Windows Filesystem (ReadDirectoryChangesW / watchdog)
 
 ---
 
-## 7. Security and Privacy Boundaries
+## 8. Security and Privacy Boundaries
 
 1. **No Automatic File Execution**: Dynamic execution is strictly prohibited. Static PE analysis parses headers safely using structured binary readers without executing target binaries.
 2. **No Automatic Destructive Actions**: ACTIS reports findings; it never unilaterally deletes, quarantines, or alters user files.
@@ -291,16 +346,19 @@ Windows Filesystem (ReadDirectoryChangesW / watchdog)
 
 ---
 
-## 8. Verification & Test Coverage
+## 9. Verification & Test Coverage
 
 The unified architecture is continuously verified by the ACTIS test suite:
 - **Baseline Unified Test Suite**: 279 comprehensive tests across core config, scanners, ML models, detection engine, threat intel, reports, Windows protection service, and architectural contracts.
-- **Threat Intelligence Sync Suite (`tests/test_threat_sync.py`)**: 24 dedicated unit and integration tests covering:
-  1. Feed adapters (URLhaus recent URLs, AbuseIPDB blacklist, VirusTotal enterprise boundary isolation).
-  2. Failure isolation (network timeouts, HTTP 429 rate limits, HTTP 401 unconfigured/unauthorized, malformed JSON resilience).
-  3. Strict indicator validation and private/reserved RFC 1918 IP shielding.
-  4. Idempotent SQLite persistence (batch upserts, conflict resolution, historical field preservation, feed status tracking).
-  5. Concurrency protection (`ThreatSyncService` non-blocking lock preventing overlapping jobs).
-  6. Background scheduler lifecycle (`ThreatSyncScheduler` start, stop, manual trigger, disabled mode).
-  7. End-to-end integration with `ThreatLookup` and `AnalysisOrchestrator` / `ThreatDetector`, verifying imported feed records immediately contribute evidence to the detection pipeline while preserving provenance.
-- **Current Test Status**: **303 passed, 0 failed** (100% pass rate).
+- **Threat Intelligence Sync Suite (`tests/test_threat_sync.py`)**: 24 dedicated unit and integration tests covering feed adapters, SQLite batch persistence, failure isolation, and scheduler lifecycle.
+- **Central TI Service & Synchronization Suite (`tests/test_central_ti_service.py`)**: 30 comprehensive tests covering:
+  1. Versioned REST API endpoints, health telemetry, and client metadata inspection.
+  2. Constant-time token verification (`hmac.compare_digest`), missing/invalid auth rejection, and sliding-window rate limiting (429).
+  3. Bounded pagination queries, filtering envelopes, and indicator point lookups.
+  4. Candidate contribution anti-poisoning policy (cannot self-promote to `CONFIRMED`).
+  5. Administrative verification state machine (`APPROVE`, `REJECT`).
+  6. Strict indicator validation and RFC 1918 private IP shielding on API and adapter layers.
+  7. `CentralACTISFeedAdapter` failure isolation (timeouts, connection errors, HTTP 401/429, malformed JSON).
+  8. Idempotent SQLite persistence via Day 12 `upsert_feed_records` and immediate queryability through `ThreatLookup`.
+  9. Complete offline resilience: local scanning and background file monitoring remain 100% functional when central service is offline.
+- **Current Test Status**: **333 passed, 0 failed** (100% pass rate).
