@@ -843,16 +843,24 @@ elif menu == "AI Security Assistant":
     st.title("🤖 ACTIS AI Security Assistant")
     st.markdown("Ask natural language questions about your security status, recent detections, or file risk explanations.")
 
-    st.caption("Operates strictly in **READ-ONLY** mode. Grounded in local database records and explainability rationale.")
+    col_stat1, col_stat2 = st.columns([3, 1])
+    with col_stat1:
+        st.caption("Operates strictly in **READ-ONLY** mode. Grounded in local database records and explainability rationale.")
+    with col_stat2:
+        st.markdown("<span class='badge-low'>🟢 Grounded & Offline</span>", unsafe_allow_html=True)
 
-    # Suggested prompts
+    # Initialize assistant chat history in session state
+    if "assistant_history" not in st.session_state:
+        st.session_state["assistant_history"] = []
+
+    # Suggested prompt pills
     col_p1, col_p2, col_p3 = st.columns(3)
     if col_p1.button("❓ What threats were detected today?"):
         st.session_state["assistant_prompt"] = "What threats were detected today?"
     if col_p2.button("❓ Show me the latest critical detections"):
         st.session_state["assistant_prompt"] = "Show me the latest critical detections."
-    if col_p3.button("❓ Explain how ACTIS detects malware"):
-        st.session_state["assistant_prompt"] = "Explain how ACTIS detects malware and phishing."
+    if col_p3.button("❓ Explain ACTIS detection methodology"):
+        st.session_state["assistant_prompt"] = "Explain ACTIS detection methodology"
 
     user_query = st.text_input(
         "Ask a security question:",
@@ -860,16 +868,33 @@ elif menu == "AI Security Assistant":
         placeholder="e.g. Why was paypal-security-verification.xyz flagged?"
     )
 
-    if st.button("💬 Ask Assistant") and user_query:
+    col_btn1, col_btn2 = st.columns([1, 3])
+    with col_btn1:
+        ask_clicked = st.button("💬 Ask Assistant", use_container_width=True)
+    with col_btn2:
+        if st.session_state.get("assistant_history"):
+            if st.button("🗑 Clear History"):
+                st.session_state["assistant_history"] = []
+                st.rerun()
+
+    if ask_clicked and user_query:
         with st.spinner("Analyzing threat history and generating grounded explanation..."):
             ans = security_assistant.ask(user_query)
+            st.session_state["assistant_history"].append({
+                "query": user_query,
+                "response": ans,
+                "timestamp": time.strftime("%H:%M:%S")
+            })
 
-        st.markdown(f"""
-        <div class="cyber-card" style="border-left: 4px solid #58a6ff;">
-            <h4 style="color: #58a6ff; margin-bottom: 10px;">Security Assistant Analysis</h4>
-            <div style="white-space: pre-wrap; line-height: 1.6;">{ans}</div>
-        </div>
-        """, unsafe_allow_html=True)
+    # Render recent responses from session state
+    if st.session_state.get("assistant_history"):
+        st.markdown("### Assistant Responses")
+        for item in reversed(st.session_state["assistant_history"]):
+            with st.container():
+                st.markdown(f"**Query ({item['timestamp']}):** *{item['query']}*")
+                with st.expander("Grounded Analysis & Evidence", expanded=True):
+                    st.markdown(item["response"])
+                st.markdown("---")
 
 
 # -------------------------------------------------------------
