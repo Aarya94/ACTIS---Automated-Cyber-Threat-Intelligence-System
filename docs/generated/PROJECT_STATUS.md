@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-10 11:13:30 UTC  
+**Generated:** 2026-10-10 11:15:44 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`f453ff9`)  
+**Current Git Branch:** `main` (`9f77010`)  
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `f453ff9`
-- **Working Tree:** 1 untracked/unstaged changes
+- **HEAD Commit:** `9f77010`
+- **Working Tree:** 2 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `9f77010` | Aaryan Suman | 2026-10-10 | feat: integrate normalized evidence with detection pipeline |
 | `f453ff9` | Aaryan Suman | 2026-10-10 | feat: integrate provider lookup with local intelligence |
 | `3c568e2` | Aaryan Suman | 2026-10-10 | feat: add threat intelligence caching layer |
 | `de90f3c` | Aaryan Suman | 2026-10-10 | feat: implement external threat intelligence provider adapters |
@@ -140,7 +141,6 @@
 | `21cf8e0` | Aaryan Suman | 2026-10-10 | docs: validate and record architecture reference |
 | `0ce5beb` | Aaryan Suman | 2026-10-10 | docs: link threat intelligence architecture from roadmap |
 | `d3bf83c` | Aaryan Suman | 2026-10-10 | docs: document IOC lookup and evidence flow |
-| `69cfd40` | Aaryan Suman | 2026-10-10 | docs: add ACTIS threat intelligence integration reference |
 
 ## Known Issues
 

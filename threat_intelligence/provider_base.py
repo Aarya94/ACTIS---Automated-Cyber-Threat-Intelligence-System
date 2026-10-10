@@ -30,12 +30,14 @@ class BaseThreatClient(ABC):
         provider_name: str,
         supported_types: Optional[Set[IndicatorType]] = None,
         timeout: float = 5.0,
-        rate_limit_rpm: Optional[int] = None
+        rate_limit_rpm: Optional[int] = None,
+        max_retries: int = 1,
     ):
         self.provider_name = provider_name
         self.supported_types = supported_types or set()
         self.timeout = max(1.0, float(timeout))
         self.rate_limit_rpm = rate_limit_rpm
+        self.max_retries = max(0, min(5, int(max_retries)))
         self._last_request_time: float = 0.0
         self._request_count_window: int = 0
         self._window_start_time: float = time.time()

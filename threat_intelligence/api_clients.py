@@ -169,7 +169,15 @@ class VirusTotalClient(BaseThreatClient):
         try:
             resp = requests.get(url, headers=self.headers, timeout=req_timeout)
             if resp.status_code == 200:
-                payload = resp.json()
+                try:
+                    payload = resp.json()
+                except Exception as json_err:
+                    return ThreatIntelEvidence.unavailable(
+                        indicator=normalized,
+                        reason=f"VirusTotal malformed JSON response: {json_err}",
+                        indicator_type=detected_type,
+                        provider="VirusTotal"
+                    )
                 attrs = payload.get("data", {}).get("attributes", {})
                 stats = attrs.get("last_analysis_stats", {})
                 positives = stats.get("malicious", 0) + stats.get("suspicious", 0)
@@ -358,7 +366,15 @@ class URLhausClient(BaseThreatClient):
 
             resp = requests.post(endpoint, data=data, headers=self.headers, timeout=req_timeout)
             if resp.status_code == 200:
-                payload = resp.json()
+                try:
+                    payload = resp.json()
+                except Exception as json_err:
+                    return ThreatIntelEvidence.unavailable(
+                        indicator=normalized,
+                        reason=f"URLhaus malformed JSON response: {json_err}",
+                        indicator_type=detected_type,
+                        provider="URLhaus"
+                    )
                 query_status = payload.get("query_status", "").lower()
 
                 if query_status == "ok":
@@ -513,7 +529,15 @@ class AbuseIPDBClient(BaseThreatClient):
             resp = requests.get(url, params=params, headers=self.headers, timeout=req_timeout)
 
             if resp.status_code == 200:
-                payload = resp.json().get("data", {})
+                try:
+                    payload = resp.json().get("data", {})
+                except Exception as json_err:
+                    return ThreatIntelEvidence.unavailable(
+                        indicator=indicator.strip(),
+                        reason=f"AbuseIPDB malformed JSON response: {json_err}",
+                        indicator_type=IndicatorType.IP_ADDRESS,
+                        provider="AbuseIPDB"
+                    )
                 score = payload.get("abuseConfidenceScore", 0)  # 0-100
                 total_reports = payload.get("totalReports", 0)
                 is_whitelisted = payload.get("isWhitelisted", False)
