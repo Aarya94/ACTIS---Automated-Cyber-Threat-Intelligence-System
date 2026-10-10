@@ -80,11 +80,15 @@ python main.py --server
 * **Interactive Swagger Documentation:** `http://127.0.0.1:8000/docs`
 * **OpenAPI Schema:** `http://127.0.0.1:8000/openapi.json`
 
-### Core API Endpoints:
-- `GET /health` — Service health and operational status.
-- `GET /threats/{indicator}` — Query known indicators (URL, domain, SHA256).
-- `POST /threats` — Submit verified threat indicators (requires API key).
-- `GET /threats/sync` — Synchronize local threat cache with the central network.
+### Core Versioned API Endpoints (`/api/v1`):
+- `GET /api/v1/health` — Central service health, database status, and verified indicator count.
+- `GET /api/v1/client/info` — Verify client credentials, assigned roles (`read`, `contribute`, `admin`), and rate limits.
+- `GET /api/v1/indicators/{indicator_type}/{indicator_value}` — Query indicator with provenance and review status.
+- `GET /api/v1/indicators` — Bounded paginated query with filters (`status`, `threat_type`, `min_confidence`).
+- `POST /api/v1/sync/pull` — Incremental bulk indicator pull for client fleet synchronization.
+- `POST /api/v1/contributions` — Submit candidate indicator report (anti-poisoning: queued as `CANDIDATE` / `PENDING`).
+- `POST /api/v1/admin/indicators/{id}/review` — Administrative review promoting/rejecting candidate records (`APPROVE`, `REJECT`).
+*(Backward-compatible legacy endpoints `/api/health`, `/api/indicator/{indicator_value}`, `/api/sync/pull`, and `/api/indicator` remain operational).*
 
 ---
 

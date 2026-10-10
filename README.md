@@ -106,10 +106,10 @@ ACTIS operates under strict defensive boundaries:
 
 ## 📊 Current Implementation vs. Roadmap
 
-### Implemented Baseline Foundation (Days 1–10)
+### Implemented Baseline Foundation (Days 1–13)
 - **Configuration Management (`config/`):** Strongly-typed `AppConfig`, environment loader, path resolver, constraint validation (11 passing tests).
 - **Enterprise Logging (`config/logger.py`):** Rotating file logs, structured JSON formatters, credential sanitization.
-- **Relational Threat Database & Scan History (`reports/`):** SQLite schema with WAL mode (`threats`, `indicators`, `scans`, `detections`, `scan_items`, `file_scan_states`), indexed queries, JSON/CSV/Markdown report generation.
+- **Relational Threat Database & Scan History (`reports/`):** SQLite schema with WAL mode (`threats`, `indicators`, `scans`, `detections`, `scan_items`, `file_scan_states`, `threat_sync_runs`, `threat_feed_status`), indexed queries, JSON/CSV/Markdown report generation.
 - **Phishing Machine Learning Foundation (`models/`, `detection_engine/`):** 19-feature morphological Random Forest classifier with formal metadata contract validation.
 - **Static Windows PE Binary Analysis (`scanners/file_feature_extractor.py`):** Read-only PE header and section parsing (`pefile`), Shannon byte entropy, 64 KB chunked SHA-256 and MD5 hashing (21 passing tests).
 - **URL Analysis Hardening (`scanners/url_scanner.py`):** RFC scheme validation, canonical normalization, default port stripping, 19-feature vector extraction, session caching.
@@ -119,17 +119,17 @@ ACTIS operates under strict defensive boundaries:
 - **Incremental Scan State (`scanners/incremental_state.py`):** Deterministic change classification (`NEW_FILE`, `UNCHANGED_FILE`, `CHANGED_FILE`, `REMOVED_FILE`, `UNAVAILABLE_FILE`), analytical/model version invalidation tags, SQLite scan state persistence, and skipping deep analysis for verified unchanged files.
 - **Windows Protection Service Foundation (`service/`):** Lightweight resident background service managing endpoint state, deterministic lifecycle (`start`, `stop`, `pause`, `resume`), state transitions (`STOPPED`, `STARTING`, `RUNNING`, `PAUSED`, `DEGRADED`, `FAILED`), worker pool coordination, bounded recovery, canonical `SecurityEvent` schema, bounded intake queue, `EventDispatcher` routing, and decoupled `AnalysisOrchestrationBoundary` handoff.
 - **Event-Driven File Protection (`scanners/file_watcher.py`, `service/file_pipeline.py`):** Real-time Windows filesystem event monitoring (`watchdog` bridge `FilesystemEventSource`), canonical path normalization (`FilesystemEventNormalizer`), temporary/editor file filtering (`FileEventFilter`), sliding-window debouncing (`FileEventDebouncer`), bounded queue backpressure (`SecurityEventQueue`), incremental scan state integration (`FileProtectionPipeline`), pre/post-inspection race condition hardening, and direct delegation to the existing `ThreatDetector` static analysis pipeline.
-- **Automated Test Infrastructure (`tests/`):** 229 unit and integration tests passing with 100% success rate.
+- **Online Threat Intelligence Integration (Day 11, `threat_intelligence/`):** Extensible `BaseThreatClient` abstraction, client adapters for VirusTotal v3, URLhaus API v1, and AbuseIPDB API v2 with sliding-window rate limiting and bounded HTTP timeouts. Strict indicator validation (`indicator_validator.py`) with RFC 1918 private/loopback IP shielding, thread-safe in-memory TTL caching (`threat_cache.py`), and unified 9-stage local-first threat lookup (`threat_lookup.py`) with 8 explicit outcome states and multi-provider conflict resolution.
+- **Scheduled Feed Synchronization & Dashboard Integration (Day 12, `threat_intelligence/sync/`, `dashboard/`):** Decoupled `ThreatSyncService` importing upstream feeds into local SQLite, feed adapters for URLhaus and AbuseIPDB, explicit `UNSUPPORTED_OPERATION` modeling for VirusTotal bulk feeds, non-blocking lock preventing overlapping runs, thread-safe `ThreatSyncScheduler` lifecycle, parameterized idempotent batch upserts (`upsert_feed_records`), and live feed controls on the Streamlit command center dashboard.
+- **Central Threat Intelligence Service & Secure Synchronization (Day 13, `backend/`, `threat_intelligence/`):** Hardened FastAPI central intelligence REST API (`/api/v1`), constant-time API key verification (`hmac.compare_digest`), role-based authorization (`read`, `contribute`, `admin`), in-memory sliding-window rate limiting (60–300 RPM default), strict RFC 1918 IP shielding, candidate contribution anti-poisoning policy (forces `CANDIDATE` / `PENDING`), administrative review endpoint (`APPROVE`, `REJECT`), client `CentralACTISFeedAdapter`, and total offline scanning isolation.
+- **Automated Test Infrastructure (`tests/`):** 333 unit, integration, and architecture validation tests passing with 100% success rate.
 
-### Planned Subsystems in Target Architecture (Days 11–16)
-- **Online Threat Intelligence Connectors (Day 11):** VirusTotal v3 client with rate limiting and offline fallback. (Reference: [Threat Intelligence Integration Architecture](docs/architecture/reference/actis-threat-intelligence-integration.md)).
-- **Central ACTIS Threat Intelligence API (Day 12):** FastAPI federated intelligence sharing service with anti-poisoning state machine.
-- **Command Dashboard & Desktop Alerts (Day 13):** Streamlit user console and native Windows toast notifications.
-- **AI Security Assistant (Day 14):** Safe, offline-grounded natural language security explainer.
-- **Security Hardening & Broad Testing (Day 15):** Adversarial sample evaluation and stress testing.
+### Planned Subsystems in Target Architecture (Days 14–16)
+- **AI Security Assistant (Day 14):** Safe, offline-grounded natural language security assistant operating strictly through controlled SQLite read interfaces with **NO unrestricted OS shell access**.
+- **Security Hardening & Broad Testing (Day 15):** Adversarial sample evaluation, false-positive auditing, and malformed input stress testing.
 - **Final Integration & Release (Day 16):** Milestone packaging, documentation finalization, and demonstration scripts.
 
-*(Note: Prototype files for some of these future modules exist historically in the repository; they are being systematically hardened and integrated per the post-Day-7 roadmap and are not yet production-ready. ACTIS is a development-stage prototype, not a full commercial antivirus or EDR system.)*
+*(Note: Prototype files for some future modules exist historically in the repository; they are being systematically hardened and integrated per the post-Day-7 roadmap and are not yet production-ready. ACTIS is a development-stage prototype, not a full commercial antivirus or EDR system.)*
 
 ---
 
@@ -144,7 +144,7 @@ ACTIS/
 ├── service/                  # Windows Protection Service & file protection pipeline (lifecycle, state, workers, queue, dispatcher, debouncer)
 ├── scanners/                 # Event/input providers (URL, text, PE static analyzer, device scanner, file watcher)
 ├── detection_engine/         # Decision engine, risk engine, heuristic rule engine
-├── threat_intelligence/      # Local indicator lookup, external API clients, sync manager
+├── threat_intelligence/      # Local indicator lookup, external API clients, sync manager, feed adapters
 ├── reports/                  # SQLite threat database schemas, query interfaces, reports
 ├── notifications/            # Alert formatting and user dispatch queue
 ├── dashboard/                # Streamlit web command center UI
@@ -169,9 +169,9 @@ pytest tests/ -v
 ```
 
 **Current Verification Status:**
-- **229 tests collected**
-- **229 tests passed (100% success rate)**
-- **0 failures / 0 errors**
+- **333 tests collected**
+- **333 tests passed (100% success rate)**
+- **0 failures / 0 errors / 4 warnings**
 
 ---
 
