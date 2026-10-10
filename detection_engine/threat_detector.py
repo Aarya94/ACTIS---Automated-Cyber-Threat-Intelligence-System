@@ -194,7 +194,7 @@ class ThreatDetector:
         intel_result = threat_lookup.lookup_url(canonical_url, domain, query_external=check_external)
         known_intel = intel_result.get("local_intel")
         external_intel = intel_result.get("external_intel")
-        ti_evidence = ThreatIntelEvidence.from_local_intel(
+        ti_evidence = intel_result.get("primary_evidence") or ThreatIntelEvidence.from_local_intel(
             intel=known_intel,
             indicator=canonical_url,
             indicator_type=IndicatorType.URL
