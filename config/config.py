@@ -96,6 +96,7 @@ from config.defaults import (
     DEFAULT_TI_SYNC_URLHAUS,
     DEFAULT_TI_SYNC_ABUSEIPDB,
     DEFAULT_TI_SYNC_VIRUSTOTAL,
+    DEFAULT_TI_SYNC_CENTRAL,
     DEFAULT_TI_SYNC_TIMEOUT,
     DEFAULT_TI_SYNC_MAX_RETRIES,
     create_default_config,
@@ -204,6 +205,7 @@ def load_app_config(
         sync_urlhaus=get_bool("ACTIS_TI_SYNC_URLHAUS", DEFAULT_TI_SYNC_URLHAUS),
         sync_abuseipdb=get_bool("ACTIS_TI_SYNC_ABUSEIPDB", DEFAULT_TI_SYNC_ABUSEIPDB),
         sync_virustotal=get_bool("ACTIS_TI_SYNC_VIRUSTOTAL", DEFAULT_TI_SYNC_VIRUSTOTAL),
+        sync_central=get_bool("ACTIS_TI_SYNC_CENTRAL", DEFAULT_TI_SYNC_CENTRAL),
         request_timeout=get_float("ACTIS_TI_SYNC_TIMEOUT", DEFAULT_TI_SYNC_TIMEOUT),
         max_retries=get_int("ACTIS_TI_SYNC_MAX_RETRIES", DEFAULT_TI_SYNC_MAX_RETRIES),
     )
@@ -266,6 +268,7 @@ TI_SYNC_ENABLED = config.sync.enabled if config.sync else False
 TI_SYNC_INTERVAL_SECONDS = config.sync.interval_seconds if config.sync else 21600
 TI_SYNC_BATCH_SIZE = config.sync.batch_size if config.sync else 500
 TI_SYNC_MAX_RECORDS = config.sync.max_records_per_sync if config.sync else 1000
+TI_SYNC_CENTRAL = config.sync.sync_central if config.sync else True
 
 ACTIS_BACKEND_URL = config.server.backend_url
 ACTIS_CLIENT_API_KEY = config.server.client_api_key

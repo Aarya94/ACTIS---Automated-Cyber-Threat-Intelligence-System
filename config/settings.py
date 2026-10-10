@@ -218,6 +218,7 @@ class ThreatSyncConfig:
     sync_urlhaus: bool = True
     sync_abuseipdb: bool = False
     sync_virustotal: bool = False
+    sync_central: bool = True
     request_timeout: float = 10.0
     max_retries: int = 2
 
@@ -230,6 +231,7 @@ class ThreatSyncConfig:
             "sync_urlhaus": self.sync_urlhaus,
             "sync_abuseipdb": self.sync_abuseipdb,
             "sync_virustotal": self.sync_virustotal,
+            "sync_central": self.sync_central,
             "request_timeout": self.request_timeout,
             "max_retries": self.max_retries,
         }

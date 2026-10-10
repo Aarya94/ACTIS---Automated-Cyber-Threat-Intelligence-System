@@ -80,6 +80,7 @@ DEFAULT_TI_SYNC_MAX_RECORDS = 1000
 DEFAULT_TI_SYNC_URLHAUS = True
 DEFAULT_TI_SYNC_ABUSEIPDB = False
 DEFAULT_TI_SYNC_VIRUSTOTAL = False
+DEFAULT_TI_SYNC_CENTRAL = True
 DEFAULT_TI_SYNC_TIMEOUT = 10.0
 DEFAULT_TI_SYNC_MAX_RETRIES = 2
 
@@ -187,6 +188,7 @@ def create_default_config(environment: str = DEFAULT_ENVIRONMENT) -> AppConfig:
         sync_urlhaus=DEFAULT_TI_SYNC_URLHAUS,
         sync_abuseipdb=DEFAULT_TI_SYNC_ABUSEIPDB,
         sync_virustotal=DEFAULT_TI_SYNC_VIRUSTOTAL,
+        sync_central=DEFAULT_TI_SYNC_CENTRAL,
         request_timeout=DEFAULT_TI_SYNC_TIMEOUT,
         max_retries=DEFAULT_TI_SYNC_MAX_RETRIES,
     )

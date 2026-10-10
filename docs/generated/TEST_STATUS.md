@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-10-10 12:13:10 UTC  
+**Generated:** 2026-10-10 12:37:48 UTC  
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)  
 
 This document inventories all automated test files, test classes, and test functions
@@ -11,8 +11,8 @@ recorded only after confirmed execution.
 
 ## Test Suite Summary
 
-- **Total Test Files:** `26`
-- **Total Discovered Test Cases:** `304`
+- **Total Test Files:** `27`
+- **Total Discovered Test Cases:** `334`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -24,6 +24,7 @@ recorded only after confirmed execution.
 |---|---|---|
 | `tests/test_backend_api.py` | 4 tests | `PASSING` |
 | `tests/test_branding_assets.py` | 6 tests | `PASSING` |
+| `tests/test_central_ti_service.py` | 30 tests | `PASSING` |
 | `tests/test_config_loading.py` | 11 tests | `PASSING` |
 | `tests/test_config_validation.py` | 11 tests | `PASSING` |
 | `tests/test_detection_engine.py` | 14 tests | `PASSING` |
@@ -70,6 +71,50 @@ recorded only after confirmed execution.
 - `test_readme_and_docs_image_references_resolve()`
 - `test_dashboard_branding_asset_resolution()`
 - `test_summary_table_of_contents_link_resolves()`
+
+### `tests/test_central_ti_service.py` (30 tests)
+
+**Class `TestCentralAPIAuthenticationAndHealth`:**
+- `test_health_v1_and_legacy_endpoints()`
+- `test_client_info_with_valid_key()`
+- `test_bearer_authorization_header_supported()`
+- `test_missing_credentials_returns_401()`
+- `test_invalid_key_returns_403()`
+- `test_rate_limiting_enforced_when_exceeded()`
+
+**Class `TestCentralAPIIndicatorRetrieval`:**
+- `test_lookup_existing_seed_indicator()`
+- `test_lookup_nonexistent_indicator()`
+- `test_lookup_private_ip_is_shielded()`
+- `test_paged_query_with_envelope_and_filters()`
+- `test_authenticated_post_sync_pull()`
+
+**Class `TestCandidateContributionAndAntiPoisoning`:**
+- `test_readonly_client_cannot_contribute()`
+- `test_contribute_candidate_indicator_forces_candidate_status()`
+- `test_contribute_private_ip_rejected_with_422()`
+- `test_contribute_malformed_hash_rejected_with_422()`
+- `test_admin_review_promotes_candidate_to_confirmed()`
+
+**Class `TestCentralACTISFeedAdapter`:**
+- `test_adapter_fetch_success_with_mocked_central_service()`
+- `test_adapter_shields_private_ips_from_central_response()`
+- `test_adapter_timeout_isolation()`
+- `test_adapter_connection_error_isolation()`
+- `test_adapter_auth_failure_401()`
+- `test_adapter_rate_limit_429()`
+- `test_adapter_malformed_json_resilience()`
+- `test_adapter_disabled_does_not_execute()`
+
+**Class `TestCentralDatabasePersistenceAndClientSync`:**
+- `test_central_feed_records_persisted_idempotently_in_local_db()`
+- `test_sync_manager_pull_verified_intelligence()`
+- `test_sync_manager_push_verified_threat()`
+
+**Class `TestUnifiedPipelineCentralTIIntegration`:**
+- `test_central_record_retrieved_by_local_threat_lookup()`
+- `test_central_record_evaluated_by_threat_detector_analysis()`
+- `test_local_scanning_functions_when_central_backend_is_offline()`
 
 ### `tests/test_config_loading.py` (11 tests)
 
