@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-10-10 12:56:13 UTC  
+**Generated:** 2026-10-10 13:24:09 UTC  
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)  
 
 This document inventories all automated test files, test classes, and test functions
@@ -11,8 +11,8 @@ recorded only after confirmed execution.
 
 ## Test Suite Summary
 
-- **Total Test Files:** `27`
-- **Total Discovered Test Cases:** `334`
+- **Total Test Files:** `28`
+- **Total Discovered Test Cases:** `361`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -40,6 +40,7 @@ recorded only after confirmed execution.
 | `tests/test_protection_service_workers.py` | 9 tests | `PASSING` |
 | `tests/test_risk_engine.py` | 3 tests | `PASSING` |
 | `tests/test_risk_engine_day6.py` | 8 tests | `PASSING` |
+| `tests/test_security_assistant.py` | 27 tests | `PASSING` |
 | `tests/test_static_pe.py` | 21 tests | `PASSING` |
 | `tests/test_text_analyzer.py` | 9 tests | `PASSING` |
 | `tests/test_threat_database.py` | 3 tests | `PASSING` |
@@ -409,6 +410,51 @@ recorded only after confirmed execution.
 - `test_whitelist_safety_override()`
 - `test_confirmed_threat_override()`
 - `test_deterministic_repeatability()`
+
+### `tests/test_security_assistant.py` (27 tests)
+
+**Class `TestAssistantRecentDetections`:**
+- `test_recent_detections_with_records()`
+- `test_recent_detections_empty_db_no_false_safety()`
+
+**Class `TestAssistantCriticalDetections`:**
+- `test_critical_detections_filtering()`
+- `test_critical_detections_empty_response()`
+
+**Class `TestAssistantStatistics`:**
+- `test_statistics_formatting()`
+- `test_statistics_database_error_handling()`
+
+**Class `TestAssistantTargetExplanation`:**
+- `test_explain_known_detection_exact_match()`
+- `test_explain_disambiguation_when_multiple_targets_match()`
+- `test_explain_known_threat_intelligence_indicator()`
+- `test_explain_candidate_threat_intelligence_notice()`
+- `test_explain_unknown_target_does_not_claim_safe()`
+
+**Class `TestAssistantTargetExtraction`:**
+- `test_extract_sha256()`
+- `test_extract_md5()`
+- `test_extract_url()`
+- `test_extract_ip()`
+- `test_extract_domain()`
+- `test_extract_filename()`
+- `test_extract_quoted_target()`
+
+**Class `TestAssistantMethodologyAndRecommendations`:**
+- `test_methodology_accuracy()`
+- `test_recommendations_non_destructive()`
+
+**Class `TestAssistantSafetyAndBoundaries`:**
+- `test_secret_masking_function()`
+- `test_secret_masking_in_fallback_query()`
+- `test_prompt_injection_resistance()`
+- `test_query_length_bounding()`
+
+**Class `TestAssistantProviderIntegration`:**
+- `test_deterministic_provider_is_default()`
+- `test_external_llm_provider_fallback_when_unconfigured()`
+- `test_external_llm_provider_fallback_on_exception()`
 
 ### `tests/test_static_pe.py` (21 tests)
 

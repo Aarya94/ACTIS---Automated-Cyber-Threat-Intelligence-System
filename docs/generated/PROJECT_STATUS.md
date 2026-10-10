@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-10 12:56:13 UTC  
+**Generated:** 2026-10-10 13:24:09 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`3cfeb30`)  
+**Current Git Branch:** `main` (`a9f1dd4`)  
 
 ---
 
@@ -117,20 +117,21 @@
 
 ## Test Status
 
-- **Total Test Files:** `27`
-- **Total Discovered Test Functions:** `334`
+- **Total Test Files:** `28`
+- **Total Discovered Test Functions:** `361`
 - **Coverage Areas:** Configuration validation, SQLite database schema & CRUD, Phishing/Malware model contracts, PE feature extraction, API backend.
 
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `3cfeb30`
-- **Working Tree:** 3 untracked/unstaged changes
+- **HEAD Commit:** `a9f1dd4`
+- **Working Tree:** 4 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `a9f1dd4` | Aaryan Suman | 2026-10-10 | docs: update roadmap and project structure for Days 12 and 13 |
 | `3cfeb30` | Aaryan Suman | 2026-10-10 | docs: document central threat intelligence architecture, boundaries, and contracts |
 | `8e060a9` | Aaryan Suman | 2026-10-10 | docs: update verified ACTIS implementation status and quickstart guide |
 | `335a8b5` | Aaryan Suman | 2026-10-10 | docs: finalize Day 13 changelog verification hashes |
@@ -140,7 +141,6 @@
 | `6f7995c` | Aaryan Suman | 2026-10-10 | feat: implement central threat intelligence api and candidate contribution state machine |
 | `5b12719` | Aaryan Suman | 2026-10-10 | docs: document scheduled threat intelligence synchronization and sync status |
 | `b6818cb` | Aaryan Suman | 2026-10-10 | test: cover threat feed adapters synchronization and pipeline integration |
-| `030c44f` | Aaryan Suman | 2026-10-10 | feat: integrate feed synchronization status and controls into dashboard |
 
 ## Known Issues
 
