@@ -156,3 +156,123 @@ The planned integration maps directly to well-defined component boundaries:
 
 ### M. Structured Result
 - **Scope:** Emits typed `DetectionResult` models containing overall risk score, five-tier risk level, confidence rating, categorical status, and an itemized explainability tree.
+
+---
+
+## 5. Local-First & External Lookup Strategy
+
+To optimize endpoint performance, eliminate redundant network overhead, and strictly maintain privacy boundaries, ACTIS executes threat lookups through an ordered, 9-stage sequence:
+
+```text
+1. Validate Indicator       --> Verify syntax, format, hash length, and RFC compliance
+2. Canonical Normalization   --> Strip noise, fold casing, remove default ports
+3. Local Cache / DB Lookup  --> Fast query against local SQLite indicators
+4. Policy Evaluation        --> Evaluate: Is external lookup enabled? Is offline mode active?
+5. External Query Dispatch  --> Non-blocking query to configured provider adapters
+6. Response Validation      --> Check status, parse JSON, enforce timeouts (≤ 5s)
+7. Evidence Normalization   --> Map into ThreatIntelEvidence with provider attribution
+8. Signal Provenance Audit  --> Tag source name, raw metrics, and confidence
+9. Unified Evidence Fusion  --> Dispatch to Detection Engine & Risk Engine
+```
+
+### Deterministic Query Outcome States
+Future implementations must distinguish between seven mutually exclusive lookup states:
+
+| Outcome State | Semantic Meaning | Analytical Handling |
+|---|---|---|
+| **`FOUND_MALICIOUS`** | Known malicious indicator verified by provider or database. | Emits high-severity `EvidenceSignal`; triggers verification evaluation. |
+| **`FOUND_BENIGN`** | Known verified safe indicator (e.g. vendor signed, CDN, whitelisted). | Emits benign signal; eligible for `FALSE_POSITIVE` override evaluation. |
+| **`NOT_FOUND`** | Indicator is clean/unseen in provider databases. | **Neutral signal.** Absence of intelligence does NOT equal proof of safety. |
+| **`PROVIDER_UNAVAILABLE`** | Remote service returned 5xx, connection refused, or DNS error. | Recorded in audit telemetry; dynamic weight normalization redistributes layer weight. |
+| **`REQUEST_TIMEOUT`** | Remote provider exceeded bounded timeout threshold. | Non-fatal error; pipeline continues without blocking user. |
+| **`INVALID_RESPONSE`** | Malformed response structure, missing schema keys, or HTTP 4xx. | Logged as warning; ignored by evidence scoring to prevent corruption. |
+| **`QUERY_SKIPPED`** | External query disabled by offline policy, private IP range, or lack of key. | Documented in audit breakdown; system relies on ML, rules, and local database. |
+
+> [!WARNING]
+> **Core Detection Rule:** An unknown indicator (`NOT_FOUND`) must **NEVER** be automatically classified as safe. It simply means external feeds have not yet indexed it; the final verdict must rely on local ML inference and heuristic rule analysis.
+
+---
+
+## 6. Evidence & Risk Semantics
+
+ACTIS maintains strict mathematical and conceptual distinctions between different security metrics. These values must **never** be treated as interchangeable:
+
+```text
+┌─────────────────────────────────┐      ┌─────────────────────────────────┐
+│     Provider Reputation         │  ≠   │       ACTIS Risk Score          │
+│ (e.g. VirusTotal 90/100)        │      │ (Multi-Layer Composite: 0–100)  │
+└─────────────────────────────────┘      └─────────────────────────────────┘
+                 ≠                                        ≠
+┌─────────────────────────────────┐      ┌─────────────────────────────────┐
+│      ML Model Probability       │  ≠   │   Categorical Classification    │
+│ (e.g. Random Forest 0.94)       │      │ (CONFIRMED, SUSPICIOUS, etc.)   │
+└─────────────────────────────────┘      └─────────────────────────────────┘
+```
+
+### Clarified Metric Distinctions
+1. **ML Prediction ($P_{\text{ML}} \in [0.0, 1.0]$):** Statistical output of a Random Forest classifier evaluating morphological features. Indicates pattern similarity to training samples, not verified malice.
+2. **Rule-Based Finding:** Deterministic boolean flag triggered by lexical signatures, packers, or structural anomalies with a fixed severity.
+3. **Provider Reputation ($S_{\text{ext}} \in [0.0, 1.0]$):** Ratio of positive detections to total participating scanning engines (e.g., $15 / 72 = 0.21$).
+4. **Provider Confidence:** Reliability rating assigned to the reporting service based on historical accuracy and freshness.
+5. **Verified Threat-Intelligence Evidence (`ThreatIntelEvidence`):** Typed container encapsulating indicator, verdict, provider provenance, and raw data.
+6. **ACTIS-Computed Risk Score ($R \in [0, 100]$):** Composite score calculated by `RiskScoringEngine` using dynamic active-weight normalization:
+
+$$\text{Active Weights Sum} = \sum_{i \in \text{Available}} W_i$$
+
+$$W_i^{\text{normalized}} = \frac{W_i}{\text{Active Weights Sum}}$$
+
+$$\text{Composite Score} = 100 \times \sum_{i \in \text{Available}} \left( S_i \times W_i^{\text{normalized}} \right)$$
+
+7. **Final Detection Classification:** Five-tier categorical lifecycle state:
+   - `CONFIRMED`: Multi-engine corroborated threats.
+   - `SUSPICIOUS`: High anomaly or high ML score lacking definitive external consensus.
+   - `CANDIDATE`: Preliminary unverified flag.
+   - `REPORTED`: Incoming unverified telemetry.
+   - `FALSE_POSITIVE`: Verified benign software overriding statistical models.
+
+---
+
+## 7. Security, Privacy & Operational Boundaries
+
+All future external threat intelligence integrations must strictly abide by the established ACTIS defensive boundaries:
+
+1. **Credential Isolation:** API keys (e.g. `VIRUSTOTAL_API_KEY`) must **NEVER** be hard-coded into repository files, committed to version control, or printed to log files. All credentials load exclusively from `.env` or system environment variables.
+2. **Bounded Network Timeouts:** Every outbound HTTP request must define an explicit timeout (maximum 5.0 seconds). Indefinite network hangs are strictly forbidden.
+3. **Rate Limiting & Quota Guards:** Provider client adapters must respect published rate limits (e.g., VirusTotal free tier: 4 requests/minute). Rapid bursts must be throttled or queued.
+4. **Zero Full-File Uploads:** **ACTIS NEVER uploads complete user files, documents, or executables to any third-party API or cloud service.** Only cryptographic hashes (SHA-256, MD5) and public URLs/domains may be queried externally.
+5. **Private Network IP Shielding:** Local and private IP address ranges (e.g., `127.0.0.1`, `10.0.0.0/8`, `192.168.0.0/16`, `172.16.0.0/12`) are filtered locally and never transmitted to external reputation services.
+6. **Preservation of Source Provenance:** Every evidence item must record its source name. External feeds must never be forged or attributed to internal engines.
+7. **Graceful Offline Fallback:** If internet connectivity is lost or a provider service is down, ACTIS must continue operating with full analytical fidelity using local models, heuristic rules, and SQLite indicator tables.
+8. **Non-Destructive Read-Only Operation:** External threat intelligence findings are purely advisory. They must **never** trigger automatic file deletion, quarantine, process termination, or registry alteration.
+
+---
+
+## 8. Component Implementation Matrix
+
+To maintain absolute architectural transparency, the implementation status of all related subsystems is explicitly categorized:
+
+| Component | Subsystem Location | Realization Status | Verified Baseline / Capabilities |
+|---|---|---|---|
+| **Local Threat DB** | `reports/threat_database.py` | **IMPLEMENTED** | SQLite WAL mode, relational schema (`threats`, `indicators`), CRUD queries, indexing (Day 4). |
+| **Evidence Contract** | `detection_engine/threat_intel_contract.py` | **IMPLEMENTED** | Strongly typed `ThreatIntelEvidence`, `ThreatIntelVerdict`, `IndicatorType`, signal conversion (Day 6). |
+| **Detection Decision Engine** | `detection_engine/decision_engine.py` | **IMPLEMENTED** | Multi-criteria evidence fusion, consensus evaluation, explainability tree generation (Day 6). |
+| **Risk Scoring Engine** | `detection_engine/risk_engine.py` | **IMPLEMENTED** | Dynamic weight re-normalization ($W_{\text{active}}$), mutual confirmation boost, 0–100 score (Day 6). |
+| **URL Scanner Pipeline** | `scanners/url_scanner.py` | **IMPLEMENTED** | 19-feature morphological extraction, RFC validation, session caching (Day 7). |
+| **PE Static Extractor** | `scanners/file_feature_extractor.py` | **IMPLEMENTED** | Read-only PE header inspection, 15 static PE features, SHA-256/MD5 hashing, byte entropy (Day 5). |
+| **Threat Lookup Wrapper** | `threat_intelligence/threat_lookup.py` | **IMPLEMENTED** | Coordinates local DB query and optional external query handoff. |
+| **VirusTotal Client** | `threat_intelligence/api_clients.py` | **PROTOTYPE** | Basic v3 client wrapper exists; rate-limiting, error guards, and validation scheduled for Day 11. |
+| **URLhaus Client** | `threat_intelligence/api_clients.py` | **PLANNED** | Not yet implemented in codebase; scheduled for future milestones. |
+| **AbuseIPDB Client** | `threat_intelligence/api_clients.py` | **PLANNED** | Not yet implemented in codebase; scheduled for future milestones. |
+| **Central Backend TI Sync** | `threat_intelligence/sync_manager.py` | **PROTOTYPE** | Client-server synchronization prototype; production state machine scheduled for Day 12. |
+
+---
+
+## 9. Conclusion & Next Steps
+
+This document serves as the governing architectural specification for Day 11 and beyond. When implementing online threat intelligence:
+1. Implement provider client adapters adhering to `BaseThreatClient`.
+2. Implement defensive response validation and rate-limit tracking.
+3. Map provider outputs to canonical `ThreatIntelEvidence` contracts.
+4. Verify integration with `RiskScoringEngine` without altering existing risk formulas.
+5. Validate offline fallback and bounded timeouts across automated unit test suites.
+

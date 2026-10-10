@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-10 10:51:57 UTC  
+**Generated:** 2026-10-10 10:53:01 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`6434480`)  
+**Current Git Branch:** `main` (`69cfd40`)  
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `6434480`
+- **HEAD Commit:** `69cfd40`
 - **Working Tree:** 1 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `69cfd40` | Aaryan Suman | 2026-10-10 | docs: add ACTIS threat intelligence integration reference |
 | `6434480` | Aaryan Suman | 2026-10-10 | test: add branding assets integrity and path resolution tests |
 | `cebffe7` | Aaryan Suman | 2026-10-10 | docs: document ACTIS branding asset conventions |
 | `9ac0aa0` | Aaryan Suman | 2026-10-10 | feat: integrate ACTIS logo into existing application interface |
@@ -140,7 +141,6 @@
 | `0646444` | Aaryan Suman | 2026-10-09 | docs: document ACTIS event-driven file protection workflow |
 | `acf96f4` | Aaryan Suman | 2026-10-09 | test: add event-to-analysis integration coverage |
 | `4ce21ab` | Aaryan Suman | 2026-10-09 | test: add event burst and queue stability coverage |
-| `55852db` | Aaryan Suman | 2026-10-09 | test: add filesystem event and debounce coverage |
 
 ## Known Issues
 
