@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-10-10 10:40:24 UTC  
+**Generated:** 2026-10-10 10:43:00 UTC  
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)  
 
 This document inventories all automated test files, test classes, and test functions
@@ -11,8 +11,8 @@ recorded only after confirmed execution.
 
 ## Test Suite Summary
 
-- **Total Test Files:** `21`
-- **Total Discovered Test Cases:** `230`
+- **Total Test Files:** `22`
+- **Total Discovered Test Cases:** `236`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -23,6 +23,7 @@ recorded only after confirmed execution.
 | Test File | Test Cases | Status |
 |---|---|---|
 | `tests/test_backend_api.py` | 4 tests | `PASSING` |
+| `tests/test_branding_assets.py` | 6 tests | `PASSING` |
 | `tests/test_config_loading.py` | 11 tests | `PASSING` |
 | `tests/test_config_validation.py` | 11 tests | `PASSING` |
 | `tests/test_detection_engine.py` | 14 tests | `PASSING` |
@@ -55,6 +56,16 @@ recorded only after confirmed execution.
 - `test_indicator_lookup()`
 - `test_unauthenticated_submission()`
 - `test_authenticated_submission_and_sync()`
+
+### `tests/test_branding_assets.py` (6 tests)
+
+**Standalone Test Functions:**
+- `test_branding_directory_and_assets_exist()`
+- `test_authoritative_master_logo_integrity()`
+- `test_derived_branding_variants_integrity()`
+- `test_readme_and_docs_image_references_resolve()`
+- `test_dashboard_branding_asset_resolution()`
+- `test_summary_table_of_contents_link_resolves()`
 
 ### `tests/test_config_loading.py` (11 tests)
 

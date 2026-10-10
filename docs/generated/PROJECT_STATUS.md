@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-10 10:40:24 UTC  
+**Generated:** 2026-10-10 10:43:00 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`9ac0aa0`)  
+**Current Git Branch:** `main` (`cebffe7`)  
 
 ---
 
@@ -117,20 +117,21 @@
 
 ## Test Status
 
-- **Total Test Files:** `21`
-- **Total Discovered Test Functions:** `230`
+- **Total Test Files:** `22`
+- **Total Discovered Test Functions:** `236`
 - **Coverage Areas:** Configuration validation, SQLite database schema & CRUD, Phishing/Malware model contracts, PE feature extraction, API backend.
 
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `9ac0aa0`
+- **HEAD Commit:** `cebffe7`
 - **Working Tree:** 1 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `cebffe7` | Aaryan Suman | 2026-10-10 | docs: document ACTIS branding asset conventions |
 | `9ac0aa0` | Aaryan Suman | 2026-10-10 | feat: integrate ACTIS logo into existing application interface |
 | `d2ed6fb` | Aaryan Suman | 2026-10-10 | docs: add official ACTIS logo to project README and documentation |
 | `7d6e374` | Aaryan Suman | 2026-10-10 | chore: add official ACTIS branding assets |
@@ -140,7 +141,6 @@
 | `4ce21ab` | Aaryan Suman | 2026-10-09 | test: add event burst and queue stability coverage |
 | `55852db` | Aaryan Suman | 2026-10-09 | test: add filesystem event and debounce coverage |
 | `38debd5` | Aaryan Suman | 2026-10-09 | feat: harden event processing against filesystem races |
-| `6f74ec2` | Aaryan Suman | 2026-10-09 | feat: connect changed files to ACTIS analysis pipeline |
 
 ## Known Issues
 
