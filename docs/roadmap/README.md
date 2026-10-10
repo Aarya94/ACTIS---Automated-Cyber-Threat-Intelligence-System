@@ -20,34 +20,26 @@ The roadmap is strictly structured into three distinct chronological phases:
 
 ```text
 ┌────────────────────────────────────────────────────────────────────────┐
-│ COMPLETED: DAYS 1 – 7 (Core Foundation & Ingestion Hardening)          │
+│ COMPLETED: DAYS 1 – 13 (Core Foundation & Central Intelligence Sync)   │
 │ • Architecture, Configuration, Logging, SQLite Database Schemas       │
 │ • Machine Learning Contracts & 19-Feature Phishing Random Forest Model │
 │ • Static Windows PE Feature Extraction & Safe Binary Parsing           │
 │ • Unified Detection Decision Engine & Multi-Criteria Risk Engine       │
 │ • URL & Message Scanner Hardening (Deduplication & Single Pipeline)   │
+│ • Device Scanner + Incremental Scan State Tracking (Junction Safe)    │
+│ • Resident Windows Protection Service Foundation & Worker Pool         │
+│ • Event-Driven Filesystem Monitoring (Watchdog + Debouncing Pipeline)  │
+│ • External Threat Intelligence (VirusTotal, URLhaus, AbuseIPDB)        │
+│ • Scheduled Feed Synchronization Service & Dashboard Controls          │
+│ • Central Threat Intelligence REST API (/api/v1) & Secure Feed Sync    │
 └───────────────────────────────────┬────────────────────────────────────┘
                                     │
                                     ▼
 ┌────────────────────────────────────────────────────────────────────────┐
-│ CURRENT BREAKTHROUGH: POST-DAY-7 ARCHITECTURE EVOLUTION                │
-│ • Shift to Windows-Oriented, Event-Driven Cyber Protection Platform    │
-│ • Separation of Event Ingest from Centralized Analysis Orchestrator   │
-│ • Specification of Resident Protection Service & Shared Threat Intel   │
-└───────────────────────────────────┬────────────────────────────────────┘
-                                    │
-                                    ▼
-┌────────────────────────────────────────────────────────────────────────┐
-│ NEXT: DAYS 8 – 16 (Targeted System Evolution)                          │
-│ • Day 8: Device Scanner + Incremental Scan State                       │
-│ • Day 9: Windows Protection Service Foundation                         │
-│ • Day 10: Event-Driven File Protection                                 │
-│ • Day 11: Online Threat Intelligence                                   │
-│ • Day 12: Central ACTIS Threat Intelligence                            │
-│ • Day 13: Dashboard + Notification Layer                               │
-│ • Day 14: AI Security Assistant                                        │
-│ • Day 15: Security Hardening + Broad Threat Coverage Testing           │
-│ • Day 16: Final Integration + Demo + Release                           │
+│ NEXT: DAYS 14 – 16 (Targeted System Evolution)                         │
+│ • Day 14: AI Security Assistant (Offline Grounded, Read-Only SQLite)   │
+│ • Day 15: Security Hardening & Adversarial Sample Robustness           │
+│ • Day 16: Final Integration, Release Verification, & Live Demo         │
 └────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -107,19 +99,27 @@ Detailed design is documented in [`docs/architecture/architecture-evolution.md`]
 
 
 
-### Day 12: Central ACTIS Threat Intelligence
-- **Goals:** Central ACTIS Threat Intelligence REST API, client-server synchronization protocol, federated sharing of verified indicators, and state machine transition enforcement (`CONFIRMED`, `SUSPICIOUS`, `CANDIDATE`).
+### Day 12: Scheduled Threat Intelligence Synchronization & Dashboard (`COMPLETED`)
+- **Delivered:** Periodic background sync scheduler (`threat_intelligence/sync/sync_service.py`), lock-safe synchronization lifecycle, feed adapters (`URLhausFeedAdapter`, `AbuseIPDBFeedAdapter`), idempotent database upserts, telemetry tracking, and Streamlit command center sync management integration (`dashboard/app.py`).
+- **Constraints Verified:** Local threat scanning remains 100% autonomous; synchronization errors do not impact local file or URL inspections.
+- **Components:** `threat_intelligence/sync/sync_service.py`, `threat_intelligence/sync/feed_adapter.py`, `threat_intelligence/sync/threat_database_sync.py`, `dashboard/app.py`, `tests/test_threat_intel_sync.py`.
+- **Baseline:** 303 automated unit and integration tests passing with 100% success rate.
 
-### Day 13: Dashboard + Notification Layer
-- **Goals:** Streamlit cybersecurity command center UI, detection visualization, scan history queries, telemetry charts, and native Windows desktop alert notifications.
+### Day 13: Central Threat Intelligence Service & Secure Synchronization (`COMPLETED`)
+- **Delivered:** Versioned central FastAPI service (`backend/api.py`), central SQLite persistence (`backend/database.py`), Pydantic v1 schemas with bounded pagination (`backend/models.py`), constant-time HMAC API key authentication, sliding-window rate limiting, anti-poisoning candidate workflow (`CANDIDATE` / `PENDING`), administrative review endpoint (`/api/v1/admin/indicators/{id}/review`), client feed adapter (`CentralACTISFeedAdapter`), and dashboard central service telemetry integration.
+- **Constraints Verified:** Local protection engine remains 100% autonomous and offline-functional. Central service is an intelligence exchange channel only; zero remote code execution, zero personal file transmission. Candidate indicators cannot pollute client detection databases without explicit admin review.
+- **Components:** `backend/api.py`, `backend/database.py`, `backend/models.py`, `threat_intelligence/sync/feed_adapter.py`, `dashboard/app.py`, `tests/test_central_ti_service.py`.
+- **Baseline:** 333 automated unit and integration tests passing with 100% success rate (30 new tests added).
 
-### Day 14: AI Security Assistant
+### Day 14: AI Security Assistant (`PLANNED`)
 - **Goals:** Offline-grounded natural language security assistant, plain-English detection explanations, security state summarization, operating strictly through controlled SQLite read interfaces with **NO unrestricted OS shell access**.
+- **Components:** `assistant/security_assistant.py`, `tests/test_security_assistant.py`.
 
-### Day 15: Security Hardening + Broad Threat Coverage Testing
+### Day 15: Security Hardening + Broad Threat Coverage Testing (`PLANNED`)
 - **Goals:** Security boundary verification, false positive rate auditing, malformed input stress-testing, adversarial sample evaluation, privacy review, and end-to-end reliability benchmarks.
+- **Components:** `tests/test_adversarial_security.py`, `tests/test_privacy_safeguards.py`.
 
-### Day 16: Final Integration + Demo + Release
+### Day 16: Final Integration + Demo + Release (`PLANNED`)
 - **Goals:** Complete system integration, reproducible deployment verification, documentation finalization, demonstration scripts, and milestone release preparation.
 
 ---

@@ -91,21 +91,26 @@ Introduced following the completion of Day 7, this architectural shift recognize
 - **Baseline:** 267 automated unit and integration tests passing with 100% success rate.
 
 
-### Day 12: Central ACTIS Threat Intelligence
-- **Goals:** Central ACTIS Threat Intelligence REST API, client-server synchronization protocol, federated sharing of verified indicators, and state machine transition enforcement (`CONFIRMED`, `SUSPICIOUS`, `CANDIDATE`).
-- **Components:** `backend/api.py`, `threat_intelligence/sync_manager.py`.
+### Day 12: Scheduled Threat Intelligence Synchronization & Dashboard (`COMPLETED`)
+- **Delivered:** Periodic background sync scheduler (`threat_intelligence/sync/sync_service.py`), lock-safe synchronization lifecycle, feed adapters (`URLhausFeedAdapter`, `AbuseIPDBFeedAdapter`), idempotent database upserts, telemetry tracking, and Streamlit command center sync management integration (`dashboard/app.py`).
+- **Constraints Verified:** Local threat scanning remains 100% autonomous; synchronization errors do not impact local file or URL inspections.
+- **Components:** `threat_intelligence/sync/sync_service.py`, `threat_intelligence/sync/feed_adapter.py`, `threat_intelligence/sync/threat_database_sync.py`, `dashboard/app.py`, `tests/test_threat_intel_sync.py`.
+- **Baseline:** 303 automated unit and integration tests passing with 100% success rate.
 
-### Day 13: Dashboard + Notification Layer
-- **Goals:** Streamlit cybersecurity command center UI, detection visualization, scan history queries, telemetry charts, and native Windows desktop alert notifications.
-- **Components:** `dashboard/app.py`, `notifications/notifier.py`.
+### Day 13: Central Threat Intelligence Service & Secure Synchronization (`COMPLETED`)
+- **Delivered:** Versioned central FastAPI service (`backend/api.py`), central SQLite persistence (`backend/database.py`), Pydantic v1 schemas with bounded pagination (`backend/models.py`), constant-time HMAC API key authentication, sliding-window rate limiting, anti-poisoning candidate workflow (`CANDIDATE` / `PENDING`), administrative review endpoint (`/api/v1/admin/indicators/{id}/review`), client feed adapter (`CentralACTISFeedAdapter`), and dashboard central service telemetry integration.
+- **Constraints Verified:** Local protection engine remains 100% autonomous and offline-functional. Central service is an intelligence exchange channel only; zero remote code execution, zero personal file transmission. Candidate indicators cannot pollute client detection databases without explicit admin review.
+- **Components:** `backend/api.py`, `backend/database.py`, `backend/models.py`, `threat_intelligence/sync/feed_adapter.py`, `dashboard/app.py`, `tests/test_central_ti_service.py`.
+- **Baseline:** 333 automated unit and integration tests passing with 100% success rate (30 new tests added).
 
-### Day 14: AI Security Assistant
+### Day 14: AI Security Assistant (`PLANNED`)
 - **Goals:** Offline-grounded natural language security assistant, plain-English detection explanations, security state summarization, operating strictly through controlled SQLite read interfaces with **NO unrestricted OS shell access**.
-- **Components:** `assistant/security_assistant.py`.
+- **Components:** `assistant/security_assistant.py`, `tests/test_security_assistant.py`.
 
-### Day 15: Security Hardening + Broad Threat Coverage Testing
+### Day 15: Security Hardening + Broad Threat Coverage Testing (`PLANNED`)
 - **Goals:** Security boundary verification, false positive rate auditing, malformed input stress-testing, adversarial sample evaluation, privacy review, and end-to-end reliability benchmarks.
 - **Components:** `tests/test_adversarial_security.py`, `tests/test_privacy_safeguards.py`.
 
-### Day 16: Final Integration + Demo + Release
+### Day 16: Final Integration + Demo + Release (`PLANNED`)
 - **Goals:** Complete system integration, reproducible deployment verification, documentation finalization, demonstration scripts, and milestone release preparation.
+
