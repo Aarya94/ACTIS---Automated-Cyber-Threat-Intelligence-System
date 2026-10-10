@@ -62,7 +62,13 @@ class ExternalApiConfig:
     urlhaus_api_key: str = ""
     openphish_api_key: str = ""
     phishtank_api_key: str = ""
-    request_timeout: float = 10.0
+    virustotal_enabled: bool = True
+    urlhaus_enabled: bool = True
+    abuseipdb_enabled: bool = True
+    request_timeout: float = 5.0
+    cache_ttl_seconds: int = 3600
+    max_retries: int = 1
+    rate_limit_vt_rpm: int = 4
 
     def __repr__(self) -> str:
         return (
@@ -72,7 +78,12 @@ class ExternalApiConfig:
             f"urlhaus_api_key={_redact_secret(self.urlhaus_api_key)}, "
             f"openphish_api_key={_redact_secret(self.openphish_api_key)}, "
             f"phishtank_api_key={_redact_secret(self.phishtank_api_key)}, "
-            f"request_timeout={self.request_timeout})"
+            f"virustotal_enabled={self.virustotal_enabled}, "
+            f"urlhaus_enabled={self.urlhaus_enabled}, "
+            f"abuseipdb_enabled={self.abuseipdb_enabled}, "
+            f"request_timeout={self.request_timeout}, "
+            f"cache_ttl_seconds={self.cache_ttl_seconds}, "
+            f"max_retries={self.max_retries})"
         )
 
     def to_dict(self, mask_secrets: bool = True) -> Dict[str, Any]:
@@ -82,7 +93,13 @@ class ExternalApiConfig:
             "urlhaus_api_key": _redact_secret(self.urlhaus_api_key) if mask_secrets else self.urlhaus_api_key,
             "openphish_api_key": _redact_secret(self.openphish_api_key) if mask_secrets else self.openphish_api_key,
             "phishtank_api_key": _redact_secret(self.phishtank_api_key) if mask_secrets else self.phishtank_api_key,
+            "virustotal_enabled": self.virustotal_enabled,
+            "urlhaus_enabled": self.urlhaus_enabled,
+            "abuseipdb_enabled": self.abuseipdb_enabled,
             "request_timeout": self.request_timeout,
+            "cache_ttl_seconds": self.cache_ttl_seconds,
+            "max_retries": self.max_retries,
+            "rate_limit_vt_rpm": self.rate_limit_vt_rpm,
         }
 
 

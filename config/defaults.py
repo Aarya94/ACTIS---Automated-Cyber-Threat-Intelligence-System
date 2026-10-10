@@ -66,7 +66,10 @@ DEFAULT_DB_TIMEOUT_SECONDS = 30.0
 DEFAULT_ENABLE_WAL = True
 
 # External Threat Intel API Defaults
-DEFAULT_API_TIMEOUT = 10.0
+DEFAULT_API_TIMEOUT = 5.0
+DEFAULT_TI_CACHE_TTL_SECONDS = 3600
+DEFAULT_TI_MAX_RETRIES = 1
+DEFAULT_VT_RATE_LIMIT_RPM = 4
 
 
 # Protection Service Defaults
@@ -118,7 +121,13 @@ def create_default_config(environment: str = DEFAULT_ENVIRONMENT) -> AppConfig:
         urlhaus_api_key="",
         openphish_api_key="",
         phishtank_api_key="",
+        virustotal_enabled=True,
+        urlhaus_enabled=True,
+        abuseipdb_enabled=True,
         request_timeout=DEFAULT_API_TIMEOUT,
+        cache_ttl_seconds=DEFAULT_TI_CACHE_TTL_SECONDS,
+        max_retries=DEFAULT_TI_MAX_RETRIES,
+        rate_limit_vt_rpm=DEFAULT_VT_RATE_LIMIT_RPM,
     )
 
     risk_config = RiskEngineConfig(

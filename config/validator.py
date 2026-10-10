@@ -139,6 +139,18 @@ def validate_api_settings(api_config: ExternalApiConfig) -> List[str]:
         errors.append(
             f"request_timeout cannot exceed 120s (got {api_config.request_timeout})"
         )
+    if api_config.cache_ttl_seconds <= 0:
+        errors.append(
+            f"cache_ttl_seconds must be > 0 (got {api_config.cache_ttl_seconds})"
+        )
+    if api_config.max_retries < 0 or api_config.max_retries > 5:
+        errors.append(
+            f"max_retries must be between 0 and 5 (got {api_config.max_retries})"
+        )
+    if api_config.rate_limit_vt_rpm <= 0:
+        errors.append(
+            f"rate_limit_vt_rpm must be > 0 (got {api_config.rate_limit_vt_rpm})"
+        )
     return errors
 
 

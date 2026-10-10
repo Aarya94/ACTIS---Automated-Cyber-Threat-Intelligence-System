@@ -139,7 +139,13 @@ def load_app_config(
         urlhaus_api_key=get_str("URLHAUS_API_KEY", ""),
         openphish_api_key=get_str("OPENPHISH_API_KEY", ""),
         phishtank_api_key=get_str("PHISHTANK_API_KEY", ""),
-        request_timeout=get_float("ACTIS_REQUEST_TIMEOUT", DEFAULT_API_TIMEOUT),
+        virustotal_enabled=get_bool("VIRUSTOTAL_ENABLED", True),
+        urlhaus_enabled=get_bool("URLHAUS_ENABLED", True),
+        abuseipdb_enabled=get_bool("ABUSEIPDB_ENABLED", True),
+        request_timeout=get_float_bounded("ACTIS_REQUEST_TIMEOUT", DEFAULT_API_TIMEOUT, 1.0, 30.0),
+        cache_ttl_seconds=get_int_bounded("ACTIS_TI_CACHE_TTL", 3600, 60, 86400 * 7),
+        max_retries=get_int_bounded("ACTIS_TI_MAX_RETRIES", 1, 0, 5),
+        rate_limit_vt_rpm=get_int_bounded("ACTIS_VT_RATE_LIMIT_RPM", 4, 1, 60),
     )
 
     risk_config = RiskEngineConfig(
@@ -225,6 +231,13 @@ MALWARE_METADATA_PATH = config.models.malware_metadata_path
 VIRUSTOTAL_API_KEY = config.apis.virustotal_api_key
 ABUSEIPDB_API_KEY = config.apis.abuseipdb_api_key
 URLHAUS_API_KEY = config.apis.urlhaus_api_key
+VIRUSTOTAL_ENABLED = config.apis.virustotal_enabled
+URLHAUS_ENABLED = config.apis.urlhaus_enabled
+ABUSEIPDB_ENABLED = config.apis.abuseipdb_enabled
+TI_REQUEST_TIMEOUT = config.apis.request_timeout
+TI_CACHE_TTL_SECONDS = config.apis.cache_ttl_seconds
+TI_MAX_RETRIES = config.apis.max_retries
+VT_RATE_LIMIT_RPM = config.apis.rate_limit_vt_rpm
 
 ACTIS_BACKEND_URL = config.server.backend_url
 ACTIS_CLIENT_API_KEY = config.server.client_api_key
