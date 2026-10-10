@@ -39,9 +39,24 @@ The following actions are **STRICTLY FORBIDDEN** across all components of ACTIS.
 7. **MUST NOT Secretly Collect Personal Data:** ACTIS must NEVER harvest browsing history, browser cookies, saved credentials, contact lists, or personal documents.
 8. **MUST NOT Upload Complete Personal Files:** ACTIS must NEVER upload whole user binaries, documents, photos, or data payloads to external servers or APIs. Only canonical cryptographic hashes (SHA-256/MD5), public domains, or URLs may be queried externally.
 9. **MUST NOT Grant Unrestricted Shell Execution to AI Assistant:** The AI Security Assistant must NEVER possess unrestricted access to the Windows command prompt (`cmd.exe`), PowerShell, or arbitrary system subprocesses. The assistant is strictly read-only and queries local SQLite detection records.
+10. **MUST NOT Introduce Remote Administration or Command Execution:** The Central Threat Intelligence API is strictly an intelligence exchange channel; it must NEVER implement remote shell execution, arbitrary payload downloads, remote file deletion, or endpoint takeover.
 
 ---
 
-## 3. Enforcement & Governance Protocol
+## 3. Central Threat Intelligence Service Security Boundaries
+
+The Central Threat Intelligence REST API service (`backend/`) enforces strict defensive operational constraints:
+
+1. **Mandatory Authentication & Constant-Time Verification:** All protected operations require API keys verified using constant-time string comparison (`hmac.compare_digest`) to prevent timing attacks.
+2. **Granular Role-Based Authorization:** Operations enforce distinct permissions (`read`, `contribute`, `admin`). Endpoints reject unauthorized scopes with HTTP 403 Forbidden.
+3. **Anti-Poisoning Candidate State Machine:** Submissions via `/api/v1/contributions` strictly enter as `status="CANDIDATE"` with `review_status="PENDING"`. Clients cannot self-promote indicators to `CONFIRMED`. Only authorized operators with the `admin` role may transition records to `CONFIRMED` (`APPROVED`).
+4. **RFC 1918 Private & Loopback IP Shielding:** Ingestion and query endpoints enforce `is_safe_public_ip()`, rejecting RFC 1918 (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16), loopback (127.0.0.0/8), and link-local ranges with HTTP 422 to prevent leaking private network topologies.
+5. **Sliding-Window Rate Limiting:** Enforces client-specific requests-per-minute (RPM) limits (60–300 RPM default) using an in-memory sliding window, rejecting bursts with HTTP 429 Too Many Requests.
+6. **Bounded Request Payloads & Pagination:** Enforces maximum page size (200 records default) and strict payload size limits to protect against memory exhaustion.
+7. **Offline Endpoint Autonomy:** Local file scanning, URL inspection, and background Windows protection run 100% autonomously without external or central connectivity dependencies. Outages or latency on the central API never degrade local threat protection.
+
+---
+
+## 4. Enforcement & Governance Protocol
 
 Any Pull Request, commit, or code change that violates any of the above prohibitions must be **immediately rejected**. AI coding agents receiving requests to build automatic file deleters, process killers, shell execution hooks, or live malware runners must decline the task, citing this document as the governing boundary.

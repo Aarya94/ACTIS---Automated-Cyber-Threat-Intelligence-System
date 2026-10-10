@@ -99,5 +99,47 @@ To prevent threat intelligence contamination and protect against poisoning, ACTI
 ## 3. Central Synchronization & Anti-Poisoning Safeguards
 
 1. **Unverified Predictions Are Never Auto-Promoted:** An ML prediction, no matter how confident (e.g., 99.8% probability), remains categorized as `CANDIDATE` or `SUSPICIOUS`. It **NEVER** transitions automatically to `CONFIRMED`.
-2. **Sync Client Push Protocol:** Clients push only indicators that have met strict verification criteria. Unverified raw telemetry remains local to the client.
-3. **Zero Payload Transmission:** Threat intelligence synchronization operates exclusively over canonical indicators (SHA-256 hashes, domain names, normalized URLs, IP addresses). Full file payloads are strictly forbidden from transmission.
+2. **Candidate Anti-Poisoning Enforcement:** Client contributions via `/api/v1/contributions` are strictly tagged as `CANDIDATE` with `review_status="PENDING"`. Contributing clients cannot self-promote indicators to `CONFIRMED`.
+3. **Administrative Verification Gate:** Only authenticated operators possessing the `admin` role may call `/api/v1/admin/indicators/{id}/review` to promote candidate records to `CONFIRMED` (`APPROVED`) or dismiss them as `FALSE_POSITIVE` (`REJECTED`).
+4. **RFC 1918 Private IP Shielding:** All submission and query pathways enforce `is_safe_public_ip()` boundary validation, rejecting private, loopback, or reserved IP ranges with HTTP 422 to prevent internal enterprise network topology leakage.
+5. **Zero Payload Transmission:** Threat intelligence synchronization operates exclusively over canonical indicators (SHA-256 hashes, domain names, normalized URLs, public IP addresses). Full file binaries, user documents, and private messages are strictly forbidden from transmission.
+
+---
+
+## 4. Central ACTIS Threat Intelligence Service & Client Synchronization
+
+The Day 13 Central Threat Intelligence service (`backend/`) extends the platform with a hardened, versioned REST API enabling fleet synchronization:
+
+```text
+External Providers (URLhaus, AbuseIPDB)
+                   │
+                   ▼
+       Central ACTIS Backend API (/api/v1)
+        [FastAPI + HMAC Auth + SQLite Central DB]
+                   │
+         ┌─────────┴─────────┐
+         ▼                   ▲
+   POST /api/v1/sync/pull    │ POST /api/v1/contributions
+   (Batch indicator pull)    │ (Candidate submission only)
+         │                   │
+         ▼                   │
+    CentralACTISFeedAdapter  │
+         │                   │
+         ▼                   │
+  Local Threat Database (SQLite) ── (Contribute verified local alerts)
+         │
+         ▼
+  ThreatLookup / Detection Pipeline
+```
+
+### Versioned Endpoints (`/api/v1`)
+- `GET /api/v1/health`: Public service telemetry, database status, verified indicator count, and uptime.
+- `GET /api/v1/client/info`: Client identity inspection, assigned roles (`read`, `contribute`, `admin`), and rate limits.
+- `GET /api/v1/indicators/{indicator_type}/{indicator_value}`: Point lookup returning indicator metadata, provenance, and review status.
+- `GET /api/v1/indicators`: Bounded pagination query with filters (`status`, `threat_type`, `min_confidence`).
+- `POST /api/v1/sync/pull`: Incremental bulk indicator pull for client fleet updates.
+- `POST /api/v1/contributions`: Client candidate indicator submission (anti-poisoning enforced: queued as `CANDIDATE`).
+- `POST /api/v1/admin/indicators/{id}/review`: Administrative review promoting/rejecting candidate records (`APPROVE`, `REJECT`).
+
+### Client Adapter & Offline Resilience
+The client-side `CentralACTISFeedAdapter` (implementing `BaseFeedAdapter`) fetches verified central intelligence and idempotently persists records into the local SQLite database via `upsert_feed_records`. Central service outages or network failures are completely isolated: local scanning, file monitoring, and risk scoring continue running 100% autonomously.
