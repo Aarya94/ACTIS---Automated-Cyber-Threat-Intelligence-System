@@ -56,25 +56,76 @@ class ThreatIntelEvidence:
             object.__setattr__(self, "confidence", clamped_conf)
 
     @classmethod
-    def unknown(cls, indicator: str, indicator_type: IndicatorType = IndicatorType.GENERIC) -> "ThreatIntelEvidence":
+    def unknown(cls, indicator: str, indicator_type: IndicatorType = IndicatorType.GENERIC, provider: str = "LOCAL_DATABASE") -> "ThreatIntelEvidence":
         return cls(
             indicator=indicator,
             indicator_type=indicator_type,
             verdict=ThreatIntelVerdict.UNKNOWN,
             confidence=0.0,
-            provider="LOCAL_DATABASE"
+            provider=provider
         )
 
     @classmethod
-    def unavailable(cls, indicator: str, reason: str = "TI service unavailable", indicator_type: IndicatorType = IndicatorType.GENERIC) -> "ThreatIntelEvidence":
+    def unavailable(cls, indicator: str, reason: str = "TI service unavailable", indicator_type: IndicatorType = IndicatorType.GENERIC, provider: str = "LOCAL_DATABASE") -> "ThreatIntelEvidence":
         return cls(
             indicator=indicator,
             indicator_type=indicator_type,
             verdict=ThreatIntelVerdict.UNAVAILABLE,
             confidence=0.0,
-            provider="LOCAL_DATABASE",
+            provider=provider,
             raw_data={"reason": reason}
         )
+
+    @classmethod
+    def from_external_intel(
+        cls,
+        intel: Optional[Dict[str, Any]],
+        indicator: str,
+        indicator_type: IndicatorType = IndicatorType.GENERIC,
+        provider: str = "EXTERNAL_PROVIDER"
+    ) -> "ThreatIntelEvidence":
+        """
+        Translates normalized external provider results dictionary into typed ThreatIntelEvidence.
+        Preserves provider provenance, detection counts, confidence, and raw provider payloads.
+        """
+        if not intel:
+            return cls.unavailable(indicator, reason="No external response received", indicator_type=indicator_type, provider=provider)
+
+        src = intel.get("source") or provider
+        if not intel.get("available", True):
+            reason = intel.get("reason") or "External service unavailable"
+            return cls.unavailable(indicator, reason=reason, indicator_type=indicator_type, provider=src)
+
+        is_mal = bool(intel.get("malicious", False))
+        positives = int(intel.get("positives", 0))
+        total = int(intel.get("total", 0))
+        conf = float(intel.get("confidence", 0.0))
+
+        if is_mal:
+            confirmed = positives >= 3 or conf >= 0.20
+            threat_type = intel.get("threat_type") or ("Malware" if indicator_type == IndicatorType.SHA256 else "Phishing / Malicious")
+            return cls(
+                indicator=indicator,
+                indicator_type=indicator_type,
+                verdict=ThreatIntelVerdict.MALICIOUS,
+                confidence=max(0.4, conf),
+                threat_type=threat_type,
+                provider=src,
+                is_confirmed_threat=confirmed,
+                raw_data=intel
+            )
+        elif total > 0 and positives == 0:
+            return cls(
+                indicator=indicator,
+                indicator_type=indicator_type,
+                verdict=ThreatIntelVerdict.CLEAN,
+                confidence=round(min(1.0, max(0.5, total / 70.0)), 2),
+                provider=src,
+                is_whitelisted=False,
+                raw_data=intel
+            )
+        else:
+            return cls.unknown(indicator, indicator_type=indicator_type, provider=src)
 
     @classmethod
     def from_local_intel(cls, intel: Optional[Dict[str, Any]], indicator: str, indicator_type: IndicatorType = IndicatorType.GENERIC) -> "ThreatIntelEvidence":
