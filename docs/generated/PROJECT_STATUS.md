@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-10 10:43:00 UTC  
+**Generated:** 2026-10-10 10:51:57 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`cebffe7`)  
+**Current Git Branch:** `main` (`6434480`)  
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `cebffe7`
+- **HEAD Commit:** `6434480`
 - **Working Tree:** 1 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `6434480` | Aaryan Suman | 2026-10-10 | test: add branding assets integrity and path resolution tests |
 | `cebffe7` | Aaryan Suman | 2026-10-10 | docs: document ACTIS branding asset conventions |
 | `9ac0aa0` | Aaryan Suman | 2026-10-10 | feat: integrate ACTIS logo into existing application interface |
 | `d2ed6fb` | Aaryan Suman | 2026-10-10 | docs: add official ACTIS logo to project README and documentation |
@@ -140,7 +141,6 @@
 | `acf96f4` | Aaryan Suman | 2026-10-09 | test: add event-to-analysis integration coverage |
 | `4ce21ab` | Aaryan Suman | 2026-10-09 | test: add event burst and queue stability coverage |
 | `55852db` | Aaryan Suman | 2026-10-09 | test: add filesystem event and debounce coverage |
-| `38debd5` | Aaryan Suman | 2026-10-09 | feat: harden event processing against filesystem races |
 
 ## Known Issues
 
