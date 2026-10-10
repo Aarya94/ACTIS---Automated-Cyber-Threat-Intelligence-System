@@ -99,21 +99,12 @@ Detailed design is documented in [`docs/architecture/architecture-evolution.md`]
 - **Components:** `scanners/file_watcher.py`, `service/file_normalizer.py`, `service/file_filter.py`, `service/debouncer.py`, `service/file_pipeline.py`, `tests/test_file_protection_events.py`, `tests/test_file_protection_burst.py`, `tests/test_file_protection_integration.py`.
 - **Baseline:** 229 automated unit and integration tests passing with 100% success rate.
 
-### Day 11: Online Threat Intelligence (`PLANNED`)
-- **Architectural Reference:** [`docs/architecture/reference/actis-threat-intelligence-integration.md`](../architecture/reference/actis-threat-intelligence-integration.md) (Authoritative design specification for local-first lookups, external provider adapters, response validation, normalized evidence signals, and risk engine integration).
-- **Milestone Scope:**
-  - Provider adapter abstraction (`BaseThreatClient`)
-  - Selected external provider integrations (VirusTotal v3, planned URLhaus & AbuseIPDB)
-  - Indicator validation and canonical normalization (SHA-256 hashes, URLs, domains, public IPs)
-  - Local-first lookup sequence against SQLite indicators before remote querying
-  - External lookup dispatch when appropriate and policy permits
-  - Defensive response validation (schema checking, HTTP status handling, outage resilience)
-  - Strict bounded timeouts (≤ 5s) and rate-limit controls
-  - Evidence normalization into canonical `ThreatIntelEvidence` / `EvidenceSignal` containers
-  - Source attribution and provenance tracking (distinguishing raw provider counts from ACTIS risk)
-  - Detection Decision Engine and Risk Engine integration preserving dynamic weight normalization
-  - Privacy safeguards (credential isolation, private IP shielding, zero full-file uploads)
-  - Comprehensive unit/integration test suites and documentation verification
+### Day 11: Online Threat Intelligence (`COMPLETED`)
+- **Delivered:** Working external threat-intelligence provider architecture, `BaseThreatClient` abstraction, comprehensive client adapters for VirusTotal v3, URLhaus API v1, and AbuseIPDB API v2 with sliding-window rate limiting and bounded HTTP timeouts. Strict canonical indicator validation (`indicator_validator.py`) with RFC 1918 private IP shielding and URL fragment stripping. Thread-safe in-memory TTL caching (`threat_cache.py`) that strictly avoids caching transient outages or timeouts. Unified 9-stage local-first threat lookup (`threat_lookup.py`) with 8 explicit outcome states (`FOUND_MALICIOUS`, `FOUND_SUSPICIOUS`, `FOUND_BENIGN`, `NOT_FOUND`, `PROVIDER_UNAVAILABLE`, `REQUEST_TIMEOUT`, `INVALID_RESPONSE`, `QUERY_SKIPPED`) and multi-provider conflict resolution. End-to-end integration with the Detection Decision Engine and Risk Engine without altering existing scoring contracts.
+- **Constraints Verified:** Zero full-file uploads, API keys masked in logs and representations, no external network dependencies during unit tests (100% mocked transport). Day 12 central intelligence sharing was NOT implemented.
+- **Components:** `threat_intelligence/provider_base.py`, `threat_intelligence/api_clients.py`, `threat_intelligence/indicator_validator.py`, `threat_intelligence/threat_cache.py`, `threat_intelligence/threat_lookup.py`, `detection_engine/threat_intel_contract.py`, `tests/test_threat_providers.py`, `tests/test_threat_intel_pipeline.py`.
+- **Baseline:** 267 automated unit and integration tests passing with 100% success rate.
+
 
 
 ### Day 12: Central ACTIS Threat Intelligence

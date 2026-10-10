@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-10 11:24:56 UTC  
+**Generated:** 2026-10-10 11:27:03 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`d712aa3`)  
+**Current Git Branch:** `main` (`788ea97`)  
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `d712aa3`
-- **Working Tree:** 5 untracked/unstaged changes
+- **HEAD Commit:** `788ea97`
+- **Working Tree:** 3 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `788ea97` | Aaryan Suman | 2026-10-10 | test: cover detection pipeline and threat intelligence integration |
 | `d712aa3` | Aaryan Suman | 2026-10-10 | test: cover provider adapter response handling |
 | `2d38f44` | Aaryan Suman | 2026-10-10 | feat: add bounded provider failure and offline fallback handling |
 | `9f77010` | Aaryan Suman | 2026-10-10 | feat: integrate normalized evidence with detection pipeline |
@@ -140,7 +141,6 @@
 | `632a3fe` | Aaryan Suman | 2026-10-10 | feat: add indicator validation for external lookups |
 | `6b4e1fb` | Aaryan Suman | 2026-10-10 | feat: add provider configuration and timeout handling |
 | `0effbb3` | Aaryan Suman | 2026-10-10 | feat: define external threat intelligence provider contract |
-| `21cf8e0` | Aaryan Suman | 2026-10-10 | docs: validate and record architecture reference |
 
 ## Known Issues
 

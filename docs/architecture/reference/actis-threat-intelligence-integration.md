@@ -1,8 +1,8 @@
 # ACTIS Threat Intelligence Integration Architecture
 
 **Document Type:** Architectural Reference & Integration Specification  
-**Document Status:** Architectural Reference / Proposed Integration Design  
-**Target Milestone:** Preparation for Day 11 (Online Threat Intelligence)  
+**Document Status:** Authoritative Architectural Specification & Verified Day 11 Implementation  
+**Target Milestone:** Milestone Day 11 (Online Threat Intelligence Integration)  
 **Author:** Aaryan Suman <aaryansuman17@gmail.com>  
 
 ---
@@ -14,7 +14,8 @@ This reference document establishes the authoritative architectural blueprint fo
 ACTIS operates under a strictly **read-only, local-first, privacy-conscious** model. Threat intelligence is conceived not as an independent, ad-hoc query script, but as **shared analytical infrastructure** that feeds standardized, typed evidence signals into the existing ACTIS Detection Engine and Risk Engine.
 
 > [!IMPORTANT]
-> **Status Disclosure:** This document represents the approved target architecture and design specification for threat intelligence integration. It details how external providers (*VirusTotal*, *URLhaus*, *AbuseIPDB*) and local databases interact with the existing analysis orchestrator, ML models, and heuristic rule engines. The presence of a provider or component in these diagrams does **not** signify that it is currently fully operational in code. Implementation statuses are explicitly itemized in the repository component inventory.
+> **Implementation Status Disclosure:** As of Milestone Day 11, the threat intelligence provider abstraction (`BaseThreatClient`), canonical indicator validator (`indicator_validator.py`), thread-safe TTL cache (`threat_cache.py`), multi-provider adapters (*VirusTotal v3*, *URLhaus*, *AbuseIPDB* in `api_clients.py`), local-first lookup pipeline (`threat_lookup.py`), and unified detection/risk engine integration are **FULLY IMPLEMENTED AND VERIFIED WITH AUTOMATED MOCKED TEST SUITES**. Live external API calls require user-provided credentials in `.env` and are strictly opt-in.
+
 
 ---
 
@@ -254,16 +255,20 @@ To maintain absolute architectural transparency, the implementation status of al
 | Component | Subsystem Location | Realization Status | Verified Baseline / Capabilities |
 |---|---|---|---|
 | **Local Threat DB** | `reports/threat_database.py` | **IMPLEMENTED** | SQLite WAL mode, relational schema (`threats`, `indicators`), CRUD queries, indexing (Day 4). |
-| **Evidence Contract** | `detection_engine/threat_intel_contract.py` | **IMPLEMENTED** | Strongly typed `ThreatIntelEvidence`, `ThreatIntelVerdict`, `IndicatorType`, signal conversion (Day 6). |
+| **Evidence Contract** | `detection_engine/threat_intel_contract.py` | **IMPLEMENTED** | Strongly typed `ThreatIntelEvidence`, `ThreatIntelVerdict`, `IndicatorType`, conflict resolution, signal conversion (Day 6, updated Day 11). |
 | **Detection Decision Engine** | `detection_engine/decision_engine.py` | **IMPLEMENTED** | Multi-criteria evidence fusion, consensus evaluation, explainability tree generation (Day 6). |
-| **Risk Scoring Engine** | `detection_engine/risk_engine.py` | **IMPLEMENTED** | Dynamic weight re-normalization ($W_{\text{active}}$), mutual confirmation boost, 0–100 score (Day 6). |
+| **Risk Scoring Engine** | `detection_engine/risk_engine.py` | **IMPLEMENTED** | Dynamic weight re-normalization ($W_{\text{active}}$), external TI integration, mutual confirmation boost, 0–100 score (Day 6, verified Day 11). |
 | **URL Scanner Pipeline** | `scanners/url_scanner.py` | **IMPLEMENTED** | 19-feature morphological extraction, RFC validation, session caching (Day 7). |
 | **PE Static Extractor** | `scanners/file_feature_extractor.py` | **IMPLEMENTED** | Read-only PE header inspection, 15 static PE features, SHA-256/MD5 hashing, byte entropy (Day 5). |
-| **Threat Lookup Wrapper** | `threat_intelligence/threat_lookup.py` | **IMPLEMENTED** | Coordinates local DB query and optional external query handoff. |
-| **VirusTotal Client** | `threat_intelligence/api_clients.py` | **PROTOTYPE** | Basic v3 client wrapper exists; rate-limiting, error guards, and validation scheduled for Day 11. |
-| **URLhaus Client** | `threat_intelligence/api_clients.py` | **PLANNED** | Not yet implemented in codebase; scheduled for future milestones. |
-| **AbuseIPDB Client** | `threat_intelligence/api_clients.py` | **PLANNED** | Not yet implemented in codebase; scheduled for future milestones. |
+| **Provider Abstraction** | `threat_intelligence/provider_base.py` | **IMPLEMENTED** | `BaseThreatClient` abstract base class, timeout configuration, capability reporting, secret-masked `__repr__` (Day 11). |
+| **Indicator Validator** | `threat_intelligence/indicator_validator.py` | **IMPLEMENTED** | Strict validation & normalization for URLs, domains, SHA-256 hashes, IPs; RFC 1918 private IP shielding (Day 11). |
+| **Threat Intelligence Cache** | `threat_intelligence/threat_cache.py` | **IMPLEMENTED** | Thread-safe in-memory cache, configurable TTL, provider-aware keys, rejects transient failure caching (Day 11). |
+| **Threat Lookup Pipeline** | `threat_intelligence/threat_lookup.py` | **IMPLEMENTED** | 9-stage local-first lookup sequence, 8 explicit outcome states, multi-provider aggregation and conflict resolution (Day 11). |
+| **VirusTotal Client** | `threat_intelligence/api_clients.py` | **IMPLEMENTED & VERIFIED WITH MOCKS** | VirusTotal v3 REST API adapter, SHA-256, URL, domain lookups, sliding-window rate limiting, bounded timeouts, schema validation (Day 11). |
+| **URLhaus Client** | `threat_intelligence/api_clients.py` | **IMPLEMENTED & VERIFIED WITH MOCKS** | URLhaus API v1 adapter, malicious URL and payload SHA-256 lookups, timeout handling, offline fallback (Day 11). |
+| **AbuseIPDB Client** | `threat_intelligence/api_clients.py` | **IMPLEMENTED & VERIFIED WITH MOCKS** | AbuseIPDB API v2 adapter, public IPv4/IPv6 reputation check, private IP shielding, confidence scoring (Day 11). |
 | **Central Backend TI Sync** | `threat_intelligence/sync_manager.py` | **PROTOTYPE** | Client-server synchronization prototype; production state machine scheduled for Day 12. |
+
 
 ---
 
