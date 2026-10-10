@@ -19,6 +19,7 @@
 ## ⚙️ Configuration & Contracts
 * [Configuration Guide](configuration.md)
 * [Database & ML Contracts](contracts.md)
+* [Official Branding & Assets](../assets/branding/README.md)
 
 ## 📅 Development Roadmap & Evolution
 * [Roadmap Overview & Post-Day-7 Evolution](roadmap/README.md)

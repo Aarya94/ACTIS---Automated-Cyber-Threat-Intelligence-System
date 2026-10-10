@@ -1,5 +1,9 @@
 # ACTIS Development Roadmap & Post-Day-7 Evolution
 
+<p align="center">
+  <img src="../../assets/branding/actis-logo-original.png" alt="ACTIS — Automated Cyber Threat Intelligence System logo" width="300" />
+</p>
+
 **Authoritative Roadmap Specification**  
 **Milestone:** Post-Day-7 Architectural Evolution  
 **Status:** Approved Roadmap Direction  

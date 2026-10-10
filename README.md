@@ -1,5 +1,9 @@
 # ACTIS — Automated Cyber Threat Intelligence System
 
+<p align="center">
+  <img src="assets/branding/actis-logo-original.png" alt="ACTIS — Automated Cyber Threat Intelligence System logo" width="380" />
+</p>
+
 > **Development Status:** ACTIS is currently a development-stage endpoint cybersecurity and threat intelligence platform for Windows.
 
 ACTIS operates under a strictly **read-only, non-destructive, privacy-first** architecture. Rather than operating as an isolated collection of ad-hoc scanners, ACTIS is evolving into a **Windows-oriented, event-driven cyber protection platform** combining lightweight resident event handling, centralized analysis orchestration, multi-layered threat intelligence, and explainable multi-criteria detection.
@@ -133,6 +137,7 @@ ACTIS operates under strict defensive boundaries:
 
 ```text
 ACTIS/
+├── assets/                   # Official branding assets (logos, icons, favicons)
 ├── config/                   # Type-safe configuration, environment loader, logging
 ├── data/                     # Local SQLite databases, training datasets
 ├── models/                   # Serialized ML model artifacts (*.pkl) and JSON metadata

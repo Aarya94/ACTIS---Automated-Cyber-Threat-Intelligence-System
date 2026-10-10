@@ -19,6 +19,7 @@
 ## ⚙️ Configuration & Contracts
 * [Configuration Guide](docs/configuration.md)
 * [Database & ML Contracts](docs/contracts.md)
+* [Official Branding & Assets](assets/branding/README.md)
 * [Windows PE Malware Dataset](docs/ml_malware_dataset.md)
 * [Safe Static PE Analysis](docs/static_pe_analysis.md)
 * [Detection Engine & Decision Fusion](docs/detection_engine_workflow.md)

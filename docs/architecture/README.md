@@ -1,5 +1,9 @@
 # ACTIS Architecture Documentation — Source of Truth
 
+<p align="center">
+  <img src="../../assets/branding/actis-logo-original.png" alt="ACTIS — Automated Cyber Threat Intelligence System logo" width="300" />
+</p>
+
 **Authoritative Documentation Root**  
 **Milestone:** Post-Day-7 Architectural Evolution  
 **Status:** Permanent Source of Truth  
