@@ -46,10 +46,16 @@ from notifications.notifier import notifier
 from threat_intelligence.sync_manager import sync_manager
 from assistant.security_assistant import security_assistant
 
+# Branding Assets
+ASSETS_DIR = BASE_DIR / "assets" / "branding"
+LOGO_PATH = ASSETS_DIR / "actis-logo-original.png"
+LOGO_MARK_PATH = ASSETS_DIR / "actis-logo-mark.png"
+FAVICON_PATH = ASSETS_DIR / "actis-favicon.png"
+
 # Streamlit Page Setup
 st.set_page_config(
     page_title="ACTIS — Cyber Threat Intelligence",
-    page_icon="🛡",
+    page_icon=str(FAVICON_PATH) if FAVICON_PATH.exists() else "🛡",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -141,7 +147,10 @@ st.markdown("""
 
 # Sidebar Navigation
 with st.sidebar:
-    st.markdown("### 🛡 ACTIS Command Center")
+    if LOGO_PATH.exists():
+        st.image(str(LOGO_PATH), use_container_width=True)
+    else:
+        st.markdown("### 🛡 ACTIS Command Center")
     st.caption("AI-Assisted Endpoint Threat Intelligence")
 
     unread_count = len(notifier.get_unread_alerts())
