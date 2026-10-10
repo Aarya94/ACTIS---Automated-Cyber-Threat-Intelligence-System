@@ -175,6 +175,7 @@ External provider queries or optional extension failures must never degrade loca
 | **Rule & Heuristics Engine** | Core | Deterministic pattern matching, entropy inspection, suspicious API calls | **Verified & Implemented** |
 | **Static PE Analyzer** | Core | Header validation, section hashing, import table parsing, entropy calculation | **Verified & Implemented** |
 | **Local Threat Intel (TI) DB** | Core | SQLite-backed indicator repository (`threat_intel.db`) with cache lookups | **Verified & Implemented** |
+| **Scheduled Threat Intel Sync** | Core Subsystem | URLhaus & AbuseIPDB scheduled feed adapters, SQLite batch upserts, status tracking | **Verified & Implemented** (`threat_intelligence/sync/`) |
 | **External TI Providers** | Core | VirusTotal, AbuseIPDB, URLhaus adapters with rate limiting & error handling | **Verified & Implemented** |
 | **Evidence Normalization** | Core | Converting heterogeneous findings into canonical `DetectionFinding` objects | **Verified & Implemented** |
 | **Detection Decision Engine** | Core | Multi-criteria evidence fusion and verdict determination | **Verified & Implemented** |
@@ -182,7 +183,7 @@ External provider queries or optional extension failures must never degrade loca
 | **Windows Protection Service** | Core Subsystem | File event watcher, path filtering, debouncing, bounded queue, incremental state | **Verified & Implemented** |
 | **Reports Engine** | Extension | Structured JSON, Markdown, and text report generation | **Verified & Implemented** |
 | **Notifications Service** | Extension | Desktop notifications, email/webhook alerts (optional delivery) | **Verified & Implemented** |
-| **Dashboard** | Extension | Monitoring web GUI & telemetry visualizer | **Prototype / In Progress** |
+| **Dashboard** | Extension | Monitoring web GUI, telemetry visualizer, feed sync status & manual controls | **Verified & Implemented** (`dashboard/app.py`) |
 | **AI Security Assistant** | Extension | Constrained LLM/RAG assistant with read-only security boundaries | **Prototype / Planned** |
 | **Central ACTIS TI Backend** | Extension | Federated intelligence exchange server for fleet sharing | **Planned (Roadmap)** |
 
@@ -201,6 +202,44 @@ External provider queries or optional extension failures must never degrade loca
    - Malicious/suspicious vote counts and total engines.
    - Raw tags and category classifications.
 5. **Decision Fusion**: The `ThreatDetector` passes normalized provider evidence into `DetectionDecisionEngine` alongside ML confidence and rule matches, weighting external intelligence with calibrated confidence.
+
+### 5.1 Scheduled Threat Intelligence Synchronization Subsystem
+
+The threat intelligence synchronization service runs as a decoupled background subsystem that periodically refreshes the local SQLite intelligence database without interrupting live file and URL scans:
+
+```
+Upstream Feeds (URLhaus Recent URLs, AbuseIPDB Blacklist)
+                       │
+                       ▼
+                 Feed Adapters
+     (URLhausFeedAdapter, AbuseIPDBFeedAdapter,
+      VirusTotalFeedAdapter [Enterprise boundary isolation])
+                       │
+                       ▼
+       Validation & Normalization Layer
+     (Canonical URLs, IP/RFC 1918 shielding, SHA-256 validation)
+                       │
+                       ▼
+          In-Memory Deduplication
+                       │
+                       ▼
+         Idempotent SQLite Persistence
+     (Parameterized batch upsert into `indicators` & `threats`,
+      run telemetry in `threat_sync_runs` & `threat_feed_status`)
+                       │
+                       ▼
+     Existing Local Threat Intel Lookup (`ThreatLookup`)
+                       │
+                       ▼
+    Unified Analysis Pipeline (`AnalysisOrchestrator`)
+```
+
+**Key Architectural Guarantees**:
+- **Zero Live Scan Disruption**: Database write transactions use short, parameterized batches. Scan read operations use read-only queries with connection isolation.
+- **Provider Failure Isolation**: If a provider experiences timeouts, HTTP 429 rate limits, or network failures, unrelated providers continue synchronization and the run reports `PARTIAL_SUCCESS`.
+- **Concurrency Protection**: An explicit `threading.Lock` prevents overlapping synchronization jobs; duplicate manual or scheduled triggers are rejected safely with `SKIPPED_ALREADY_RUNNING`.
+- **Honest Capability Reporting**: Bulk feeds are implemented only where upstream APIs genuinely support them (URLhaus CSV/JSON recent URLs; AbuseIPDB blacklist API). VirusTotal bulk feeds require enterprise agreements and explicitly report `UNSUPPORTED_OPERATION` rather than fabricating synthetic feeds.
+- **Immediate Analysis Availability**: Indicators upserted into SQLite are immediately discoverable by `threat_lookup.lookup_url()`, `threat_lookup.lookup_ip()`, and `threat_lookup.lookup_hash()`, feeding directly into `DetectionDecisionEngine` and `RiskEngine`.
 
 ---
 
@@ -255,11 +294,13 @@ Windows Filesystem (ReadDirectoryChangesW / watchdog)
 ## 8. Verification & Test Coverage
 
 The unified architecture is continuously verified by the ACTIS test suite:
-- **Baseline Test Suite**: 267 comprehensive tests across core config, scanners, ML models, detection engine, threat intel, reports, and services.
-- **Unified Architecture Suite (`tests/test_unified_architecture.py`)**: 12 dedicated architectural compliance tests covering:
-  1. Multi-modal ingestion (`analyze_file`, `analyze_url`, `analyze_message`) via `AnalysisOrchestrator`.
-  2. Contract symmetry between URL and file analysis (verifying presence and schema of `DetectionResult`).
-  3. `SecurityEvent` handoff boundary for Windows monitoring subsystem.
-  4. Failure isolation when external threat intelligence providers time out or encounter HTTP 429.
-  5. Scanners delegating to the orchestrator without maintaining competing detection engines.
-- **Current Test Status**: **279 passed, 0 failed** (100% pass rate).
+- **Baseline Unified Test Suite**: 279 comprehensive tests across core config, scanners, ML models, detection engine, threat intel, reports, Windows protection service, and architectural contracts.
+- **Threat Intelligence Sync Suite (`tests/test_threat_sync.py`)**: 24 dedicated unit and integration tests covering:
+  1. Feed adapters (URLhaus recent URLs, AbuseIPDB blacklist, VirusTotal enterprise boundary isolation).
+  2. Failure isolation (network timeouts, HTTP 429 rate limits, HTTP 401 unconfigured/unauthorized, malformed JSON resilience).
+  3. Strict indicator validation and private/reserved RFC 1918 IP shielding.
+  4. Idempotent SQLite persistence (batch upserts, conflict resolution, historical field preservation, feed status tracking).
+  5. Concurrency protection (`ThreatSyncService` non-blocking lock preventing overlapping jobs).
+  6. Background scheduler lifecycle (`ThreatSyncScheduler` start, stop, manual trigger, disabled mode).
+  7. End-to-end integration with `ThreatLookup` and `AnalysisOrchestrator` / `ThreatDetector`, verifying imported feed records immediately contribute evidence to the detection pipeline while preserving provenance.
+- **Current Test Status**: **303 passed, 0 failed** (100% pass rate).

@@ -10,6 +10,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 Milestone Scope: Architecture planning, configuration management, logging infrastructure, database/ML contracts, initial validation tests, and project foundations.
 
+### 2026-10-10 — Day 12: Scheduled Threat Intelligence Synchronization & Dashboard Integration
+
+Implemented a robust, decoupled, and tested Threat Intelligence synchronization service importing supported upstream threat feeds into the local SQLite threat database, isolating provider failures, preserving provenance, and ensuring imported indicators are immediately queryable by the unified analysis pipeline. Built feed adapters implementing `BaseFeedAdapter` for **URLhaus** (recent payload URLs feed with automatic tagging and status parsing) and **AbuseIPDB** (configurable blacklist query with confidence thresholding and RFC 1918 shielding). Modeled the **VirusTotal** bulk feed limitation explicitly as `UNSUPPORTED_OPERATION` rather than creating synthetic feeds or misrepresenting enterprise endpoints. Built the core `ThreatSyncService` with in-memory deduplication, failure isolation (per-provider error trapping), structured outcome telemetry (`SyncRunResult`, `ProviderSyncResult`), and non-blocking concurrency locking preventing overlapping sync runs. Extended SQLite persistence (`reports/threat_database.py`) with `threat_sync_runs` and `threat_feed_status` tables, and implemented parameterized, idempotent batch upserts (`upsert_feed_records`) into existing `indicators` and `threats` tables without creating duplicates or clearing historical data on empty feeds. Implemented `ThreatSyncScheduler` with thread-safe lifecycle control, configurable interval, graceful shutdown, and explicit manual trigger (`trigger_sync_now()`), ensuring background threads are never started on module import. Integrated live feed synchronization metrics and manual synchronization controls into the Streamlit dashboard (`dashboard/app.py`), preserving strict read-only detection boundaries. Expanded the automated test suite from 279 to 303 passing tests (+24 tests in `tests/test_threat_sync.py`), achieving 100% test pass rate with zero network dependencies.
+
+#### Commits
+
+| Commit | Type | Description | Files | Verification |
+|--------|------|-------------|-------|--------------|
+| `f12bf62` | feat | Implement scheduled threat intelligence synchronization service and feed adapters | `threat_intelligence/sync/`, `reports/threat_database.py`, `config/` | Passed (303 tests) |
+| `030c44f` | feat | Integrate feed synchronization status and controls into dashboard | `dashboard/app.py` | Passed (303 tests) |
+| `b6818cb` | test | Cover threat feed adapters synchronization and pipeline integration | `tests/test_threat_sync.py`, `tests/test_file_protection_integration.py`, `detection_engine/threat_detector.py` | Passed (303 tests) |
+| `pending` | docs | Document scheduled threat intelligence synchronization and sync status | `docs/architecture/unified-architecture.md`, `docs/CHANGELOG.md` | Passed (303 tests) |
+
+---
+
 ### 2026-10-10 — Unified ACTIS Architecture Adoption & Validation
 
 Adopted and validated the authoritative Unified ACTIS Architecture, establishing the Core + Extensions model across the repository without unnecessary rewrites. Conducted a complete repository audit verifying previous milestones (Days 1–11: 267 baseline tests passing). Unified structured detection contracts across input modalities by ensuring `ThreatDetector.analyze_file()` evaluates the canonical `DetectionDecisionEngine` and exports structured `DetectionResult` metadata, matching `analyze_url()`. Introduced the formal `AnalysisOrchestrator` (`detection_engine/orchestrator.py`) implementing `IAnalysisOrchestrationBoundary` to serve as the single authoritative pipeline coordinator for file, URL, and message scanning, as well as Windows Protection Service security events. Created `docs/architecture/unified-architecture.md` specifying Core vs Extension boundaries, structured contracts, evidence provenance, and verified component status. Added 12 dedicated compliance and integration tests (`tests/test_unified_architecture.py`) verifying multi-modal ingestion, contract symmetry, event handoffs, scanner delegation, and failure isolation, expanding the test suite to 279 passing tests (0 failures).
