@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-10 11:27:03 UTC  
+**Generated:** 2026-10-10 11:28:16 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`788ea97`)  
+**Current Git Branch:** `main` (`d58cc4d`)  
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `788ea97`
-- **Working Tree:** 3 untracked/unstaged changes
+- **HEAD Commit:** `d58cc4d`
+- **Working Tree:** 7 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `d58cc4d` | Aaryan Suman | 2026-10-10 | docs: update threat intelligence architecture status and roadmap |
 | `788ea97` | Aaryan Suman | 2026-10-10 | test: cover detection pipeline and threat intelligence integration |
 | `d712aa3` | Aaryan Suman | 2026-10-10 | test: cover provider adapter response handling |
 | `2d38f44` | Aaryan Suman | 2026-10-10 | feat: add bounded provider failure and offline fallback handling |
@@ -140,7 +141,6 @@
 | `de90f3c` | Aaryan Suman | 2026-10-10 | feat: implement external threat intelligence provider adapters |
 | `632a3fe` | Aaryan Suman | 2026-10-10 | feat: add indicator validation for external lookups |
 | `6b4e1fb` | Aaryan Suman | 2026-10-10 | feat: add provider configuration and timeout handling |
-| `0effbb3` | Aaryan Suman | 2026-10-10 | feat: define external threat intelligence provider contract |
 
 ## Known Issues
 
