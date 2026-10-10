@@ -67,46 +67,40 @@ class ThreatLookup:
         preferred_provider: Optional[str] = None
     ) -> Optional[BaseThreatClient]:
         """Selects the most suitable, configured provider for the indicator type."""
+        configured = [
+            p for p in self.available_providers
+            if p.supports_indicator_type(indicator_type) and p.is_configured()
+        ]
+        if not configured:
+            return None
+
         if preferred_provider:
-            for p in self.available_providers:
+            for p in configured:
                 if p.provider_name.lower() == preferred_provider.lower():
-                    if p.supports_indicator_type(indicator_type) and p.is_configured():
-                        return p
+                    return p
 
         # Priority selection based on indicator type:
-        # IP Address -> AbuseIPDB (specialized), then VirusTotal
         if indicator_type == IndicatorType.IP_ADDRESS:
-            if abuseipdb_client.is_configured():
-                return abuseipdb_client
-            if vt_client.is_configured():
-                return vt_client
+            for p in configured:
+                if "abuse" in p.provider_name.lower():
+                    return p
 
-        # URL -> URLhaus (real-time malware payloads), then VirusTotal
         elif indicator_type == IndicatorType.URL:
-            if vt_client.is_configured():
-                return vt_client
-            if urlhaus_client.is_configured():
-                return urlhaus_client
+            for p in configured:
+                if "virus" in p.provider_name.lower() or "vt" in p.provider_name.lower():
+                    return p
+            for p in configured:
+                if "urlhaus" in p.provider_name.lower():
+                    return p
 
-        # File Hashes -> VirusTotal (multi-engine consensus), then URLhaus
         elif indicator_type in (IndicatorType.SHA256, IndicatorType.MD5, IndicatorType.SHA1):
-            if vt_client.is_configured():
-                return vt_client
-            if urlhaus_client.is_configured():
-                return urlhaus_client
+            for p in configured:
+                if "virus" in p.provider_name.lower() or "vt" in p.provider_name.lower():
+                    return p
 
-        # Domains -> VirusTotal, then URLhaus
-        elif indicator_type == IndicatorType.DOMAIN:
-            if vt_client.is_configured():
-                return vt_client
-            if urlhaus_client.is_configured():
-                return urlhaus_client
+        # Default to first available configured provider supporting this type
+        return configured[0]
 
-        # Fallback to configured external_client if it supports this type
-        if self.external_client.supports_indicator_type(indicator_type) and self.external_client.is_configured():
-            return self.external_client
-
-        return None
 
     def lookup_indicator(
         self,
@@ -305,6 +299,96 @@ class ThreatLookup:
             query_external=query_external
         )
 
+    def lookup_indicator_multi_provider(
+        self,
+        indicator: str,
+        indicator_type: Optional[Union[str, IndicatorType]] = None,
+        provider_names: Optional[List[str]] = None
+    ) -> Dict[str, Any]:
+        """
+        Queries multiple configured external threat intelligence providers,
+        aggregates individual findings, and resolves conflicts and duplicates.
+        """
+        is_val, normalized, err, resolved_type = validate_and_normalize_indicator(
+            indicator,
+            expected_type=indicator_type
+        )
+        if not is_val or not normalized or not resolved_type:
+            unavail_ev = ThreatIntelEvidence.unavailable(
+                indicator=indicator or "",
+                reason=err or "Invalid indicator",
+                indicator_type=resolved_type or IndicatorType.GENERIC,
+                provider="ACTIS_Validator"
+            )
+            return {
+                "indicator": indicator,
+                "indicator_type": resolved_type.value if resolved_type else "GENERIC",
+                "evidences": [unavail_ev],
+                "aggregated_evidence": unavail_ev,
+                "is_known_threat": False,
+                "outcome_state": OUTCOME_INVALID_RESPONSE,
+            }
+
+        target_providers = []
+        for p in self.available_providers:
+            if provider_names:
+                if any(p.provider_name.lower() == req.lower() for req in provider_names):
+                    if p.supports_indicator_type(resolved_type) and p.is_configured():
+                        target_providers.append(p)
+            else:
+                if p.supports_indicator_type(resolved_type) and p.is_configured():
+                    target_providers.append(p)
+
+        if not target_providers:
+            unavail_ev = ThreatIntelEvidence.unavailable(
+                indicator=normalized,
+                reason="No configured providers available for this indicator type",
+                indicator_type=resolved_type,
+                provider="NONE"
+            )
+            return {
+                "indicator": normalized,
+                "indicator_type": resolved_type.value,
+                "evidences": [unavail_ev],
+                "aggregated_evidence": unavail_ev,
+                "is_known_threat": False,
+                "outcome_state": OUTCOME_QUERY_SKIPPED,
+            }
+
+        evidences: List[ThreatIntelEvidence] = []
+        for provider in target_providers:
+            cached_ev = self.cache.get(provider.provider_name, resolved_type, normalized)
+            if cached_ev:
+                evidences.append(cached_ev)
+            else:
+                ev = provider.lookup(normalized, resolved_type)
+                if ev.verdict != ThreatIntelVerdict.UNAVAILABLE:
+                    self.cache.set(ev)
+                evidences.append(ev)
+
+        aggregated = ThreatIntelEvidence.aggregate_findings(evidences)
+        is_threat = aggregated.verdict in (ThreatIntelVerdict.MALICIOUS, ThreatIntelVerdict.SUSPICIOUS)
+
+        outcome_state = OUTCOME_NOT_FOUND
+        if aggregated.verdict == ThreatIntelVerdict.MALICIOUS:
+            outcome_state = OUTCOME_FOUND_MALICIOUS
+        elif aggregated.verdict == ThreatIntelVerdict.SUSPICIOUS:
+            outcome_state = OUTCOME_FOUND_SUSPICIOUS
+        elif aggregated.verdict == ThreatIntelVerdict.CLEAN:
+            outcome_state = OUTCOME_FOUND_BENIGN
+        elif aggregated.verdict == ThreatIntelVerdict.UNAVAILABLE:
+            outcome_state = OUTCOME_PROVIDER_UNAVAILABLE
+
+        return {
+            "indicator": normalized,
+            "indicator_type": resolved_type.value,
+            "evidences": evidences,
+            "aggregated_evidence": aggregated,
+            "is_known_threat": is_threat,
+            "outcome_state": outcome_state,
+        }
+
 
 # Global threat lookup singleton
 threat_lookup = ThreatLookup()
+

@@ -230,3 +230,95 @@ class ThreatIntelEvidence:
             "is_whitelisted": self.is_whitelisted,
             "timestamp": self.timestamp
         }
+
+    @classmethod
+    def aggregate_findings(
+        cls,
+        evidence_list: List["ThreatIntelEvidence"]
+    ) -> "ThreatIntelEvidence":
+        """
+        Synthesizes findings from multiple threat intelligence providers.
+        Resolves conflicts explicitly:
+        - UNAVAILABLE signals are filtered out (provider outage does not count as clean).
+        - MALICIOUS takes precedence over SUSPICIOUS and CLEAN.
+        - Multiple detections do not blindly sum confidence; highest confidence is preserved with attribution.
+        - Preserves all contributing provider attributions and raw responses.
+        - If all providers are unavailable, returns UNAVAILABLE.
+        """
+        if not evidence_list:
+            return cls.unknown(indicator="", indicator_type=IndicatorType.GENERIC, provider="NONE")
+
+        indicator = evidence_list[0].indicator
+        ind_type = evidence_list[0].indicator_type
+
+        # Filter out unavailable unless all are unavailable
+        valid_evidences = [e for e in evidence_list if e.verdict != ThreatIntelVerdict.UNAVAILABLE]
+        if not valid_evidences:
+            providers = ", ".join(e.provider for e in evidence_list)
+            return cls.unavailable(
+                indicator=indicator,
+                reason=f"All intelligence providers unavailable: {providers}",
+                indicator_type=ind_type,
+                provider=providers
+            )
+
+        malicious = [e for e in valid_evidences if e.verdict == ThreatIntelVerdict.MALICIOUS]
+        if malicious:
+            max_conf = max(e.confidence for e in malicious)
+            providers = sorted(list({e.provider for e in malicious}))
+            threat_types = sorted(list({e.threat_type for e in malicious if e.threat_type}))
+            is_confirmed = any(e.is_confirmed_threat for e in malicious)
+            raw = {
+                "contributing_providers": [e.to_dict() for e in evidence_list],
+                "reporting_malicious": providers,
+                "conflict_resolved": len(valid_evidences) > len(malicious)
+            }
+            return cls(
+                indicator=indicator,
+                indicator_type=ind_type,
+                verdict=ThreatIntelVerdict.MALICIOUS,
+                confidence=max_conf,
+                threat_type=", ".join(threat_types) if threat_types else "Malicious Activity",
+                provider=" + ".join(providers),
+                is_confirmed_threat=is_confirmed,
+                raw_data=raw
+            )
+
+        suspicious = [e for e in valid_evidences if e.verdict == ThreatIntelVerdict.SUSPICIOUS]
+        if suspicious:
+            max_conf = max(e.confidence for e in suspicious)
+            providers = sorted(list({e.provider for e in suspicious}))
+            threat_types = sorted(list({e.threat_type for e in suspicious if e.threat_type}))
+            raw = {
+                "contributing_providers": [e.to_dict() for e in evidence_list],
+                "reporting_suspicious": providers,
+                "conflict_resolved": len(valid_evidences) > len(suspicious)
+            }
+            return cls(
+                indicator=indicator,
+                indicator_type=ind_type,
+                verdict=ThreatIntelVerdict.SUSPICIOUS,
+                confidence=max_conf,
+                threat_type=", ".join(threat_types) if threat_types else "Suspicious Activity",
+                provider=" + ".join(providers),
+                is_confirmed_threat=False,
+                raw_data=raw
+            )
+
+        clean = [e for e in valid_evidences if e.verdict == ThreatIntelVerdict.CLEAN]
+        if clean:
+            avg_conf = sum(e.confidence for e in clean) / len(clean)
+            providers = sorted(list({e.provider for e in clean}))
+            raw = {"contributing_providers": [e.to_dict() for e in evidence_list]}
+            return cls(
+                indicator=indicator,
+                indicator_type=ind_type,
+                verdict=ThreatIntelVerdict.CLEAN,
+                confidence=round(avg_conf, 2),
+                provider=" + ".join(providers),
+                raw_data=raw
+            )
+
+        # Remaining are UNKNOWN
+        return cls.unknown(indicator=indicator, indicator_type=ind_type, provider="AGGREGATED")
+

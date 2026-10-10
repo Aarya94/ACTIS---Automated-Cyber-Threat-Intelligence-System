@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-10 11:17:55 UTC  
+**Generated:** 2026-10-10 11:24:56 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`2d38f44`)  
+**Current Git Branch:** `main` (`d712aa3`)  
 
 ---
 
@@ -117,20 +117,21 @@
 
 ## Test Status
 
-- **Total Test Files:** `23`
-- **Total Discovered Test Functions:** `257`
+- **Total Test Files:** `24`
+- **Total Discovered Test Functions:** `268`
 - **Coverage Areas:** Configuration validation, SQLite database schema & CRUD, Phishing/Malware model contracts, PE feature extraction, API backend.
 
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `2d38f44`
-- **Working Tree:** 2 untracked/unstaged changes
+- **HEAD Commit:** `d712aa3`
+- **Working Tree:** 5 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `d712aa3` | Aaryan Suman | 2026-10-10 | test: cover provider adapter response handling |
 | `2d38f44` | Aaryan Suman | 2026-10-10 | feat: add bounded provider failure and offline fallback handling |
 | `9f77010` | Aaryan Suman | 2026-10-10 | feat: integrate normalized evidence with detection pipeline |
 | `f453ff9` | Aaryan Suman | 2026-10-10 | feat: integrate provider lookup with local intelligence |
@@ -140,7 +141,6 @@
 | `6b4e1fb` | Aaryan Suman | 2026-10-10 | feat: add provider configuration and timeout handling |
 | `0effbb3` | Aaryan Suman | 2026-10-10 | feat: define external threat intelligence provider contract |
 | `21cf8e0` | Aaryan Suman | 2026-10-10 | docs: validate and record architecture reference |
-| `0ce5beb` | Aaryan Suman | 2026-10-10 | docs: link threat intelligence architecture from roadmap |
 
 ## Known Issues
 

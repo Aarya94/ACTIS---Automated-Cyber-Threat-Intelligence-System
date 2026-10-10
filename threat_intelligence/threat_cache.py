@@ -44,6 +44,15 @@ class ThreatIntelligenceCache:
         self._hits: int = 0
         self._misses: int = 0
 
+    @property
+    def size(self) -> int:
+        with self._lock:
+            return len(self._cache)
+
+    def __len__(self) -> int:
+        return self.size
+
+
     @staticmethod
     def build_cache_key(provider: str, indicator_type: IndicatorType, indicator: str) -> str:
         """Constructs canonical, safe, secret-free cache key."""

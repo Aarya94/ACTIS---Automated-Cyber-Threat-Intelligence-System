@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-10-10 11:17:55 UTC  
+**Generated:** 2026-10-10 11:24:56 UTC  
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)  
 
 This document inventories all automated test files, test classes, and test functions
@@ -11,8 +11,8 @@ recorded only after confirmed execution.
 
 ## Test Suite Summary
 
-- **Total Test Files:** `23`
-- **Total Discovered Test Cases:** `257`
+- **Total Test Files:** `24`
+- **Total Discovered Test Cases:** `268`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -42,6 +42,7 @@ recorded only after confirmed execution.
 | `tests/test_static_pe.py` | 21 tests | `PASSING` |
 | `tests/test_text_analyzer.py` | 9 tests | `PASSING` |
 | `tests/test_threat_database.py` | 3 tests | `PASSING` |
+| `tests/test_threat_intel_pipeline.py` | 11 tests | `PASSING` |
 | `tests/test_threat_providers.py` | 21 tests | `PASSING` |
 | `tests/test_url_scanner.py` | 11 tests | `PASSING` |
 | `tests/test_week1_validation.py` | 4 tests | `PASSING` |
@@ -418,6 +419,23 @@ recorded only after confirmed execution.
 - `test_seed_indicators_present()`
 - `test_register_and_lookup_custom_indicator()`
 - `test_scan_session_lifecycle()`
+
+### `tests/test_threat_intel_pipeline.py` (11 tests)
+
+**Standalone Test Functions:**
+- `test_local_first_lookup_known_malicious()`
+- `test_local_not_found_queries_external_provider()`
+- `test_caching_layer_bypasses_repeated_external_calls()`
+- `test_cache_does_not_cache_transient_failures()`
+- `test_conflicting_provider_findings_resolution()`
+- `test_duplicate_findings_deduplication()`
+- `test_threat_detector_url_analysis_with_external_ti()`
+- `test_provider_failure_isolation_in_detection()`
+- `test_secret_masking_in_repr_and_config()`
+- `test_url_scanner_scan_url_logic_regression()`
+- `test_text_analyzer_regression()`
+
+**Class `MockProvider`:**
 
 ### `tests/test_threat_providers.py` (21 tests)
 

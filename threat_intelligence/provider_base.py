@@ -42,7 +42,19 @@ class BaseThreatClient(ABC):
         self._request_count_window: int = 0
         self._window_start_time: float = time.time()
 
+    def __repr__(self) -> str:
+        key_val = getattr(self, "api_key", "")
+        masked_key = "***" if key_val else "<not set>"
+        return (
+            f"<{self.__class__.__name__} name={self.provider_name} "
+            f"configured={self.is_configured()} api_key={masked_key}>"
+        )
+
+    def __str__(self) -> str:
+        return self.__repr__()
+
     def supports_indicator_type(self, indicator_type: IndicatorType) -> bool:
+
         """Returns True if this provider supports the given indicator type."""
         return indicator_type in self.supported_types
 
