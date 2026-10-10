@@ -157,6 +157,8 @@ def validate_and_normalize_indicator(
         if not is_val:
             return False, None, f"Invalid URL: {err}", resolved_type
         normalized = normalize_url(clean)
+        if "#" in normalized:
+            normalized = normalized.split("#", 1)[0]
         return True, normalized, None, resolved_type
 
     elif resolved_type == IndicatorType.DOMAIN:

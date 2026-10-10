@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-10-10 11:15:44 UTC  
+**Generated:** 2026-10-10 11:17:55 UTC  
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)  
 
 This document inventories all automated test files, test classes, and test functions
@@ -11,8 +11,8 @@ recorded only after confirmed execution.
 
 ## Test Suite Summary
 
-- **Total Test Files:** `22`
-- **Total Discovered Test Cases:** `236`
+- **Total Test Files:** `23`
+- **Total Discovered Test Cases:** `257`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -42,6 +42,7 @@ recorded only after confirmed execution.
 | `tests/test_static_pe.py` | 21 tests | `PASSING` |
 | `tests/test_text_analyzer.py` | 9 tests | `PASSING` |
 | `tests/test_threat_database.py` | 3 tests | `PASSING` |
+| `tests/test_threat_providers.py` | 21 tests | `PASSING` |
 | `tests/test_url_scanner.py` | 11 tests | `PASSING` |
 | `tests/test_week1_validation.py` | 4 tests | `PASSING` |
 
@@ -417,6 +418,37 @@ recorded only after confirmed execution.
 - `test_seed_indicators_present()`
 - `test_register_and_lookup_custom_indicator()`
 - `test_scan_session_lifecycle()`
+
+### `tests/test_threat_providers.py` (21 tests)
+
+**Class `TestIndicatorValidator`:**
+- `test_sha256_normalization_and_validation()`
+- `test_malformed_sha256_rejection()`
+- `test_url_canonical_normalization()`
+- `test_private_and_loopback_ip_shielding()`
+- `test_public_ip_acceptance()`
+
+**Class `TestVirusTotalClient`:**
+- `test_is_configured_and_disabled_state()`
+- `test_lookup_hash_malicious_confirmed()`
+- `test_lookup_hash_suspicious()`
+- `test_lookup_hash_clean()`
+- `test_lookup_not_found_404()`
+- `test_lookup_rate_limit_429()`
+- `test_lookup_auth_failure_401()`
+- `test_lookup_timeout_isolation()`
+- `test_lookup_malformed_json_resilience()`
+- `test_lookup_url_base64_identifier()`
+
+**Class `TestURLhausClient`:**
+- `test_urlhaus_malicious_hit()`
+- `test_urlhaus_no_results()`
+- `test_urlhaus_timeout()`
+
+**Class `TestAbuseIPDBClient`:**
+- `test_private_ip_boundary_enforced()`
+- `test_public_ip_malicious()`
+- `test_public_ip_clean()`
 
 ### `tests/test_url_scanner.py` (11 tests)
 
