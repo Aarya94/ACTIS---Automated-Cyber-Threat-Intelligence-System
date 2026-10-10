@@ -21,7 +21,7 @@ Implemented a hardened, central Threat Intelligence REST API service (`backend/`
 | `6f7995c` | feat | Implement central threat intelligence API and candidate contribution state machine | `backend/models.py`, `backend/database.py`, `backend/api.py`, `config/` | Passed (333 tests) |
 | `9abcfda` | feat | Add central ACTIS feed adapter and client synchronization | `threat_intelligence/sync/feed_adapter.py`, `threat_intelligence/sync_manager.py`, `threat_intelligence/sync/sync_service.py`, `dashboard/app.py` | Passed (333 tests) |
 | `d7fcfed` | test | Cover central threat intelligence API authentication and synchronization | `tests/test_central_ti_service.py` | Passed (333 tests) |
-| `pending` | docs | Document central threat intelligence service architecture and contracts | `docs/architecture/unified-architecture.md`, `docs/CHANGELOG.md` | Passed (333 tests) |
+| `04691b3` | docs | Document central threat intelligence service architecture and contracts | `docs/architecture/unified-architecture.md`, `docs/CHANGELOG.md` | Passed (333 tests) |
 
 ---
 

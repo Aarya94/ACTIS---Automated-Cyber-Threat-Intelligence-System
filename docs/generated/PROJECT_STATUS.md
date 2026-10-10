@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-10 12:39:34 UTC  
+**Generated:** 2026-10-10 12:39:58 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`d7fcfed`)  
+**Current Git Branch:** `main` (`04691b3`)  
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `d7fcfed`
-- **Working Tree:** 8 untracked/unstaged changes
+- **HEAD Commit:** `04691b3`
+- **Working Tree:** 1 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `04691b3` | Aaryan Suman | 2026-10-10 | docs: document central threat intelligence service architecture and contracts |
 | `d7fcfed` | Aaryan Suman | 2026-10-10 | test: cover central threat intelligence api authentication and synchronization |
 | `9abcfda` | Aaryan Suman | 2026-10-10 | feat: add central actis feed adapter and client synchronization |
 | `6f7995c` | Aaryan Suman | 2026-10-10 | feat: implement central threat intelligence api and candidate contribution state machine |
@@ -140,7 +141,6 @@
 | `f12bf62` | Aaryan Suman | 2026-10-10 | feat: implement scheduled threat intelligence synchronization service and feed adapters |
 | `a40074b` | Aaryan Suman | 2026-10-10 | docs: document unified core and extensions architecture and sync status |
 | `e8e523b` | Aaryan Suman | 2026-10-10 | test: add validation suite for unified architecture compliance |
-| `8060ed5` | Aaryan Suman | 2026-10-10 | feat: adopt unified analysis orchestrator and symmetric detection contracts |
 
 ## Known Issues
 
