@@ -8,7 +8,6 @@ from pathlib import Path
 from urllib.parse import urlparse
 from typing import Dict, Any, Optional
 
-from scanners.file_feature_extractor import FileFeatureExtractor
 from detection_engine.model_manager import model_manager
 from detection_engine.rule_engine import RuleEngine
 from detection_engine.risk_engine import RiskEngine
@@ -47,6 +46,7 @@ class ThreatDetector:
             return {"error": f"File not found: {path}", "is_valid": False}
 
         # Step 1: Extract Static Metadata & Hashes
+        from scanners.file_feature_extractor import FileFeatureExtractor
         static_info = FileFeatureExtractor.extract_features(path)
         if not static_info.get("is_valid", False):
             return static_info

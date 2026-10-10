@@ -216,7 +216,7 @@ class TestEndToEndProtectionServiceIntegration:
 
             # 2. Wait for watcher -> debouncer (0.15s) -> queue -> worker -> pipeline
             deadline = time.time() + 4.0
-            while pipeline.get_stats()["events_processed"] == 0 and time.time() < deadline:
+            while pipeline.get_stats()["analyzed_count"] == 0 and time.time() < deadline:
                 time.sleep(0.05)
 
             stats = pipeline.get_stats()
