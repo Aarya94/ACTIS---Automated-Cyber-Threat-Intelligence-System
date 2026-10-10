@@ -699,8 +699,8 @@ elif menu == "Threat Intelligence":
                 st.success(f"Registered indicator #{ind_id} successfully.")
 
     with tab4:
-        st.subheader("Upstream Threat Feed Synchronization")
-        st.markdown("Automated import of verified IOCs from upstream feeds (URLhaus, AbuseIPDB, VirusTotal) into local SQLite.")
+        st.subheader("Upstream & Central Threat Feed Synchronization")
+        st.markdown("Automated import of verified IOCs from upstream feeds (URLhaus, AbuseIPDB, VirusTotal) and Central ACTIS Threat Network into local SQLite.")
 
         latest_run = threat_sync_service.get_latest_sync_run()
         feed_statuses = threat_sync_service.get_all_feed_statuses()

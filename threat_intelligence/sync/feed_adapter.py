@@ -28,6 +28,9 @@ from config.config import (
     ABUSEIPDB_ENABLED,
     VIRUSTOTAL_API_KEY,
     VIRUSTOTAL_ENABLED,
+    ACTIS_BACKEND_URL,
+    ACTIS_CLIENT_API_KEY,
+    TI_SYNC_CENTRAL,
     TI_REQUEST_TIMEOUT,
     get_logger,
 )
@@ -685,3 +688,250 @@ class VirusTotalFeedAdapter(BaseFeedAdapter):
                 error_message=f"Unexpected error querying VirusTotal feed: {e}",
                 duration_seconds=dur,
             )
+
+
+class CentralACTISFeedAdapter(BaseFeedAdapter):
+    """
+    Central ACTIS Threat Intelligence Feed Adapter.
+    Synchronizes verified threat indicators from the central ACTIS REST API backend
+    into the local ACTIS SQLite database using authenticated pull queries.
+    Enforces timeout bounds, private IP shielding, and provider failure isolation.
+    """
+
+    def __init__(
+        self,
+        backend_url: Optional[str] = None,
+        api_key: Optional[str] = None,
+        enabled: Optional[bool] = None,
+        timeout: Optional[float] = None,
+        min_confidence: float = 0.8,
+        status_filter: str = "CONFIRMED",
+    ):
+        eff_enabled = enabled if enabled is not None else TI_SYNC_CENTRAL
+        eff_timeout = timeout or TI_REQUEST_TIMEOUT or 10.0
+        super().__init__(provider_name="CentralACTIS", enabled=eff_enabled, timeout=eff_timeout)
+        self.backend_url = (backend_url or ACTIS_BACKEND_URL or "http://127.0.0.1:8000").rstrip("/")
+        self.api_key = api_key or ACTIS_CLIENT_API_KEY or "actis-client-default-secret-token"
+        self.min_confidence = min_confidence
+        self.status_filter = status_filter
+        self.headers = {
+            "X-ACTIS-API-Key": self.api_key,
+            "Accept": "application/json",
+            "User-Agent": "ACTIS-Security-Endpoint/1.0",
+        }
+
+    def is_configured(self) -> bool:
+        """Central ACTIS requires enabled flag, a backend URL, and an API key."""
+        return bool(self.enabled and self.backend_url and self.api_key)
+
+    def fetch_feed(
+        self,
+        max_records: int = 500,
+        timeout: Optional[float] = None,
+    ) -> Tuple[List[FeedRecord], ProviderSyncResult]:
+        """
+        Retrieves, validates, and normalizes indicators from the Central ACTIS service.
+        Returns a tuple of (validated_records, ProviderSyncResult).
+        """
+        started_at = datetime.now(timezone.utc).isoformat()
+        t0 = time.time()
+        req_timeout = timeout or self.timeout
+
+        if not self.enabled:
+            dur = time.time() - t0
+            return [], ProviderSyncResult(
+                provider=self.provider_name,
+                status=SyncStatus.DISABLED,
+                started_at=started_at,
+                completed_at=datetime.now(timezone.utc).isoformat(),
+                error_category=SyncErrorCategory.NONE,
+                error_message="Central ACTIS feed sync is disabled in configuration.",
+                duration_seconds=dur,
+            )
+
+        if not self.is_configured():
+            dur = time.time() - t0
+            return [], ProviderSyncResult(
+                provider=self.provider_name,
+                status=SyncStatus.FAILED,
+                started_at=started_at,
+                completed_at=datetime.now(timezone.utc).isoformat(),
+                error_category=SyncErrorCategory.UNCONFIGURED,
+                error_message="Central ACTIS feed adapter is not configured (missing URL or API key).",
+                duration_seconds=dur,
+            )
+
+        # Primary endpoint: versioned /api/v1/indicators; fallback to /api/indicators
+        endpoint_url = f"{self.backend_url}/api/v1/indicators"
+        params = {
+            "min_confidence": self.min_confidence,
+            "status_filter": self.status_filter,
+            "limit": min(max_records, 1000),
+            "offset": 0,
+        }
+
+        try:
+            resp = requests.get(
+                endpoint_url,
+                params=params,
+                headers=self.headers,
+                timeout=req_timeout,
+            )
+
+            # Fallback to legacy endpoint if v1 route not found (404)
+            if resp.status_code == 404:
+                legacy_url = f"{self.backend_url}/api/indicators"
+                resp = requests.get(
+                    legacy_url,
+                    params={"min_confidence": self.min_confidence, "status_filter": self.status_filter, "limit": max_records},
+                    headers=self.headers,
+                    timeout=req_timeout,
+                )
+
+            dur = time.time() - t0
+            completed_at = datetime.now(timezone.utc).isoformat()
+
+            if resp.status_code == 200:
+                try:
+                    payload = resp.json()
+                except Exception as e:
+                    return [], ProviderSyncResult(
+                        provider=self.provider_name,
+                        status=SyncStatus.FAILED,
+                        started_at=started_at,
+                        completed_at=completed_at,
+                        error_category=SyncErrorCategory.MALFORMED_RESPONSE,
+                        error_message=f"Central ACTIS returned malformed JSON: {e}",
+                        duration_seconds=dur,
+                    )
+
+                raw_indicators: List[Dict[str, Any]] = payload.get("indicators", [])
+                records_received = len(raw_indicators)
+                validated_records: List[FeedRecord] = []
+                records_rejected = 0
+
+                for item in raw_indicators:
+                    raw_val = str(item.get("indicator_value", "")).strip()
+                    raw_type = str(item.get("indicator_type", "")).strip().lower()
+
+                    if not raw_val or not raw_type:
+                        records_rejected += 1
+                        continue
+
+                    # Shield private/loopback IP addresses
+                    if raw_type == "ip":
+                        is_safe, _ = is_safe_public_ip(raw_val)
+                        if not is_safe:
+                            records_rejected += 1
+                            continue
+
+                    # Defensive normalization
+                    is_valid, norm_val, err, resolved_type = validate_and_normalize_indicator(raw_val, raw_type)
+                    if not is_valid or not norm_val or not resolved_type:
+                        records_rejected += 1
+                        continue
+
+                    threat_type = str(item.get("threat_type", "Generic Threat"))
+                    threat_name = str(item.get("threat_name", "Network Threat"))
+                    confidence = float(item.get("confidence", 0.9))
+                    rec_status = str(item.get("status", "CONFIRMED"))
+                    tags = item.get("tags", [])
+                    if isinstance(tags, str):
+                        tags = [t.strip() for t in tags.split(",") if t.strip()]
+
+                    feed_rec = FeedRecord(
+                        indicator=norm_val,
+                        indicator_type=resolved_type,
+                        source_feed="central_actis_network",
+                        confidence=confidence,
+                        status=rec_status,
+                        threat_type=threat_type,
+                        threat_name=threat_name,
+                        first_seen=item.get("first_seen"),
+                        last_seen=item.get("last_seen") or item.get("verified_at"),
+                        tags=list(tags),
+                        metadata={"notes": str(item.get("notes") or "Synchronized from central ACTIS threat network.")},
+                    )
+                    validated_records.append(feed_rec)
+
+                logger.info(
+                    f"Central ACTIS feed fetch complete: {records_received} received, "
+                    f"{len(validated_records)} validated, {records_rejected} rejected in {dur:.2f}s."
+                )
+
+                return validated_records, ProviderSyncResult(
+                    provider=self.provider_name,
+                    status=SyncStatus.SUCCESS,
+                    started_at=started_at,
+                    completed_at=completed_at,
+                    records_received=records_received,
+                    records_validated=len(validated_records),
+                    records_rejected=records_rejected,
+                    duration_seconds=dur,
+                )
+
+            elif resp.status_code in (401, 403):
+                return [], ProviderSyncResult(
+                    provider=self.provider_name,
+                    status=SyncStatus.FAILED,
+                    started_at=started_at,
+                    completed_at=completed_at,
+                    error_category=SyncErrorCategory.AUTH_FAILURE,
+                    error_message=f"HTTP {resp.status_code}: Central ACTIS authentication failure. Check API key.",
+                    duration_seconds=dur,
+                )
+            elif resp.status_code == 429:
+                return [], ProviderSyncResult(
+                    provider=self.provider_name,
+                    status=SyncStatus.FAILED,
+                    started_at=started_at,
+                    completed_at=completed_at,
+                    error_category=SyncErrorCategory.RATE_LIMITED,
+                    error_message="HTTP 429: Central ACTIS rate limit exceeded.",
+                    duration_seconds=dur,
+                )
+            else:
+                return [], ProviderSyncResult(
+                    provider=self.provider_name,
+                    status=SyncStatus.FAILED,
+                    started_at=started_at,
+                    completed_at=completed_at,
+                    error_category=SyncErrorCategory.HTTP_ERROR,
+                    error_message=f"HTTP {resp.status_code}: Central ACTIS service returned error status.",
+                    duration_seconds=dur,
+                )
+
+        except requests.exceptions.Timeout:
+            dur = time.time() - t0
+            return [], ProviderSyncResult(
+                provider=self.provider_name,
+                status=SyncStatus.FAILED,
+                started_at=started_at,
+                completed_at=datetime.now(timezone.utc).isoformat(),
+                error_category=SyncErrorCategory.NETWORK_TIMEOUT,
+                error_message=f"Central ACTIS request timed out after {req_timeout:.1f}s.",
+                duration_seconds=dur,
+            )
+        except requests.exceptions.RequestException as e:
+            dur = time.time() - t0
+            return [], ProviderSyncResult(
+                provider=self.provider_name,
+                status=SyncStatus.FAILED,
+                started_at=started_at,
+                completed_at=datetime.now(timezone.utc).isoformat(),
+                error_category=SyncErrorCategory.CONNECTION_ERROR,
+                error_message=f"Cannot connect to Central ACTIS backend: {e}",
+                duration_seconds=dur,
+            )
+        except Exception as e:
+            dur = time.time() - t0
+            return [], ProviderSyncResult(
+                provider=self.provider_name,
+                status=SyncStatus.FAILED,
+                started_at=started_at,
+                completed_at=datetime.now(timezone.utc).isoformat(),
+                error_category=SyncErrorCategory.MALFORMED_RESPONSE,
+                error_message=f"Unexpected error querying Central ACTIS feed: {e}",
+                duration_seconds=dur,
+            )
+

@@ -36,10 +36,16 @@ from threat_intelligence.sync import (
     URLhausFeedAdapter,
     AbuseIPDBFeedAdapter,
     VirusTotalFeedAdapter,
+    CentralACTISFeedAdapter,
     ThreatSyncService,
     threat_sync_service,
     ThreatSyncScheduler,
     threat_sync_scheduler,
+)
+from threat_intelligence.sync_manager import (
+    SyncManager,
+    sync_manager,
+    CentralThreatIntelligenceClient,
 )
 
 __all__ = [
@@ -66,8 +72,12 @@ __all__ = [
     "URLhausFeedAdapter",
     "AbuseIPDBFeedAdapter",
     "VirusTotalFeedAdapter",
+    "CentralACTISFeedAdapter",
     "ThreatSyncService",
     "threat_sync_service",
     "ThreatSyncScheduler",
     "threat_sync_scheduler",
+    "SyncManager",
+    "sync_manager",
+    "CentralThreatIntelligenceClient",
 ]

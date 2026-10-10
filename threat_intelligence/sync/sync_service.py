@@ -22,6 +22,7 @@ from threat_intelligence.sync.feed_adapter import (
     URLhausFeedAdapter,
     AbuseIPDBFeedAdapter,
     VirusTotalFeedAdapter,
+    CentralACTISFeedAdapter,
 )
 from reports.threat_database import (
     upsert_feed_records,
@@ -63,6 +64,7 @@ class ThreatSyncService:
                 URLhausFeedAdapter(),
                 AbuseIPDBFeedAdapter(),
                 VirusTotalFeedAdapter(),
+                CentralACTISFeedAdapter(),
             ]
 
     def register_adapter(self, adapter: BaseFeedAdapter) -> None:
