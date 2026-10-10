@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-10 14:22:48 UTC  
+**Generated:** 2026-10-10 15:06:49 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`56151d9`)  
+**Current Git Branch:** `main` (`331edd8`)  
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `56151d9`
-- **Working Tree:** 10 untracked/unstaged changes
+- **HEAD Commit:** `331edd8`
+- **Working Tree:** 7 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `331edd8` | Aaryan Suman | 2026-10-10 | docs(architecture): reconcile architectural documentation and test baselines with Day 14 |
 | `56151d9` | Aaryan Suman | 2026-10-10 | docs: document Day 14 grounded AI security assistant and update roadmap |
 | `332e3cf` | Aaryan Suman | 2026-10-10 | test(assistant): add comprehensive test suite for grounded security assistant and safety boundaries |
 | `5e6e55f` | Aaryan Suman | 2026-10-10 | feat(dashboard): integrate grounded security assistant with session history and native markdown |
@@ -140,7 +141,6 @@
 | `8e060a9` | Aaryan Suman | 2026-10-10 | docs: update verified ACTIS implementation status and quickstart guide |
 | `335a8b5` | Aaryan Suman | 2026-10-10 | docs: finalize Day 13 changelog verification hashes |
 | `04691b3` | Aaryan Suman | 2026-10-10 | docs: document central threat intelligence service architecture and contracts |
-| `d7fcfed` | Aaryan Suman | 2026-10-10 | test: cover central threat intelligence api authentication and synchronization |
 
 ## Known Issues
 

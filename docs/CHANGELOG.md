@@ -33,7 +33,8 @@ Expanded the automated test suite from 333 to 360 passing tests (+27 comprehensi
 | `b22965f` | feat | Implement grounded security assistant with evidence breakdown and read-only boundaries | `assistant/security_assistant.py`, `assistant/__init__.py` | Passed (360 tests) |
 | `5e6e55f` | feat | Integrate grounded security assistant with session history and native markdown | `dashboard/app.py` | Passed (360 tests) |
 | `332e3cf` | test | Add comprehensive test suite for grounded security assistant and safety boundaries | `tests/test_security_assistant.py` | Passed (360 tests) |
-| `1d2db4c` | docs | Document Day 14 grounded AI security assistant and update roadmap | `README.md`, `docs/quickstart.md`, `docs/architecture/project-structure.md`, `docs/roadmap/README.md`, `docs/roadmap/month-1.md`, `docs/CHANGELOG.md` | Passed (360 tests) |
+| `56151d9` | docs | Document Day 14 grounded AI security assistant and update roadmap | `README.md`, `docs/quickstart.md`, `docs/architecture/project-structure.md`, `docs/roadmap/README.md`, `docs/roadmap/month-1.md`, `docs/CHANGELOG.md` | Passed (360 tests) |
+| `331edd8` | docs | Reconcile architectural documentation and test baselines with Day 14 | `docs/architecture/*`, `docs/generated/*` | Passed (360 tests) |
 
 ---
 
