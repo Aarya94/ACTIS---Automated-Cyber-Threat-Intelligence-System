@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-10-10 11:42:09 UTC  
+**Generated:** 2026-10-10 12:11:49 UTC  
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)  
 
 This document inventories all automated test files, test classes, and test functions
@@ -11,8 +11,8 @@ recorded only after confirmed execution.
 
 ## Test Suite Summary
 
-- **Total Test Files:** `25`
-- **Total Discovered Test Cases:** `280`
+- **Total Test Files:** `26`
+- **Total Discovered Test Cases:** `304`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -44,6 +44,7 @@ recorded only after confirmed execution.
 | `tests/test_threat_database.py` | 3 tests | `PASSING` |
 | `tests/test_threat_intel_pipeline.py` | 11 tests | `PASSING` |
 | `tests/test_threat_providers.py` | 21 tests | `PASSING` |
+| `tests/test_threat_sync.py` | 24 tests | `PASSING` |
 | `tests/test_unified_architecture.py` | 12 tests | `PASSING` |
 | `tests/test_url_scanner.py` | 11 tests | `PASSING` |
 | `tests/test_week1_validation.py` | 4 tests | `PASSING` |
@@ -468,6 +469,40 @@ recorded only after confirmed execution.
 - `test_private_ip_boundary_enforced()`
 - `test_public_ip_malicious()`
 - `test_public_ip_clean()`
+
+### `tests/test_threat_sync.py` (24 tests)
+
+**Class `TestFeedAdapters`:**
+- `test_urlhaus_adapter_fetch_success()`
+- `test_urlhaus_adapter_rejects_malformed_urls()`
+- `test_urlhaus_adapter_timeout_isolation()`
+- `test_urlhaus_adapter_rate_limit_429()`
+- `test_urlhaus_adapter_malformed_json()`
+- `test_abuseipdb_adapter_fetch_success()`
+- `test_abuseipdb_adapter_shields_private_ips()`
+- `test_abuseipdb_adapter_unconfigured_error()`
+- `test_virustotal_adapter_reports_enterprise_limitation()`
+
+**Class `TestThreatDatabaseSyncPersistence`:**
+- `test_upsert_feed_records_new_indicators()`
+- `test_upsert_feed_records_idempotent_duplicate()`
+- `test_upsert_feed_records_updates_confidence_and_status()`
+- `test_upsert_feed_records_empty_feed_does_not_delete()`
+- `test_feed_status_tracking_in_db()`
+- `test_sync_run_history_in_db()`
+
+**Class `TestSyncServiceAndScheduler`:**
+- `test_sync_service_sync_all_success()`
+- `test_sync_service_partial_success_when_one_fails()`
+- `test_sync_service_prevents_overlapping_runs()`
+- `test_scheduler_lifecycle()`
+- `test_scheduler_disabled_does_not_start()`
+- `test_scheduler_manual_trigger()`
+
+**Class `TestUnifiedPipelineTIIntegration`:**
+- `test_imported_feed_record_retrieved_by_threat_lookup()`
+- `test_imported_feed_record_analyzed_by_threat_detector()`
+- `test_unknown_indicator_remains_unknown_when_not_in_feed()`
 
 ### `tests/test_unified_architecture.py` (12 tests)
 

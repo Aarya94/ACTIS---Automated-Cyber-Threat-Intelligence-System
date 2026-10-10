@@ -125,6 +125,39 @@ def initialize_database():
     );
     """)
 
+    # 7. Threat sync runs table
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS threat_sync_runs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        run_id TEXT UNIQUE NOT NULL,
+        started_at TEXT NOT NULL,
+        completed_at TEXT,
+        overall_status TEXT NOT NULL,
+        total_received INTEGER DEFAULT 0,
+        total_inserted INTEGER DEFAULT 0,
+        total_updated INTEGER DEFAULT 0,
+        total_rejected INTEGER DEFAULT 0,
+        details_json TEXT
+    );
+    """)
+
+    # 8. Threat feed status table
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS threat_feed_status (
+        provider TEXT PRIMARY KEY,
+        last_attempt TEXT,
+        last_successful TEXT,
+        status TEXT NOT NULL DEFAULT 'NEVER_SYNCED',
+        records_received INTEGER DEFAULT 0,
+        records_inserted INTEGER DEFAULT 0,
+        records_updated INTEGER DEFAULT 0,
+        records_rejected INTEGER DEFAULT 0,
+        error_category TEXT,
+        error_message TEXT,
+        updated_at TEXT NOT NULL
+    );
+    """)
+
     # Indexes
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_indicators_type_val ON indicators(indicator_type, indicator_value);")
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_detections_target ON detections(target);")
@@ -132,6 +165,7 @@ def initialize_database():
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_scans_time ON scans(started_at);")
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_file_states_sha256 ON file_scan_states(sha256);")
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_file_states_mtime ON file_scan_states(mtime);")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_sync_runs_started ON threat_sync_runs(started_at);")
 
     # Seed known threat indicators if empty
     cursor.execute("SELECT COUNT(*) as cnt FROM indicators;")
@@ -402,5 +436,204 @@ def clear_file_scan_states() -> None:
     conn.close()
 
 
+def upsert_feed_records(records: List[Dict[str, Any]]) -> Tuple[int, int, int]:
+    """
+    Idempotently inserts or updates threat indicators from an upstream feed in SQLite.
+    Returns a tuple of (inserted_count, updated_count, unchanged_count).
+    Ensures safe transaction isolation, parameterized execution, and historical preservation.
+    """
+    if not records:
+        return 0, 0, 0
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    now = datetime.now().isoformat()
+
+    inserted = 0
+    updated = 0
+    unchanged = 0
+
+    try:
+        with conn:
+            for rec in records:
+                itype = str(rec.get("indicator_type", "")).strip().lower()
+                ival = str(rec.get("indicator_value", "")).strip().lower()
+                if not itype or not ival:
+                    continue
+
+                source = rec.get("source", "Upstream_Feed")
+                confidence = float(rec.get("confidence", 0.8))
+                status = str(rec.get("status", "SUSPICIOUS")).upper()
+                threat_type = rec.get("threat_type", "Malware")
+                threat_name = rec.get("threat_name", "Upstream Feed Detection")
+                first_seen = rec.get("first_seen") or now
+                last_seen = rec.get("last_seen") or now
+
+                # Check if indicator already exists
+                cursor.execute(
+                    "SELECT id, threat_id, confidence, status, source FROM indicators WHERE indicator_type = ? AND lower(indicator_value) = ?",
+                    (itype, ival)
+                )
+                existing = cursor.fetchone()
+
+                if existing:
+                    old_conf = float(existing["confidence"])
+                    old_status = existing["status"]
+                    old_source = existing["source"]
+
+                    # Upgrade confidence or status if newly observed data is higher confidence
+                    new_conf = max(old_conf, confidence)
+                    new_status = "CONFIRMED" if "CONFIRMED" in (old_status, status) else status
+                    new_source = old_source if source in old_source else f"{old_source},{source}"
+
+                    cursor.execute("""
+                    UPDATE indicators
+                    SET last_seen = ?, confidence = ?, status = ?, source = ?
+                    WHERE id = ?
+                    """, (last_seen, new_conf, new_status, new_source, existing["id"]))
+
+                    if new_conf > old_conf or new_status != old_status or new_source != old_source:
+                        updated += 1
+                    else:
+                        unchanged += 1
+                else:
+                    # Insert threat record
+                    cursor.execute("""
+                    INSERT INTO threats (threat_type, name, risk_level, status, description, first_seen, last_seen, verified_by)
+                    VALUES (?, ?, 'HIGH', ?, 'Upstream threat intelligence feed import', ?, ?, ?)
+                    """, (threat_type, threat_name, status, first_seen, last_seen, source))
+                    threat_id = cursor.lastrowid
+
+                    # Insert indicator
+                    cursor.execute("""
+                    INSERT INTO indicators (threat_id, indicator_type, indicator_value, source, confidence, status, first_seen, last_seen)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    """, (threat_id, itype, ival, source, confidence, status, first_seen, last_seen))
+                    inserted += 1
+
+    finally:
+        conn.close()
+
+    return inserted, updated, unchanged
+
+
+def record_sync_run(run_data: Dict[str, Any]) -> None:
+    """Inserts a structured sync run record into threat_sync_runs."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    details_json = json.dumps(run_data.get("provider_results", {}))
+    with conn:
+        cursor.execute("""
+        INSERT INTO threat_sync_runs (
+            run_id, started_at, completed_at, overall_status,
+            total_received, total_inserted, total_updated, total_rejected, details_json
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(run_id) DO UPDATE SET
+            completed_at = excluded.completed_at,
+            overall_status = excluded.overall_status,
+            total_received = excluded.total_received,
+            total_inserted = excluded.total_inserted,
+            total_updated = excluded.total_updated,
+            total_rejected = excluded.total_rejected,
+            details_json = excluded.details_json;
+        """, (
+            str(run_data.get("run_id", "")),
+            str(run_data.get("started_at", "")),
+            run_data.get("completed_at"),
+            str(run_data.get("overall_status", "SUCCESS")),
+            int(run_data.get("total_records_received", 0)),
+            int(run_data.get("total_records_inserted", 0)),
+            int(run_data.get("total_records_updated", 0)),
+            int(run_data.get("total_records_rejected", 0)),
+            details_json,
+        ))
+    conn.close()
+
+
+def update_feed_status(status_data: Dict[str, Any]) -> None:
+    """Updates live provider synchronization status in threat_feed_status."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    now = datetime.now().isoformat()
+    with conn:
+        cursor.execute("""
+        INSERT INTO threat_feed_status (
+            provider, last_attempt, last_successful, status,
+            records_received, records_inserted, records_updated, records_rejected,
+            error_category, error_message, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(provider) DO UPDATE SET
+            last_attempt = excluded.last_attempt,
+            last_successful = COALESCE(excluded.last_successful, threat_feed_status.last_successful),
+            status = excluded.status,
+            records_received = excluded.records_received,
+            records_inserted = excluded.records_inserted,
+            records_updated = excluded.records_updated,
+            records_rejected = excluded.records_rejected,
+            error_category = excluded.error_category,
+            error_message = excluded.error_message,
+            updated_at = excluded.updated_at;
+        """, (
+            str(status_data.get("provider", "")),
+            status_data.get("last_attempt"),
+            status_data.get("last_successful"),
+            str(status_data.get("status", "NEVER_SYNCED")),
+            int(status_data.get("records_received", 0)),
+            int(status_data.get("records_inserted", 0)),
+            int(status_data.get("records_updated", 0)),
+            int(status_data.get("records_rejected", 0)),
+            status_data.get("error_category"),
+            status_data.get("error_message"),
+            now,
+        ))
+    conn.close()
+
+
+def get_feed_statuses() -> List[Dict[str, Any]]:
+    """Retrieves current synchronization status for all registered threat feeds."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM threat_feed_status ORDER BY provider ASC;")
+    rows = cursor.fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def get_latest_sync_run() -> Optional[Dict[str, Any]]:
+    """Retrieves the most recent sync run record."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM threat_sync_runs ORDER BY id DESC LIMIT 1;")
+    row = cursor.fetchone()
+    conn.close()
+    if row:
+        d = dict(row)
+        try:
+            d["details_json"] = json.loads(d["details_json"])
+        except Exception:
+            pass
+        return d
+    return None
+
+
+def get_recent_sync_runs(limit: int = 10) -> List[Dict[str, Any]]:
+    """Retrieves recent sync run records."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM threat_sync_runs ORDER BY id DESC LIMIT ?;", (limit,))
+    rows = cursor.fetchall()
+    conn.close()
+    results = []
+    for r in rows:
+        d = dict(r)
+        try:
+            d["details_json"] = json.loads(d["details_json"])
+        except Exception:
+            pass
+        results.append(d)
+    return results
+
+
 # Initialize tables on import
 initialize_database()
+

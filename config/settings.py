@@ -209,6 +209,33 @@ class ServiceConfig:
 
 
 @dataclass
+class ThreatSyncConfig:
+    """Settings for scheduled upstream threat intelligence synchronization."""
+    enabled: bool = False
+    interval_seconds: int = 21600  # 6 hours
+    batch_size: int = 500
+    max_records_per_sync: int = 1000
+    sync_urlhaus: bool = True
+    sync_abuseipdb: bool = False
+    sync_virustotal: bool = False
+    request_timeout: float = 10.0
+    max_retries: int = 2
+
+    def to_dict(self, mask_secrets: bool = True) -> Dict[str, Any]:
+        return {
+            "enabled": self.enabled,
+            "interval_seconds": self.interval_seconds,
+            "batch_size": self.batch_size,
+            "max_records_per_sync": self.max_records_per_sync,
+            "sync_urlhaus": self.sync_urlhaus,
+            "sync_abuseipdb": self.sync_abuseipdb,
+            "sync_virustotal": self.sync_virustotal,
+            "request_timeout": self.request_timeout,
+            "max_retries": self.max_retries,
+        }
+
+
+@dataclass
 class AppConfig:
     """Unified application configuration root for ACTIS."""
     app_name: str = "ACTIS"
@@ -221,6 +248,7 @@ class AppConfig:
     scanner: Optional[ScannerConfig] = None
     server: Optional[ServerConfig] = None
     service: Optional[ServiceConfig] = None
+    sync: Optional[ThreatSyncConfig] = None
 
     def to_dict(self, mask_secrets: bool = True) -> Dict[str, Any]:
         """Serializes complete AppConfig into a dictionary, redacting sensitive secrets by default."""
@@ -235,5 +263,7 @@ class AppConfig:
             "scanner": self.scanner.to_dict(mask_secrets) if self.scanner else None,
             "server": self.server.to_dict(mask_secrets) if self.server else None,
             "service": self.service.to_dict(mask_secrets) if self.service else None,
+            "sync": self.sync.to_dict(mask_secrets) if self.sync else None,
         }
+
 

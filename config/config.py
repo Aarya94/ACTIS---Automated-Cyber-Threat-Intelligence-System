@@ -44,6 +44,7 @@ from config.settings import (
     ScannerConfig,
     ServerConfig,
     ServiceConfig,
+    ThreatSyncConfig,
 )
 from config.env_loader import (
     load_environment,
@@ -88,6 +89,15 @@ from config.defaults import (
     DEFAULT_SERVICE_AUTO_RESTART,
     DEFAULT_SERVICE_MAX_RESTARTS,
     DEFAULT_SERVICE_RESTART_COOLDOWN,
+    DEFAULT_TI_SYNC_ENABLED,
+    DEFAULT_TI_SYNC_INTERVAL_SECONDS,
+    DEFAULT_TI_SYNC_BATCH_SIZE,
+    DEFAULT_TI_SYNC_MAX_RECORDS,
+    DEFAULT_TI_SYNC_URLHAUS,
+    DEFAULT_TI_SYNC_ABUSEIPDB,
+    DEFAULT_TI_SYNC_VIRUSTOTAL,
+    DEFAULT_TI_SYNC_TIMEOUT,
+    DEFAULT_TI_SYNC_MAX_RETRIES,
     create_default_config,
 )
 from config.validator import (
@@ -186,6 +196,18 @@ def load_app_config(
         restart_cooldown_seconds=get_float("ACTIS_SERVICE_RESTART_COOLDOWN", DEFAULT_SERVICE_RESTART_COOLDOWN),
     )
 
+    sync_config = ThreatSyncConfig(
+        enabled=get_bool("ACTIS_TI_SYNC_ENABLED", DEFAULT_TI_SYNC_ENABLED),
+        interval_seconds=get_int("ACTIS_TI_SYNC_INTERVAL", DEFAULT_TI_SYNC_INTERVAL_SECONDS),
+        batch_size=get_int("ACTIS_TI_SYNC_BATCH_SIZE", DEFAULT_TI_SYNC_BATCH_SIZE),
+        max_records_per_sync=get_int("ACTIS_TI_SYNC_MAX_RECORDS", DEFAULT_TI_SYNC_MAX_RECORDS),
+        sync_urlhaus=get_bool("ACTIS_TI_SYNC_URLHAUS", DEFAULT_TI_SYNC_URLHAUS),
+        sync_abuseipdb=get_bool("ACTIS_TI_SYNC_ABUSEIPDB", DEFAULT_TI_SYNC_ABUSEIPDB),
+        sync_virustotal=get_bool("ACTIS_TI_SYNC_VIRUSTOTAL", DEFAULT_TI_SYNC_VIRUSTOTAL),
+        request_timeout=get_float("ACTIS_TI_SYNC_TIMEOUT", DEFAULT_TI_SYNC_TIMEOUT),
+        max_retries=get_int("ACTIS_TI_SYNC_MAX_RETRIES", DEFAULT_TI_SYNC_MAX_RETRIES),
+    )
+
     cfg = AppConfig(
         app_name=APP_NAME,
         environment=active_env,
@@ -197,6 +219,7 @@ def load_app_config(
         scanner=scanner_config,
         server=server_config,
         service=service_config,
+        sync=sync_config,
     )
     validate_config(cfg, strict=False)
     return cfg
@@ -238,6 +261,11 @@ TI_REQUEST_TIMEOUT = config.apis.request_timeout
 TI_CACHE_TTL_SECONDS = config.apis.cache_ttl_seconds
 TI_MAX_RETRIES = config.apis.max_retries
 VT_RATE_LIMIT_RPM = config.apis.rate_limit_vt_rpm
+
+TI_SYNC_ENABLED = config.sync.enabled if config.sync else False
+TI_SYNC_INTERVAL_SECONDS = config.sync.interval_seconds if config.sync else 21600
+TI_SYNC_BATCH_SIZE = config.sync.batch_size if config.sync else 500
+TI_SYNC_MAX_RECORDS = config.sync.max_records_per_sync if config.sync else 1000
 
 ACTIS_BACKEND_URL = config.server.backend_url
 ACTIS_CLIENT_API_KEY = config.server.client_api_key

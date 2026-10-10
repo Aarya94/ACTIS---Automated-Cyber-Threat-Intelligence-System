@@ -10,7 +10,15 @@ import math
 from typing import List, Optional
 from urllib.parse import urlparse
 
-from config.settings import AppConfig, DatabaseConfig, ExternalApiConfig, RiskEngineConfig, ScannerConfig, ServerConfig
+from config.settings import (
+    AppConfig,
+    DatabaseConfig,
+    ExternalApiConfig,
+    RiskEngineConfig,
+    ScannerConfig,
+    ServerConfig,
+    ThreatSyncConfig,
+)
 
 
 class ConfigurationError(ValueError):
@@ -154,6 +162,22 @@ def validate_api_settings(api_config: ExternalApiConfig) -> List[str]:
     return errors
 
 
+def validate_sync_settings(sync_config: ThreatSyncConfig) -> List[str]:
+    """Validates scheduled threat intelligence synchronization parameters."""
+    errors = []
+    if sync_config.interval_seconds <= 0:
+        errors.append(f"sync interval_seconds must be > 0 (got {sync_config.interval_seconds})")
+    if sync_config.batch_size <= 0:
+        errors.append(f"sync batch_size must be > 0 (got {sync_config.batch_size})")
+    if sync_config.max_records_per_sync <= 0:
+        errors.append(f"sync max_records_per_sync must be > 0 (got {sync_config.max_records_per_sync})")
+    if sync_config.request_timeout <= 0.0 or sync_config.request_timeout > 120.0:
+        errors.append(f"sync request_timeout must be between 0 and 120s (got {sync_config.request_timeout})")
+    if sync_config.max_retries < 0 or sync_config.max_retries > 5:
+        errors.append(f"sync max_retries must be between 0 and 5 (got {sync_config.max_retries})")
+    return errors
+
+
 def validate_config(config: AppConfig, strict: bool = True) -> List[str]:
     """
     Validates complete ACTIS AppConfig. Returns list of error messages.
@@ -181,8 +205,12 @@ def validate_config(config: AppConfig, strict: bool = True) -> List[str]:
     if config.server:
         errors.extend(validate_server_settings(config.server))
 
+    if config.sync:
+        errors.extend(validate_sync_settings(config.sync))
+
     if errors and strict:
         err_msg = "ACTIS Configuration Validation Failed:\n  - " + "\n  - ".join(errors)
         raise ConfigurationError(err_msg)
 
     return errors
+

@@ -1,6 +1,6 @@
 # ACTIS Database Reference
 
-**Generated:** 2026-10-10 11:42:09 UTC  
+**Generated:** 2026-10-10 12:11:49 UTC  
 **Source of Truth:** DDL Schema Analysis (`reports/threat_database.py`)  
 
 This document describes the relational database persistence subsystem for ACTIS.
@@ -110,6 +110,37 @@ ACTIS uses an embedded SQLite database configured for high concurrency and resil
 | `rule_version` | `TEXT` | None |
 | `detection_reasons` | `TEXT` | None |
 
+### Table: `threat_sync_runs`
+
+| Column Name | Data Type | Constraints / Purpose |
+|---|---|---|
+| `id` | `INTEGER` | PRIMARY KEY AUTOINCREMENT |
+| `run_id` | `TEXT` | UNIQUE NOT NULL |
+| `started_at` | `TEXT` | NOT NULL |
+| `completed_at` | `TEXT` | None |
+| `overall_status` | `TEXT` | NOT NULL |
+| `total_received` | `INTEGER` | DEFAULT 0 |
+| `total_inserted` | `INTEGER` | DEFAULT 0 |
+| `total_updated` | `INTEGER` | DEFAULT 0 |
+| `total_rejected` | `INTEGER` | DEFAULT 0 |
+| `details_json` | `TEXT` | None |
+
+### Table: `threat_feed_status`
+
+| Column Name | Data Type | Constraints / Purpose |
+|---|---|---|
+| `provider` | `TEXT` | PRIMARY KEY |
+| `last_attempt` | `TEXT` | None |
+| `last_successful` | `TEXT` | None |
+| `status` | `TEXT` | NOT NULL DEFAULT 'NEVER_SYNCED' |
+| `records_received` | `INTEGER` | DEFAULT 0 |
+| `records_inserted` | `INTEGER` | DEFAULT 0 |
+| `records_updated` | `INTEGER` | DEFAULT 0 |
+| `records_rejected` | `INTEGER` | DEFAULT 0 |
+| `error_category` | `TEXT` | None |
+| `error_message` | `TEXT` | None |
+| `updated_at` | `TEXT` | NOT NULL |
+
 ---
 
 ## Indices & Performance Optimizations
@@ -122,6 +153,7 @@ ACTIS uses an embedded SQLite database configured for high concurrency and resil
 | `idx_scans_time` | `scans` | `started_at` | Sub-millisecond B-tree lookup |
 | `idx_file_states_sha256` | `file_scan_states` | `sha256` | Sub-millisecond B-tree lookup |
 | `idx_file_states_mtime` | `file_scan_states` | `mtime` | Sub-millisecond B-tree lookup |
+| `idx_sync_runs_started` | `threat_sync_runs` | `started_at` | Sub-millisecond B-tree lookup |
 
 ---
 

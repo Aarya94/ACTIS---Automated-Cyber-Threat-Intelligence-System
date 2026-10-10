@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-10 11:42:09 UTC  
+**Generated:** 2026-10-10 12:11:49 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`e8e523b`)  
+**Current Git Branch:** `main` (`a40074b`)  
 
 ---
 
@@ -112,25 +112,26 @@
 - **Database Engine:** SQLite 3
 - **Database Schema Source:** `reports\threat_database.py`
 - **Schema Definition Status:** `IMPLEMENTED`
-- **Tables Defined:** 6 (`threats, indicators, scans, detections, scan_items, file_scan_states`)
-- **Indices Defined:** 6
+- **Tables Defined:** 8 (`threats, indicators, scans, detections, scan_items, file_scan_states, threat_sync_runs, threat_feed_status`)
+- **Indices Defined:** 7
 
 ## Test Status
 
-- **Total Test Files:** `25`
-- **Total Discovered Test Functions:** `280`
+- **Total Test Files:** `26`
+- **Total Discovered Test Functions:** `304`
 - **Coverage Areas:** Configuration validation, SQLite database schema & CRUD, Phishing/Malware model contracts, PE feature extraction, API backend.
 
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `e8e523b`
-- **Working Tree:** 5 untracked/unstaged changes
+- **HEAD Commit:** `a40074b`
+- **Working Tree:** 23 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `a40074b` | Aaryan Suman | 2026-10-10 | docs: document unified core and extensions architecture and sync status |
 | `e8e523b` | Aaryan Suman | 2026-10-10 | test: add validation suite for unified architecture compliance |
 | `8060ed5` | Aaryan Suman | 2026-10-10 | feat: adopt unified analysis orchestrator and symmetric detection contracts |
 | `100e74a` | Aaryan Suman | 2026-10-10 | docs: record Day 11 changelog and synchronize generated status |
@@ -140,7 +141,6 @@
 | `2d38f44` | Aaryan Suman | 2026-10-10 | feat: add bounded provider failure and offline fallback handling |
 | `9f77010` | Aaryan Suman | 2026-10-10 | feat: integrate normalized evidence with detection pipeline |
 | `f453ff9` | Aaryan Suman | 2026-10-10 | feat: integrate provider lookup with local intelligence |
-| `3c568e2` | Aaryan Suman | 2026-10-10 | feat: add threat intelligence caching layer |
 
 ## Known Issues
 

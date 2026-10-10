@@ -31,6 +31,7 @@ from config.settings import (
     ScannerConfig,
     ServerConfig,
     ServiceConfig,
+    ThreatSyncConfig,
 )
 
 # Application Baseline
@@ -70,6 +71,17 @@ DEFAULT_API_TIMEOUT = 5.0
 DEFAULT_TI_CACHE_TTL_SECONDS = 3600
 DEFAULT_TI_MAX_RETRIES = 1
 DEFAULT_VT_RATE_LIMIT_RPM = 4
+
+# Scheduled Threat Intel Synchronization Defaults
+DEFAULT_TI_SYNC_ENABLED = False
+DEFAULT_TI_SYNC_INTERVAL_SECONDS = 21600  # 6 hours
+DEFAULT_TI_SYNC_BATCH_SIZE = 500
+DEFAULT_TI_SYNC_MAX_RECORDS = 1000
+DEFAULT_TI_SYNC_URLHAUS = True
+DEFAULT_TI_SYNC_ABUSEIPDB = False
+DEFAULT_TI_SYNC_VIRUSTOTAL = False
+DEFAULT_TI_SYNC_TIMEOUT = 10.0
+DEFAULT_TI_SYNC_MAX_RETRIES = 2
 
 
 # Protection Service Defaults
@@ -167,6 +179,18 @@ def create_default_config(environment: str = DEFAULT_ENVIRONMENT) -> AppConfig:
         restart_cooldown_seconds=DEFAULT_SERVICE_RESTART_COOLDOWN,
     )
 
+    sync_config = ThreatSyncConfig(
+        enabled=DEFAULT_TI_SYNC_ENABLED,
+        interval_seconds=DEFAULT_TI_SYNC_INTERVAL_SECONDS,
+        batch_size=DEFAULT_TI_SYNC_BATCH_SIZE,
+        max_records_per_sync=DEFAULT_TI_SYNC_MAX_RECORDS,
+        sync_urlhaus=DEFAULT_TI_SYNC_URLHAUS,
+        sync_abuseipdb=DEFAULT_TI_SYNC_ABUSEIPDB,
+        sync_virustotal=DEFAULT_TI_SYNC_VIRUSTOTAL,
+        request_timeout=DEFAULT_TI_SYNC_TIMEOUT,
+        max_retries=DEFAULT_TI_SYNC_MAX_RETRIES,
+    )
+
     return AppConfig(
         app_name=APP_NAME,
         environment=environment,
@@ -178,4 +202,5 @@ def create_default_config(environment: str = DEFAULT_ENVIRONMENT) -> AppConfig:
         scanner=scanner_config,
         server=server_config,
         service=service_config,
+        sync=sync_config,
     )
