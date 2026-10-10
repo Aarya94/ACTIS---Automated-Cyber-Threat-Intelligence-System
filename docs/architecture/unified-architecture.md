@@ -184,8 +184,8 @@ External provider queries or optional extension failures must never degrade loca
 | **Reports Engine** | Extension | Structured JSON, Markdown, and text report generation | **Verified & Implemented** |
 | **Notifications Service** | Extension | Desktop notifications, email/webhook alerts (optional delivery) | **Verified & Implemented** |
 | **Dashboard** | Extension | Monitoring web GUI, telemetry visualizer, feed sync status & manual controls | **Verified & Implemented** (`dashboard/app.py`) |
-| **AI Security Assistant** | Extension | Constrained LLM/RAG assistant with read-only security boundaries | **Prototype / Planned** |
-| **Central ACTIS TI Backend** | Extension | Federated intelligence exchange server for fleet sharing | **Planned (Roadmap)** |
+| **Central ACTIS TI Backend** | Extension | Federated intelligence exchange server for fleet sharing | **Verified & Implemented** (Day 13, `backend/`) |
+| **AI Security Assistant** | Extension | Grounded natural language security assistant with read-only boundaries | **Verified & Implemented** (Day 14, `assistant/`) |
 
 ---
 
@@ -361,4 +361,14 @@ The unified architecture is continuously verified by the ACTIS test suite:
   7. `CentralACTISFeedAdapter` failure isolation (timeouts, connection errors, HTTP 401/429, malformed JSON).
   8. Idempotent SQLite persistence via Day 12 `upsert_feed_records` and immediate queryability through `ThreatLookup`.
   9. Complete offline resilience: local scanning and background file monitoring remain 100% functional when central service is offline.
-- **Current Test Status**: **333 passed, 0 failed** (100% pass rate).
+- **Grounded AI Security Assistant Suite (`tests/test_security_assistant.py`)**: 27 dedicated unit, integration, and security boundary tests covering:
+  1. Deterministic intent routing: recent detections, flagged target explanations, indicator lookups, scan stats, methodology, and safe defensive guidance.
+  2. Multi-factor scoring provenance breakdown: Threat Intelligence (35%), Machine Learning (30%), Heuristic Rules (20%).
+  3. Candidate indicator anti-poisoning warnings (`CANDIDATE` vs `CONFIRMED`).
+  4. Disambiguation policy for ambiguous target matches instead of arbitrary row selection.
+  5. Absence-of-evidence safety warnings (unknown indicator is not reported as safe).
+  6. Read-only non-destructive boundaries (zero OS shell execution, zero automated file deletion/quarantine).
+  7. Automated secret masking and credential sanitization (`mask_sensitive_strings`).
+  8. Offline isolation and provider fallback (`DeterministicAssistantProvider` / `ExternalLLMProvider`).
+  9. Streamlit dashboard session conversation history and native Markdown rendering.
+- **Current Test Status**: **360 passed, 0 failed** (100% pass rate).

@@ -184,12 +184,12 @@ Following the Day 7 milestone, ACTIS evolved beyond a collection of independent 
 - **Role:** Fuses multi-source evidence into a normalized composite risk score (0–100) and severity band (`CRITICAL`, `HIGH`, `MEDIUM`, `LOW`).
 
 ### 5. Shared Threat Intelligence (`threat_intelligence/`, `reports/`)
-- **Status:** Local TI `IMPLEMENTED`; Online TI & Central Sync `PROTOTYPE / NOT YET MILESTONE-COMPLETE`.
-- **Role:** Provides local SQLite indicator lookups, optional external enrichment (VirusTotal v3), and client synchronization with the central ACTIS Threat Intelligence API.
+- **Status:** `IMPLEMENTED` (Completed across Days 11–13: local-first SQLite caching, multi-provider online enrichment with RFC 1918 shielding, scheduled background feed synchronization, and central ACTIS intelligence sharing API).
+- **Role:** Provides local SQLite indicator lookups, external enrichment (VirusTotal, URLhaus, AbuseIPDB), scheduled feed synchronization, and client synchronization with the central ACTIS Threat Intelligence API.
 
 ### 6. User & System Presentations
-- **Status:** `PROTOTYPE / NOT YET MILESTONE-COMPLETE` (Scheduled for Days 13–14).
-  - *Command Dashboard (`dashboard/app.py`):* Streamlit interactive UI.
-  - *Notification System (`notifications/notifier.py`):* Desktop alerts and telemetry banners.
+- **Status:** Dashboard and AI Assistant `IMPLEMENTED`; Notifications `PARTIALLY IMPLEMENTED`.
+  - *Command Dashboard (`dashboard/app.py`):* `IMPLEMENTED` (Streamlit interactive UI with detection visualization, scan metrics, feed sync controls, central service telemetry, and AI security assistant conversational tab).
+  - *Notification System (`notifications/notifier.py`):* `PARTIALLY IMPLEMENTED` (Console alerts and structured notification dispatch operational; native Windows desktop toast notifications scheduled for refinement).
   - *Audit Reporting (`reports/report_generator.py`):* `IMPLEMENTED` (JSON, CSV, Markdown reports).
-  - *AI Security Assistant (`assistant/security_assistant.py`):* Grounded offline security explainer.
+  - *AI Security Assistant (`assistant/security_assistant.py`):* `IMPLEMENTED` (Completed in Day 14: offline-grounded read-only security assistant with multi-factor scoring provenance, exact matching + disambiguation, secret masking, candidate anti-poisoning caveats, and provider fallback).

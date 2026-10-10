@@ -197,25 +197,25 @@ To ensure absolute transparency and prevent misleading claims, components are ca
 | **Detection Decision Engine (`detection_engine/`)** | `IMPLEMENTED` | Multi-criteria fusion, dynamic weight normalization, rule engine, confidence scoring. |
 | **Device Scanner (`scanners/device_scanner.py`)** | `IMPLEMENTED` | Completed in Day 8: loop safety, chunked streaming SHA-256, structured scan result, incremental state tracking. |
 | **Windows Protection Service (`service/`)** | `IMPLEMENTED` | Completed in Day 9: deterministic lifecycle, state machine, worker management, SecurityEvent contract, bounded intake queue, EventDispatcher, AnalysisOrchestrator handoff, and Windows SCM host adapter. |
-| **Automated Test Suite (`tests/`)** | `IMPLEMENTED` | 229 automated unit and integration tests passing with 100% success rate. |
+| **Automated Test Suite (`tests/`)** | `IMPLEMENTED` | 360 automated unit and integration tests passing with 100% success rate. |
 | **Event-Driven File Protection (`scanners/file_watcher.py`, `service/file_pipeline.py`)** | `IMPLEMENTED` | Completed in Day 10: watchdog observer, path normalization, temporary file filtering, debouncing, bounded queue backpressure, incremental state integration, race hardening, and ThreatDetector analysis handoff. |
-| **Online Threat Intelligence (`threat_intelligence/api_clients.py`)** | `PROTOTYPE / NOT YET MILESTONE-COMPLETE` | Prototype VT client; rate-limiting and normalized abstraction scheduled for Day 11. |
-| **Central ACTIS TI API (`backend/`, `threat_intelligence/sync_manager.py`)** | `PROTOTYPE / NOT YET MILESTONE-COMPLETE` | Prototype FastAPI server; federated synchronization scheduled for Day 12. |
-| **Dashboard & Notifications (`dashboard/`, `notifications/`)** | `PROTOTYPE / NOT YET MILESTONE-COMPLETE` | Streamlit and notifier prototypes; integrated UI and alerts scheduled for Day 13. |
-| **AI Security Assistant (`assistant/`)** | `PROTOTYPE / NOT YET MILESTONE-COMPLETE` | Prototype SQLite explainer; safe conversational interface scheduled for Day 14. |
+| **Online Threat Intelligence (`threat_intelligence/`)** | `IMPLEMENTED` | Completed in Day 11: multi-provider lookup (VT, URLhaus, AbuseIPDB), caching, RFC 1918 shielding, rate limiting, and failure isolation. |
+| **Scheduled Feed Sync & Dashboard (`threat_intelligence/sync/`, `dashboard/`)** | `IMPLEMENTED` | Completed in Day 12: background sync scheduler, feed adapters, idempotent SQLite batch upserts, telemetry, and dashboard sync controls. |
+| **Central ACTIS TI API (`backend/`)** | `IMPLEMENTED` | Completed in Day 13: versioned FastAPI REST service, constant-time HMAC auth, candidate anti-poisoning workflow, and admin review endpoint. |
+| **AI Security Assistant (`assistant/`)** | `IMPLEMENTED` | Completed in Day 14: offline-grounded read-only security assistant, multi-factor scoring provenance, exact matching + disambiguation, secret masking, candidate anti-poisoning caveats, and provider fallback. |
 
 ---
 
 ## 7. Next Roadmap Steps (Days 8–16)
 
-Following this architectural evolution, future development will systematically build out the event-driven platform:
+Following this architectural evolution, future development systematically builds out the platform:
 
 - **Day 8:** Device Scanner + Incremental Scan State (`COMPLETED`)
 - **Day 9:** Windows Protection Service Foundation (`COMPLETED`)
 - **Day 10:** Event-Driven File Protection (`COMPLETED`)
-- **Day 11:** Online Threat Intelligence (`PLANNED`)
-- **Day 12:** Central ACTIS Threat Intelligence (`PLANNED`)
-- **Day 13:** Dashboard + Notification Layer (`PLANNED`)
-- **Day 14:** AI Security Assistant (`PLANNED`)
+- **Day 11:** Online Threat Intelligence (`COMPLETED`)
+- **Day 12:** Scheduled Threat Intelligence Synchronization & Dashboard (`COMPLETED`)
+- **Day 13:** Central Threat Intelligence Service & Secure Synchronization (`COMPLETED`)
+- **Day 14:** Grounded AI Security Assistant and Explainable Threat Analysis (`COMPLETED`)
 - **Day 15:** Security Hardening + Broad Threat Coverage Testing (`PLANNED`)
 - **Day 16:** Final Integration + Demo + Release (`PLANNED`)

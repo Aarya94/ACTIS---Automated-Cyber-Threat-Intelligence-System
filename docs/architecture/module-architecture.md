@@ -97,7 +97,7 @@ To maintain absolute architectural truthfulness and prevent overclaiming, every 
 ---
 
 ### 2.7 User Presentations & Interface Subsystems
-- **Notifications (`notifications/`):** `PROTOTYPE / NOT YET MILESTONE-COMPLETE` (Console alerts operational; native Windows desktop toast notifications scheduled for Day 13).
-- **Dashboard (`dashboard/`):** `PROTOTYPE / NOT YET MILESTONE-COMPLETE` (Streamlit command center prototype; full telemetry views and scan controls scheduled for Day 13).
-- **AI Security Assistant (`assistant/`):** `PROTOTYPE / NOT YET MILESTONE-COMPLETE` (Offline SQLite explainer prototype; safe conversational interface scheduled for Day 14).
-- **Central Threat Sharing API (`backend/`):** `PROTOTYPE / NOT YET MILESTONE-COMPLETE` (FastAPI REST service prototype; client synchronization scheduled for Day 12).
+- **Notifications (`notifications/`):** `PARTIALLY IMPLEMENTED` (Console alerts and structured notification dispatch operational; native Windows desktop toast notifications scheduled for refinement).
+- **Dashboard (`dashboard/`):** `IMPLEMENTED` (Streamlit command center operational across Days 12–14: live telemetry views, feed sync management, and grounded security assistant interface).
+- **AI Security Assistant (`assistant/`):** `IMPLEMENTED` (Completed in Day 14: offline-grounded read-only security assistant, multi-factor scoring provenance, exact matching + disambiguation, secret masking, candidate anti-poisoning caveats, and provider fallback).
+- **Central Threat Sharing API (`backend/`):** `IMPLEMENTED` (Completed in Day 13: versioned FastAPI REST service, constant-time HMAC authentication, candidate contribution anti-poisoning, and admin review endpoint).
