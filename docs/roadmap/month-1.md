@@ -103,9 +103,11 @@ Introduced following the completion of Day 7, this architectural shift recognize
 - **Components:** `backend/api.py`, `backend/database.py`, `backend/models.py`, `threat_intelligence/sync/feed_adapter.py`, `dashboard/app.py`, `tests/test_central_ti_service.py`.
 - **Baseline:** 333 automated unit and integration tests passing with 100% success rate (30 new tests added).
 
-### Day 14: AI Security Assistant (`PLANNED`)
-- **Goals:** Offline-grounded natural language security assistant, plain-English detection explanations, security state summarization, operating strictly through controlled SQLite read interfaces with **NO unrestricted OS shell access**.
-- **Components:** `assistant/security_assistant.py`, `tests/test_security_assistant.py`.
+### Day 14: Grounded AI Security Assistant and Explainable Threat Analysis (`COMPLETED`)
+- **Delivered:** Read-only security assistant (`assistant/security_assistant.py`), deterministic intent routing (recent detections, explain target, indicator lookup, scan statistics, methodology, safe defensive guidance), multi-factor scoring explainability (Intel 35%, ML 30%, Rules 20%), candidate anti-poisoning caveats, disambiguated target matching, absence-of-evidence safety warnings (missing != safe), secret masking (`mask_sensitive_strings`), provider abstraction (`BaseAssistantProvider`, `DeterministicAssistantProvider`, `ExternalLLMProvider`), dashboard session conversation history (`dashboard/app.py`), and offline indicator badge.
+- **Constraints Verified:** Strictly read-only; zero arbitrary OS shell execution, zero automated file deletion/quarantine, zero prompt injection escalation, zero personal file transmission to external LLM providers.
+- **Components:** `assistant/security_assistant.py`, `assistant/__init__.py`, `dashboard/app.py`, `tests/test_security_assistant.py`.
+- **Baseline:** 360 automated unit and integration tests passing with 100% success rate (27 new tests added).
 
 ### Day 15: Security Hardening + Broad Threat Coverage Testing (`PLANNED`)
 - **Goals:** Security boundary verification, false positive rate auditing, malformed input stress-testing, adversarial sample evaluation, privacy review, and end-to-end reliability benchmarks.

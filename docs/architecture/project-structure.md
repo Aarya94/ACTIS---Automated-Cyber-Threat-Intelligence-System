@@ -51,9 +51,9 @@ ACTIS/
 | `threat_intelligence/`| Local indicator lookup, external API clients (VT, URLhaus, AbuseIPDB), caching, scheduled sync service, and central feed adapters. | **IMPLEMENTED** | Multi-provider lookup and RFC 1918 shielding completed on Day 11; scheduled synchronization service and feed adapters completed on Day 12; central feed adapter completed on Day 13. |
 | `notifications/` | Alert formatting and console/desktop dispatch (`notifier.py`). | **PARTIALLY IMPLEMENTED** | Console and structured alert formatting operational; native Windows desktop toast notifications scheduled for refinement. |
 | `dashboard/` | Interactive Streamlit command center (`app.py`). | **IMPLEMENTED** | Streamlit command center operational with detection visualization, scan metrics, manual sync triggers, and central threat service telemetry integration. |
-| `assistant/` | Grounded security assistant (`security_assistant.py`) querying local SQLite records. | **PARTIALLY IMPLEMENTED** | Read-only SQLite query and threat explainer operational; advanced conversational interface scheduled for Day 14. |
+| `assistant/` | Grounded security assistant (`security_assistant.py`) querying local SQLite records. | **IMPLEMENTED** | Read-only evidence-grounded AI assistant operational (Day 14). Provides multi-factor score breakdown (Intel 35%, ML 30%, Rules 20%), candidate anti-poisoning caveats, disambiguated target matching, defensive guidance, secret masking, and dashboard conversation history. |
 | `backend/` | Central FastAPI intelligence sharing API (`api.py`, `database.py`, `models.py`). | **IMPLEMENTED** | Versioned REST API v1, constant-time HMAC auth, sliding-window rate limiting, candidate anti-poisoning workflow, and admin review endpoint completed on Day 13. |
-| `tests/` | Automated test suites (`pytest`). | **IMPLEMENTED** | 333 passing automated tests with 100% pass rate (0 failures, 4 warnings). |
+| `tests/` | Automated test suites (`pytest`). | **IMPLEMENTED** | 360 passing automated tests with 100% pass rate (0 failures, 4 warnings). |
 | `logs/` | Runtime rotating log directory (`actis.log`). | **EXISTING** | Managed by `config/logger.py` with sanitization and rotation. |
 | `docs/` | Authoritative documentation framework (`architecture/`, `roadmap/`, `generated/`). | **IMPLEMENTED** | Authoritative source of truth for ACTIS engineering. |
 

@@ -116,15 +116,40 @@ python main.py --quick-scan
 
 ---
 
+## 🤖 Grounded AI Security Assistant (Offline)
+
+ACTIS provides a safe, read-only AI security assistant that answers queries about detections, indicators, statistics, and methodology without arbitrary shell execution or file modifications:
+
+### 1. Interactive CLI Mode
+Launch the unified CLI menu and select option `7`:
+```powershell
+python main.py
+# Select [7] AI Security Assistant
+```
+
+### 2. Streamlit Web Command Center
+Navigate to the **AI Security Assistant** tab in the Streamlit dashboard (`http://localhost:8501`).
+
+### Example Queries:
+- **Recent Detections:** `"What did ACTIS detect recently?"` or `"Show recent high-risk detections"`
+- **Explain Flagged Target:** `"Why was notepad.exe flagged?"` or `"Explain why 185.220.101.5 was flagged"`
+- **Threat Indicator Lookup:** `"Lookup indicator 185.220.101.5"` or `"Is domain evil-phish.com in the threat database?"`
+- **Detection Statistics:** `"Show scan statistics"` or `"What is the detection summary?"`
+- **Detection Methodology:** `"Explain ACTIS detection methodology"` or `"How does ACTIS detect malware?"`
+- **Defensive Guidance:** `"What should I do if a file is flagged as malicious?"`
+
+---
+
 ## 🧪 Running Automated Tests
 
 ACTIS includes an automated unit and integration test suite:
 
 ```powershell
-# Run all tests
+# Run all tests (360 tests)
 pytest tests/ -v
 
 # Run specific subsystem tests
+pytest tests/test_security_assistant.py -v
 pytest tests/test_config_loading.py -v
 pytest tests/test_config_validation.py -v
 pytest tests/test_threat_database.py -v

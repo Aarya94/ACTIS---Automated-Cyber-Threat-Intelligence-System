@@ -10,6 +10,33 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 Milestone Scope: Architecture planning, configuration management, logging infrastructure, database/ML contracts, initial validation tests, and project foundations.
 
+### 2026-10-10 — Day 14: Grounded AI Security Assistant and Explainable Threat Analysis
+
+Audited, hardened, and integrated the Day 14 AI Security Assistant (`assistant/security_assistant.py`, `dashboard/app.py`) providing evidence-grounded, explainable threat intelligence and detection analysis. Enforced strict read-only security boundaries: zero arbitrary OS shell execution, zero automated file deletion or quarantine, zero modification of Windows Defender or endpoint settings, and zero transmission of private files or user documents. Implemented robust natural language intent routing for:
+1. **Recent Detections:** Real-time queries for recent detections and high-risk security events derived strictly from SQLite detection history (`scans.db`), with truthful distinction between an empty database and a verified clean workstation.
+2. **Explain Flagged Target:** Multi-factor evidence breakdown explaining why a file, URL, domain, or message was flagged, displaying recorded timestamps, risk scores, severity classifications, and itemized weighted scoring contributions (Threat Intel 35%, ML Inference 30%, Heuristic Rules 20%). Added candidate indicator anti-poisoning caveats explicitly distinguishing `CONFIRMED` intelligence from unverified `CANDIDATE` reports.
+3. **Indicator Lookup:** Querying local threat intelligence indicators (`threat_database.py`), accurately reflecting status (`CONFIRMED`, `SUSPICIOUS`, `CANDIDATE`, `REPORTED`, `FALSE_POSITIVE`) and confidence, with strict safety caveats stating that missing indicators are not automatically safe.
+4. **Scan Statistics:** Deriving aggregate metrics from SQLite scan history (scans, detections, average risk scores, risk distribution).
+5. **Detection Methodology:** Plain-English architectural explanations grounded in verified repository capabilities (ML Random Forest, static PE header parsing, RFC-compliant URL analysis, multi-criteria risk engine, background Windows service).
+6. **Defensive Guidance:** Safe, non-destructive incident response recommendations (isolation, credential rotation, independent verification) without autonomous remediation.
+7. **Disambiguation & Absence-of-Evidence Safety:** Exact and prefix target matching with candidate disambiguation when multiple targets match, avoiding silent arbitrary selection. Truthful missing target handling refusing to claim unrecorded targets are safe.
+8. **Sensitive Data Minimization & Secret Masking:** Automated credential sanitization (`mask_sensitive_strings`) preventing leakage of API keys, tokens, or private paths.
+9. **Provider Abstraction & Offline Isolation:** Pluggable `BaseAssistantProvider` interface with default `DeterministicAssistantProvider` and configurable `ExternalLLMProvider` fallback, ensuring complete local functionality when external AI providers are unavailable or disabled.
+10. **Dashboard Integration:** Streamlit conversational interface (`dashboard/app.py`) featuring session history (`st.session_state["assistant_history"]`), native markdown formatting, clear history controls, and offline status indicator.
+
+Expanded the automated test suite from 333 to 360 passing tests (+27 comprehensive tests in `tests/test_security_assistant.py`), achieving 100% test pass rate with zero failures.
+
+#### Commits
+
+| Commit | Type | Description | Files | Verification |
+|--------|------|-------------|-------|--------------|
+| `b22965f` | feat | Implement grounded security assistant with evidence breakdown and read-only boundaries | `assistant/security_assistant.py`, `assistant/__init__.py` | Passed (360 tests) |
+| `5e6e55f` | feat | Integrate grounded security assistant with session history and native markdown | `dashboard/app.py` | Passed (360 tests) |
+| `332e3cf` | test | Add comprehensive test suite for grounded security assistant and safety boundaries | `tests/test_security_assistant.py` | Passed (360 tests) |
+| `1d2db4c` | docs | Document Day 14 grounded AI security assistant and update roadmap | `README.md`, `docs/quickstart.md`, `docs/architecture/project-structure.md`, `docs/roadmap/README.md`, `docs/roadmap/month-1.md`, `docs/CHANGELOG.md` | Passed (360 tests) |
+
+---
+
 ### 2026-10-10 — Day 13: Central Threat Intelligence Service and Secure ACTIS Synchronization
 
 Implemented a hardened, central Threat Intelligence REST API service (`backend/`) and secure client synchronization subsystem extending the unified ACTIS architecture. Defined versioned API contracts (`/api/v1/health`, `/api/v1/indicators`, `/api/v1/indicators/{indicator_type}/{indicator_value}`, `/api/v1/sync/pull`, `/api/v1/contributions`, and `/api/v1/admin/indicators/{indicator_id}/review`). Implemented constant-time API key verification (`hmac.compare_digest`), role-based authorization (`read`, `contribute`, `admin`), in-memory sliding-window rate limiting per client identity (default 60–300 RPM), and defensive payload bounds. Enforced strict RFC 1918 private/loopback/link-local IP shielding via `is_safe_public_ip` and indicator normalization on all retrieval, synchronization, and contribution pathways. Implemented an anti-poisoning candidate contribution policy: submitted indicators are strictly assigned `status="CANDIDATE"`, `review_status="PENDING"`, and `source_type="CLIENT_CONTRIBUTION"`, preventing unauthorized self-promotion to `CONFIRMED`. Added an administrative review endpoint for state transitions (`APPROVE`, `REJECT`). Implemented the client-side `CentralACTISFeedAdapter` extending `BaseFeedAdapter` in `threat_intelligence/sync/feed_adapter.py` and updated `SyncManager`, allowing ACTIS endpoint nodes to synchronize verified threat intelligence into their local SQLite database (`upsert_feed_records`) while maintaining total outage isolation: local file scanning and background Windows monitoring run 100% autonomously without external or central connectivity dependencies. Updated the Streamlit dashboard (`dashboard/app.py`) to reflect Central ACTIS Threat Network synchronization. Expanded the automated test suite from 303 to 333 passing tests (+30 comprehensive tests in `tests/test_central_ti_service.py`), achieving 100% pass rate with zero network dependencies (100% mocked transport).
