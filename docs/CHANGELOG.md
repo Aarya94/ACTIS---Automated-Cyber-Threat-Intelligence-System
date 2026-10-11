@@ -10,6 +10,48 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 Milestone Scope: Complete core defensive architecture, configuration, logging, database schemas, static PE analysis, URL/message analysis, device scanning, resident Windows service foundation, file watcher pipeline, threat intel integration, scheduled sync, central TI API, grounded AI assistant, security hardening, and release demonstration.
 
+### 2026-10-11 — Day 19: Non-PE File Fallback Static Analysis Subsystem
+
+Implemented safe static analysis for non-PE files including bounded streaming cryptographic hashing, safe archive inspection (ZIP, TAR, GZIP, and graceful 7z handling), static script heuristic inspection (PowerShell, Batch, VBScript, Python), and 12 dedicated non-PE detection rules without executing files or extracting contents to disk. Preserved existing Windows PE analysis pathways and zero-privilege offline operation. Implemented and verified:
+1. **Non-PE Contracts & Data Architecture (`scanners/non_pe_contract.py`):**
+   - Defined `NonPEFileType` enum (`UNKNOWN`, `ARCHIVE_ZIP`, `ARCHIVE_TAR`, `ARCHIVE_GZIP`, `ARCHIVE_7Z`, `SCRIPT_POWERSHELL`, `SCRIPT_BATCH`, `SCRIPT_VBSCRIPT`, `SCRIPT_PYTHON`, `GENERIC_TEXT`, `GENERIC_BINARY`).
+   - Defined `NonPEAnalysisMethod` and `NonPEAnalysisStatus` distinguishing format detection, unsupported formats, parsing errors, incomplete analyses, and successful inspections.
+   - Defined structured dataclasses `ArchiveMetadata`, `ScriptMetadata`, and `NonPEAnalysisResult` for standardized indicator delivery to the detection engine.
+2. **Bounded Streaming Cryptographic Hashing (`scanners/non_pe_analyzer.py`):**
+   - Implemented streaming file hashing (`compute_streaming_hashes`) with 64KB bounded buffer reads for SHA-256 and MD5, eliminating memory exhaustion on large files.
+   - Enforced defensive boundary checks: isolated read state, permission error isolation, file truncation handling, and strict read-only operation.
+3. **Safe Archive Metadata Inspection (`scanners/non_pe_analyzer.py`):**
+   - Implemented safe metadata parsing for ZIP, TAR, and GZIP without filesystem extraction or execution.
+   - Enforced defensive resource boundaries: 50MB maximum archive size, 5,000 maximum entries, 500MB declared uncompressed size limit, and 100:1 compression ratio detection (ZIP bomb mitigation).
+   - Audited for concealed executables (`.exe`, `.dll`, `.bat`, etc.), camouflage double extensions (`.pdf.exe`), excessive entries, and encrypted items.
+   - Built graceful fallback for unsupported formats (e.g., 7z) without crashes or false-negative verdicts.
+4. **Static Script Heuristic Inspection (`scanners/non_pe_analyzer.py`):**
+   - Built read-only static analysis for PowerShell, Windows Batch, VBScript, and Python scripts with zero execution (`eval`, `exec`, and subprocess strictly prohibited).
+   - Comment and documentation filtering to eliminate false positives in benign scripts and documentation examples.
+   - Safe evidence extraction with bounded snippet lengths (100 characters max) and credential/secret masking.
+5. **Detection Engine Heuristic Rules (`detection_engine/rule_engine.py`):**
+   - Added 12 dedicated non-PE static rules:
+     - `RULE_ARCHIVE_ZIP_BOMB` (CRITICAL, +45.0)
+     - `RULE_ARCHIVE_DOUBLE_EXTENSION` (HIGH, +30.0)
+     - `RULE_ARCHIVE_EXECUTABLE_CONTENT` (MEDIUM, +20.0)
+     - `RULE_ARCHIVE_EXCESSIVE_ENTRIES` (MEDIUM, +20.0)
+     - `RULE_ARCHIVE_ENCRYPTED_ENTRIES` (LOW, +10.0)
+     - `RULE_SCRIPT_POWERSHELL_DOWNLOAD_EXECUTE` (CRITICAL, +45.0)
+     - `RULE_SCRIPT_SHADOW_COPY_DELETION` (CRITICAL, +45.0)
+     - `RULE_SCRIPT_POWERSHELL_ENCODED_COMMAND` (HIGH, +30.0)
+     - `RULE_SCRIPT_VBSCRIPT_DOWNLOAD_DROPPER` (HIGH, +30.0)
+     - `RULE_SCRIPT_BATCH_DOWNLOAD_EXECUTE` (HIGH, +25.0)
+     - `RULE_SCRIPT_PYTHON_DYNAMIC_EXECUTION` (HIGH, +25.0)
+     - `RULE_SCRIPT_POWERSHELL_EXECUTION_BYPASS` (MEDIUM, +20.0)
+6. **Pipeline Routing Integration (`scanners/file_feature_extractor.py`, `detection_engine/threat_detector.py`):**
+   - Routed non-PE files from `FileFeatureExtractor.extract_features` to `NonPEAnalyzer.analyze_non_pe_file`, ensuring PE files continue through existing PE pipelines while non-PE files receive structured fallback analysis.
+   - Threaded `detected_format`, `analysis_method`, and `non_pe_features` into `ThreatDetector.scan_file` and `RiskEngine.calculate_risk`.
+7. **Test Suite Expansion:**
+   - Added 24 automated tests in `tests/test_non_pe_analysis.py` covering streaming hashing, archive inspection, script heuristics, boundary handling, and full pipeline integration.
+   - Maintained 100% pass rate across the full test suite: 496 passing tests (472 baseline + 24 new).
+
+---
+
 ### 2026-10-11 — Day 18: Enhanced Windows PE Static Import, Dangerous API Sequence & Section Heuristic Analysis
 
 Implemented standard Mandiant import hashing (`imphash`), 10-category threat family API mapping, and advanced section/import heuristic rules for static Windows PE analysis. Preserved all existing Day 1–17 architectures, offline resilience, and defensive read-only contracts. Implemented and verified:

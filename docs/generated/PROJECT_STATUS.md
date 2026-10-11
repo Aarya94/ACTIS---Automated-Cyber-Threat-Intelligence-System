@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-11 11:47:00 UTC
+**Generated:** 2026-10-11 11:47:18 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`31e8a12`)
+**Current Git Branch:** `main` (`54ff907`)
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `31e8a12`
-- **Working Tree:** 4 untracked/unstaged changes
+- **HEAD Commit:** `54ff907`
+- **Working Tree:** 3 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `54ff907` | Aaryan Suman | 2026-10-11 | test(scanner): cover non-pe fallback and malformed archives |
 | `31e8a12` | Aaryan Suman | 2026-10-11 | feat(detection): add heuristic rules for archives and malicious scripts |
 | `80d069b` | Aaryan Suman | 2026-10-11 | feat(scanner): add non-pe archive and script static analysis subsystem |
 | `61db8d4` | Aaryan Suman | 2026-10-11 | docs(day18): document enhanced PE import analysis, heuristic rules, and Day 18 milestone |
@@ -140,7 +141,6 @@
 | `0ea1677` | Aaryan Suman | 2026-10-11 | feat(notifications): add native Windows desktop toast notifier with async dispatch and secret redaction |
 | `9d8001f` | Aaryan Suman | 2026-10-11 | feat(service): implement safe Windows SCM installation, status, and removal scripts |
 | `8f62018` | Aaryan Suman | 2026-10-11 | feat(service): enhance Windows service host lifecycle and CLI integration |
-| `6e166d5` | Aaryan Suman | 2026-10-11 | docs(release): reconcile Day 15 hardening baseline and Day 16 release verification |
 
 ## Known Issues
 

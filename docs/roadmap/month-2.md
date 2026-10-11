@@ -38,14 +38,29 @@ Month 2 integrates production Windows Service Control Manager (SCM) deployment a
 - **Validation**: 472 automated tests passing with 100% success rate (+11 new unit and rule verification tests).
 - **Not Included**: Live process memory inspection, driver loading, or code execution.
 
-### Days 32–34: Non-PE File Fallback Analysis
-- **Goal**: Provide safe static evaluation for non-PE files (scripts, archives, office documents).
-- **Tasks**: Stream SHA-256/MD5 hashing, detect archive extensions, analyze macro presence heuristics without execution.
-- **Expected Output**: Graceful fallback analyzer for non-Windows executable file types.
-- **Files/Components**: `scanners/file_scanner.py`.
-- **Validation**: Test hashing and metadata extraction on text and zip files.
-- **Dependencies**: `scanners/file_feature_extractor.py`.
-- **Not Included**: Microsoft Office COM automation.
+### Days 32–34: Non-PE File Fallback Analysis Subsystem (`COMPLETED` — Day 19)
+- **Delivered**:
+  1. *Non-PE Contract & Architecture (`scanners/non_pe_contract.py`)*: Formal dataclasses (`NonPEAnalysisResult`, `ArchiveMetadata`, `ScriptMetadata`) and enums (`NonPEFileType`, `NonPEAnalysisMethod`, `NonPEAnalysisStatus`) providing structured static analysis contracts without code execution.
+  2. *Bounded Streaming Cryptographic Hashing (`scanners/non_pe_analyzer.py`)*: 64KB bounded chunk streaming for SHA-256 and MD5, eliminating high memory consumption on large files, with deterministic calculation, isolated state, and resource boundary enforcement.
+  3. *Safe Archive Inspection (`scanners/non_pe_analyzer.py`)*: Format identification and metadata inspection for ZIP, TAR, and GZIP without filesystem extraction. Defense-in-depth limits: 50MB max archive size, 5,000 maximum entries, 500MB declared uncompressed size, and 100:1 compression ratio detection (ZIP bomb mitigation). Graceful fallback for unsupported archive types (7z) reporting format honestly without false negatives or crashes.
+  4. *Static Script Heuristic Inspection (`scanners/non_pe_analyzer.py`)*: Purely read-only static analysis for PowerShell, Windows Batch, VBScript, and Python. Bounded scanning (up to 2MB), comment and documentation filtering to eliminate false positives, and evidence snippet truncation (100 chars max) with sensitive redaction. Pure static detection with zero `eval`, `exec`, or process execution.
+  5. *Detection Engine Heuristic Rules (`detection_engine/rule_engine.py`)*: 12 dedicated non-PE static rules:
+     - `RULE_ARCHIVE_ZIP_BOMB` (CRITICAL, 45.0): Excessive compression ratio or uncompressed expansion.
+     - `RULE_ARCHIVE_DOUBLE_EXTENSION` (HIGH, 30.0): Files disguised with double extensions inside archives.
+     - `RULE_ARCHIVE_EXECUTABLE_CONTENT` (MEDIUM, 20.0): Executable binaries concealed within archives.
+     - `RULE_ARCHIVE_EXCESSIVE_ENTRIES` (MEDIUM, 20.0): Suspiciously high entry counts.
+     - `RULE_ARCHIVE_ENCRYPTED_ENTRIES` (LOW, 10.0): Password-protected or encrypted archive entries.
+     - `RULE_SCRIPT_POWERSHELL_DOWNLOAD_EXECUTE` (CRITICAL, 45.0): WebClient/Net.WebClient download and dynamic execution cradle.
+     - `RULE_SCRIPT_SHADOW_COPY_DELETION` (CRITICAL, 45.0): Volume Shadow Copy or recovery deletion commands (`vssadmin delete shadows`, `bcdedit /set recoveryenabled no`).
+     - `RULE_SCRIPT_POWERSHELL_ENCODED_COMMAND` (HIGH, 30.0): Obfuscated base64 PowerShell invocation (`-EncodedCommand`, `-enc`).
+     - `RULE_SCRIPT_VBSCRIPT_DOWNLOAD_DROPPER` (HIGH, 30.0): MSXML2/WinHttp download and WScript/Shell execution.
+     - `RULE_SCRIPT_BATCH_DOWNLOAD_EXECUTE` (HIGH, 25.0): Living-off-the-land download tools (`certutil -urlcache`, `bitsadmin`) combined with execution.
+     - `RULE_SCRIPT_PYTHON_DYNAMIC_EXECUTION` (HIGH, 25.0): Combination of network/base64 decoding with dynamic execution primitives (`exec`, `eval`).
+     - `RULE_SCRIPT_POWERSHELL_EXECUTION_BYPASS` (MEDIUM, 20.0): Execution policy bypass flags (`-ExecutionPolicy Bypass`, `-WindowStyle Hidden`).
+  6. *Unified Pipeline Routing (`scanners/file_feature_extractor.py`, `detection_engine/threat_detector.py`)*: Seamless routing from `FileFeatureExtractor.extract_features` when files are not valid PE executables to `NonPEAnalyzer.analyze_non_pe_file`, populating `detected_format`, `analysis_method`, and `non_pe_features` across `ThreatDetector` and `RiskEngine`.
+- **Files/Components**: `scanners/non_pe_contract.py`, `scanners/non_pe_analyzer.py`, `scanners/file_feature_extractor.py`, `detection_engine/rule_engine.py`, `detection_engine/threat_detector.py`, `tests/test_non_pe_analysis.py`.
+- **Validation**: 496 automated tests passing with 100% success rate (+24 new unit and integration tests).
+- **Security Boundaries**: Zero dynamic script execution, zero archive extraction to disk, zero unconstrained memory allocation.
 
 ### Day 35: Week 5 Integration Audit
 - **Goal**: Full regression check for static file analysis routines.

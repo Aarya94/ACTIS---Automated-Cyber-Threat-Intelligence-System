@@ -126,7 +126,9 @@ ACTIS operates under strict defensive boundaries:
 - **Security Hardening & Adversarial Robustness (Day 15, `tests/`):** Comprehensive boundary verification against malformed PE binaries, oversized files (>50MB), malformed/adversarial URLs, non-string/None inputs, regex resource safety, private IP and local directory leakage prevention across all provider lookups, prompt injection rejection, queue saturation burst testing (500–1,000 events), and SQLite multi-threaded transaction concurrency.
 - **Final Integration, Demonstration & Release Verification (Day 16, `scripts/`, `tests/`):** Comprehensive end-to-end integration across all 15 core subsystems, reproducible safe offline demonstration workflow (`scripts/demo_actis.py`) covering 7 representative flows (Demos A–G), and 13 release acceptance tests (`tests/test_release_integration.py`).
 - **Windows Service Integration & Native Windows Notifications (Day 17, `service/`, `scripts/`, `notifications/`):** Production Windows Service Control Manager (SCM) deployment tooling (`install_windows_service.ps1`, `status_windows_service.ps1`, `uninstall_windows_service.ps1`), standalone host lifecycle routing via CLI (`main.py --service`, `main.py --service-status`), graceful worker cleanup on failure, and native Windows desktop toast notifications (`notifications/windows_toast.py`) with non-blocking async dispatch (<50ms), automated secret/credential redaction, rate limiting flood protection, and silent test mode.
-- **Automated Test Infrastructure (`tests/`):** 461 unit, integration, adversarial security, service lifecycle, and notification verification tests passing with 100% success rate (+26 new tests for Day 17).
+- **Enhanced PE Static Analysis & Heuristics (Day 18, `scanners/`, `detection_engine/`):** Standard Mandiant import hashing (`imphash`), threat family categorization across 10 dangerous API categories, section entropy dispersion analysis, and 7 new heuristic detection rules targeting process hollowing, token impersonation, dynamic API resolving, and anti-analysis.
+- **Non-PE File Fallback Analysis Subsystem (Day 19, `scanners/`, `detection_engine/`):** Purely read-only static analysis for non-PE files including bounded streaming cryptographic hashing (SHA-256, MD5) with 64KB buffer chunks, safe archive metadata inspection (ZIP, TAR, GZIP, and graceful 7z handling) without disk extraction or zip bombs (50MB / 5,000 entries / 100:1 ratio limits), static script heuristics (PowerShell, Batch, VBScript, Python) with comment filtering and snippet masking, and 12 dedicated non-PE detection rules.
+- **Automated Test Infrastructure (`tests/`):** 496 unit, integration, adversarial security, service lifecycle, notification, PE analysis, and non-PE fallback verification tests passing with 100% success rate (+24 new tests for Day 19).
 
 *(Note: ACTIS is a defensive cybersecurity platform and release candidate prototype, not a commercial antivirus or EDR product. Resident Windows Service integration is supported via standard Windows SCM facilities; real SCM registration requires administrative privileges and is fully removable via documented scripts.)*
 
@@ -170,8 +172,8 @@ pytest tests/ -v
 ```
 
 **Current Verification Status:**
-- **472 tests collected**
-- **472 tests passed (100% success rate)**
+- **496 tests collected**
+- **496 tests passed (100% success rate)**
 - **0 failures / 0 errors / 4 warnings**
 
 ### Run Safe Offline System Demonstration
