@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-11 08:32:22 UTC  
+**Generated:** 2026-10-11 08:32:50 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`7c2d263`)  
+**Current Git Branch:** `main` (`7cabdf4`)  
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `7c2d263`
-- **Working Tree:** 7 untracked/unstaged changes
+- **HEAD Commit:** `7cabdf4`
+- **Working Tree:** 5 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `7cabdf4` | Aaryan Suman | 2026-10-11 | feat(security): add log credential redaction and privacy safeguards test suite |
 | `7c2d263` | Aaryan Suman | 2026-10-11 | fix(detection): break module circular dependency and shield unspecified IPs |
 | `8dba147` | Aaryan Suman | 2026-10-11 | test(security): add adversarial input and false-positive regression coverage |
 | `7b5cd71` | Aaryan Suman | 2026-10-10 | docs(changelog): align Day 14 commit history and generated changelog telemetry |
@@ -140,7 +141,6 @@
 | `5e6e55f` | Aaryan Suman | 2026-10-10 | feat(dashboard): integrate grounded security assistant with session history and native markdown |
 | `b22965f` | Aaryan Suman | 2026-10-10 | feat(assistant): implement grounded security assistant with evidence breakdown and read-only boundaries |
 | `a9f1dd4` | Aaryan Suman | 2026-10-10 | docs: update roadmap and project structure for Days 12 and 13 |
-| `3cfeb30` | Aaryan Suman | 2026-10-10 | docs: document central threat intelligence architecture, boundaries, and contracts |
 
 ## Known Issues
 

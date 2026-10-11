@@ -57,6 +57,20 @@ The Central Threat Intelligence REST API service (`backend/`) enforces strict de
 
 ---
 
-## 4. Enforcement & Governance Protocol
+## 4. Adversarial Robustness & Privacy Safeguards (Day 15 Hardening)
+
+Verified defensive constraints established during Day 15 security hardening:
+
+1. **Parser & Size Failure Isolation:** Local PE binary parsing strictly bounds file size checks before deep inspection (`MAX_FILE_SIZE_BYTES = 50 MB`). Parsing malformed DOS headers, out-of-bounds offsets, non-ASCII sections, or invalid signatures raises handled structured warnings and flags files without unhandled exceptions.
+2. **Deterministic URL Ingestion & ReDoS Safety:** All URL and message text evaluations enforce maximum input length bounds (4,096 characters for URLs). Regex patterns operate in linear time without nested repetition, ensuring pathological inputs complete within bounded time (< 1.0s).
+3. **Automated Structured Logging Redaction:** `config/config.py` enforces a global `SecretMaskingFilter` on all console and rotating file logger handlers. Sensitive API keys, bearer tokens, passwords, and authorization secrets matching `SECRET_PATTERN` are automatically masked (`****`) before emission.
+4. **Special-Purpose IP Privacy Protection:** Ingestion and external query adapters strictly reject non-public routable IP addresses via `is_safe_public_ip()`. This includes RFC 1918 private IPv4 (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16), IPv4 loopback (127.0.0.0/8), IPv4 link-local (169.254.0.0/16), IPv4/IPv6 unspecified (0.0.0.0, ::), IPv6 loopback (::1), IPv6 link-local (fe80::/10), IPv6 unique-local (fc00::/7), and multicast addresses.
+5. **Local File Path Isolation:** Local file paths (e.g. `C:\Users\SensitiveUser\...`) and raw binary contents are strictly quarantined locally. Outbound threat intelligence queries (VirusTotal, URLhaus, AbuseIPDB, Central ACTIS) transmit only cryptographic hashes, canonical domains, or normalized URLs.
+6. **Queue Backpressure & Saturation Safety:** `SecurityEventQueue` enforces a strict capacity ceiling (default 10,000 items). Burst overload discards excess events gracefully with rate-limited logging, increments `dropped_count`, and prevents memory exhaustion or deadlock.
+7. **SQLite Multithreaded Concurrency & Integrity:** Database operations across worker threads enforce connection isolation, timeout parameters (15.0s), and foreign-key integrity constraints without persistent table locks.
+
+---
+
+## 5. Enforcement & Governance Protocol
 
 Any Pull Request, commit, or code change that violates any of the above prohibitions must be **immediately rejected**. AI coding agents receiving requests to build automatic file deleters, process killers, shell execution hooks, or live malware runners must decline the task, citing this document as the governing boundary.

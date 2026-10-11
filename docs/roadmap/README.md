@@ -20,7 +20,7 @@ The roadmap is strictly structured into three distinct chronological phases:
 
 ```text
 ┌────────────────────────────────────────────────────────────────────────┐
-│ COMPLETED: DAYS 1 – 14 (Core Foundation, Central Sync & AI Assistant)  │
+│ COMPLETED: DAYS 1 – 15 (Core Foundation, Central Sync, AI & Hardening) │
 │ • Architecture, Configuration, Logging, SQLite Database Schemas       │
 │ • Machine Learning Contracts & 19-Feature Phishing Random Forest Model │
 │ • Static Windows PE Feature Extraction & Safe Binary Parsing           │
@@ -33,12 +33,12 @@ The roadmap is strictly structured into three distinct chronological phases:
 │ • Scheduled Feed Synchronization Service & Dashboard Controls          │
 │ • Central Threat Intelligence REST API (/api/v1) & Secure Feed Sync    │
 │ • Grounded AI Security Assistant & Explainable Analysis (Offline)      │
+│ • Security Hardening, Adversarial Robustness & Broad Threat Coverage   │
 └───────────────────────────────────┬────────────────────────────────────┘
                                     │
                                     ▼
 ┌────────────────────────────────────────────────────────────────────────┐
-│ NEXT: DAYS 15 – 16 (Targeted System Hardening & Release)               │
-│ • Day 15: Security Hardening & Adversarial Sample Robustness           │
+│ NEXT: DAY 16 (Final Integration, Release Verification, & Live Demo)    │
 │ • Day 16: Final Integration, Release Verification, & Live Demo         │
 └────────────────────────────────────────────────────────────────────────┘
 ```
@@ -117,9 +117,11 @@ Detailed design is documented in [`docs/architecture/architecture-evolution.md`]
 - **Components:** `assistant/security_assistant.py`, `assistant/__init__.py`, `dashboard/app.py`, `tests/test_security_assistant.py`.
 - **Baseline:** 360 automated unit and integration tests passing with 100% success rate (27 new tests added).
 
-### Day 15: Security Hardening + Broad Threat Coverage Testing (`PLANNED`)
-- **Goals:** Security boundary verification, false positive rate auditing, malformed input stress-testing, adversarial sample evaluation, privacy review, and end-to-end reliability benchmarks.
-- **Components:** `tests/test_adversarial_security.py`, `tests/test_privacy_safeguards.py`.
+### Day 15: Security Hardening, Adversarial Robustness & Broad Threat Coverage Testing (`COMPLETED`)
+- **Delivered:** Comprehensive adversarial input hardening across all intake channels (malformed PE headers, truncated files, oversized binaries bounded at 50MB, random noise), malformed and adversarial URL validation, ReDoS-safe linear time message evaluation. Strict privacy safeguards preventing local file paths or document contents from leaking to external intelligence APIs. Automated structured logging credential masking (`SecretMaskingFilter`), special-purpose IP shielding (`is_safe_public_ip` covering RFC 1918, loopback, link-local, unspecified, and multicast), circular-import-safe module boundaries (`detection_engine` / `threat_intelligence`), assistant prompt injection immunity, `SecurityEventQueue` capacity saturation burst stress-testing (500–1,000 events) with backpressure drop telemetry, and isolated SQLite multi-threaded transaction concurrency testing.
+- **Constraints Verified:** Strictly read-only; zero dynamic execution of inspected binaries, zero automated file deletion/quarantine, zero unrestricted AI shell execution, zero complete user file uploads.
+- **Components:** `tests/test_adversarial_security.py`, `tests/test_privacy_safeguards.py`, `config/config.py`, `detection_engine/threat_detector.py`, `threat_intelligence/indicator_validator.py`.
+- **Baseline:** 417 automated unit, integration, and security tests passing with 100% success rate (+57 new tests added).
 
 ### Day 16: Final Integration + Demo + Release (`PLANNED`)
 - **Goals:** Complete system integration, reproducible deployment verification, documentation finalization, demonstration scripts, and milestone release preparation.

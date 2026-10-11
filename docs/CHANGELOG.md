@@ -10,6 +10,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 Milestone Scope: Architecture planning, configuration management, logging infrastructure, database/ML contracts, initial validation tests, and project foundations.
 
+### 2026-10-11 — Day 15: Security Hardening, Adversarial Robustness & Broad Threat Coverage Testing
+
+Audited, hardened, and verified the ACTIS platform against malformed and adversarial inputs, false-positive biases, credential/privacy leaks, and resource exhaustion. Preserved existing read-only contracts, multi-criteria risk scoring policies, and offline autonomy. Implemented and verified:
+1. **Malformed PE Binary Hardening:** Resilient static analysis of truncated DOS headers, invalid PE signatures, corrupted section offsets, unexpected section counts, non-ASCII section names, random binary noise, and empty files without unhandled exceptions or crashing.
+2. **Oversized Binary Protection:** Enforced `MAX_FILE_SIZE_BYTES` (50 MB) boundary pre-checks before deep PE parsing, preventing excessive memory allocation.
+3. **Adversarial URL Input Hardening:** Bounded URL parsing (max 4,096 chars), control character and null byte rejection (`[\x00-\x1f\x7f]`), unsupported scheme rejection, embedded credential and port preservation, and 19-feature vector morphological extraction resilience across malformed and non-string inputs.
+4. **ReDoS Immunity & Message Resource Safety:** Linear-time regex evaluation across urgency, credential lure, and financial lure keyword patterns; untrusted message boundary processing completing in < 1.0s even under pathological repetition.
+5. **Local File Path Privacy Isolation:** Verified that raw local file paths (e.g. `C:\Users\SensitiveUser\...`) and file binary contents are never transmitted upstream to external threat intelligence providers (VirusTotal, URLhaus, AbuseIPDB) or the Central ACTIS API; lookups strictly use minimum required indicators (cryptographic hashes, canonical domains, URLs).
+6. **Automated Structured Logging Credential Redaction:** Implemented `SecretMaskingFilter` and `mask_sensitive_strings` in `config/config.py`, automatically masking API keys, bearer tokens, passwords, and authorization secrets (`****`) across all console and rotating file logs.
+7. **Comprehensive Special-Purpose IP Shielding:** Extended `is_safe_public_ip` in `threat_intelligence/indicator_validator.py` to explicitly reject IPv4/IPv6 unspecified addresses (`0.0.0.0`, `::`) alongside RFC 1918 private IPv4, loopback (`127.0.0.1`, `::1`), link-local (`169.254.1.1`, `fe80::1`), unique-local (`fc00::1`), and multicast addresses across all external lookup and central sync paths.
+8. **Circular Import Resolution:** Eliminated cyclic dependency between `detection_engine` and `threat_intelligence` packages by lazily resolving `threat_lookup` in `ThreatDetector`, enabling clean isolated package imports.
+9. **AI Security Assistant Instruction Boundaries:** Verified prompt injection immunity, absence-of-evidence safety caveats ("missing intelligence does not mean safe"), candidate anti-poisoning caveats, and strict denial of command execution or database mutation requests.
+10. **Security Event Queue Saturation Stress Testing:** Verified bounded queue capacity (10,000 items), drop telemetry tracking under producer bursts (500–1,000 events), producer/consumer thread safety, and cancellation handling.
+11. **SQLite Multithreaded Concurrency Integrity:** Verified concurrent worker read/write transactions under timeout and foreign-key enforcement without locks or corruption.
+
+Expanded the automated test suite from 360 to 417 passing tests (+57 comprehensive tests in `tests/test_adversarial_security.py` and `tests/test_privacy_safeguards.py`), achieving 100% test pass rate with zero failures.
+
+---
+
 ### 2026-10-10 — Day 14: Grounded AI Security Assistant and Explainable Threat Analysis
 
 Audited, hardened, and integrated the Day 14 AI Security Assistant (`assistant/security_assistant.py`, `dashboard/app.py`) providing evidence-grounded, explainable threat intelligence and detection analysis. Enforced strict read-only security boundaries: zero arbitrary OS shell execution, zero automated file deletion or quarantine, zero modification of Windows Defender or endpoint settings, and zero transmission of private files or user documents. Implemented robust natural language intent routing for:
