@@ -123,9 +123,9 @@ ACTIS operates under strict defensive boundaries:
 - **Scheduled Feed Synchronization & Dashboard Integration (Day 12, `threat_intelligence/sync/`, `dashboard/`):** Decoupled `ThreatSyncService` importing upstream feeds into local SQLite, feed adapters for URLhaus and AbuseIPDB, explicit `UNSUPPORTED_OPERATION` modeling for VirusTotal bulk feeds, non-blocking lock preventing overlapping runs, thread-safe `ThreatSyncScheduler` lifecycle, parameterized idempotent batch upserts (`upsert_feed_records`), and live feed controls on the Streamlit command center dashboard.
 - **Central Threat Intelligence Service & Secure Synchronization (Day 13, `backend/`, `threat_intelligence/`):** Hardened FastAPI central intelligence REST API (`/api/v1`), constant-time API key verification (`hmac.compare_digest`), role-based authorization (`read`, `contribute`, `admin`), in-memory sliding-window rate limiting (60–300 RPM default), strict RFC 1918 IP shielding, candidate contribution anti-poisoning policy (forces `CANDIDATE` / `PENDING`), administrative review endpoint (`APPROVE`, `REJECT`), client `CentralACTISFeedAdapter`, and total offline scanning isolation.
 - **Grounded AI Security Assistant & Explainable Threat Analysis (Day 14, `assistant/`, `dashboard/`):** Read-only security assistant providing explainable detection breakdowns, multi-factor scoring provenance (Intel 35%, ML 30%, Rules 20%), candidate indicator anti-poisoning caveats, deterministic target disambiguation, secret masking (`mask_sensitive_strings`), and safe defensive incident response recommendations without arbitrary shell or file modifications. Integrated with the Streamlit dashboard via session conversation history and native Markdown.
-- **Security Hardening & Adversarial Robustness (Day 15, `tests/`):** Comprehensive boundary verification against malformed PE binaries, oversized files (>50MB), malformed/adversarial URLs, regex resource safety, private IP and local directory leakage prevention across all provider lookups, prompt injection rejection, queue saturation burst testing (500–1,000 events), and SQLite multi-threaded transaction concurrency.
+- **Security Hardening & Adversarial Robustness (Day 15, `tests/`):** Comprehensive boundary verification against malformed PE binaries, oversized files (>50MB), malformed/adversarial URLs, non-string/None inputs, regex resource safety, private IP and local directory leakage prevention across all provider lookups, prompt injection rejection, queue saturation burst testing (500–1,000 events), and SQLite multi-threaded transaction concurrency.
 - **Final Integration, Demonstration & Release Verification (Day 16, `scripts/`, `tests/`):** Comprehensive end-to-end integration across all 15 core subsystems, reproducible safe offline demonstration workflow (`scripts/demo_actis.py`) covering 7 representative flows (Demos A–G), and 13 release acceptance tests (`tests/test_release_integration.py`).
-- **Automated Test Infrastructure (`tests/`):** 430 unit, integration, adversarial security, and release verification tests passing with 100% success rate (+13 new tests for Day 16).
+- **Automated Test Infrastructure (`tests/`):** 435 unit, integration, adversarial security, and release verification tests passing with 100% success rate (+18 new tests for Days 15–16).
 
 *(Note: ACTIS is a development-stage cybersecurity platform and release candidate prototype, not a commercial antivirus or EDR product. Resident Windows Service integration is verified through modular architecture and mocks; production enterprise deployment requires deployment environment hardening.)*
 
@@ -169,8 +169,8 @@ pytest tests/ -v
 ```
 
 **Current Verification Status:**
-- **430 tests collected**
-- **430 tests passed (100% success rate)**
+- **435 tests collected**
+- **435 tests passed (100% success rate)**
 - **0 failures / 0 errors / 4 warnings**
 
 ### Run Safe Offline System Demonstration

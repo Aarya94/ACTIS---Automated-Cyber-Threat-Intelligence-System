@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-11 09:24:25 UTC  
+**Generated:** 2026-10-11 09:24:52 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`58a79da`)  
+**Current Git Branch:** `main` (`12b397c`)  
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `58a79da`
-- **Working Tree:** 17 untracked/unstaged changes
+- **HEAD Commit:** `12b397c`
+- **Working Tree:** 5 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `12b397c` | Aaryan Suman | 2026-10-11 | fix(security): harden analysis pipelines against non-string, None, and directory inputs |
 | `58a79da` | Aaryan Suman | 2026-10-11 | feat(release): implement safe offline demonstration workflow and release acceptance suite |
 | `d47becd` | Aaryan Suman | 2026-10-11 | docs(release): document Day 16 integration demonstration and update release baseline |
 | `21b9b1d` | Aaryan Suman | 2026-10-11 | test(integration): add end-to-end release integration acceptance tests |
@@ -140,7 +141,6 @@
 | `7cabdf4` | Aaryan Suman | 2026-10-11 | feat(security): add log credential redaction and privacy safeguards test suite |
 | `7c2d263` | Aaryan Suman | 2026-10-11 | fix(detection): break module circular dependency and shield unspecified IPs |
 | `8dba147` | Aaryan Suman | 2026-10-11 | test(security): add adversarial input and false-positive regression coverage |
-| `7b5cd71` | Aaryan Suman | 2026-10-10 | docs(changelog): align Day 14 commit history and generated changelog telemetry |
 
 ## Known Issues
 

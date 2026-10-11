@@ -166,7 +166,7 @@ python scripts/demo_actis.py
 ACTIS includes an automated test suite with 100% pass rate:
 
 ```powershell
-# Run the complete test suite (430 tests)
+# Run the complete test suite (435 tests)
 pytest tests/ -q
 
 # Run the release candidate integration suite
