@@ -11,11 +11,16 @@ from typing import Dict, Any, Optional
 from detection_engine.model_manager import model_manager
 from detection_engine.rule_engine import RuleEngine
 from detection_engine.risk_engine import RiskEngine
-from threat_intelligence.threat_lookup import threat_lookup
 from reports.threat_database import record_detection, register_indicator
 from config.config import get_logger
 
 logger = get_logger("ThreatDetector")
+
+
+def _get_threat_lookup():
+    """Lazily resolves threat_lookup singleton to avoid circular import cycles."""
+    from threat_intelligence.threat_lookup import threat_lookup
+    return threat_lookup
 
 
 class ThreatDetector:
@@ -60,7 +65,7 @@ class ThreatDetector:
             return cached_result
 
         # Step 2: Local & External Threat Intelligence Lookup
-        intel_result = threat_lookup.lookup_hash(sha256, query_external=check_external)
+        intel_result = _get_threat_lookup().lookup_hash(sha256, query_external=check_external)
         known_intel = intel_result.get("local_intel")
         external_intel = intel_result.get("external_intel")
 
@@ -239,7 +244,7 @@ class ThreatDetector:
             return cached_result
 
         # Step 3: Local & External Threat Intelligence Lookup
-        intel_result = threat_lookup.lookup_url(canonical_url, domain, query_external=check_external)
+        intel_result = _get_threat_lookup().lookup_url(canonical_url, domain, query_external=check_external)
         known_intel = intel_result.get("local_intel")
         external_intel = intel_result.get("external_intel")
         ti_evidence = intel_result.get("primary_evidence") or ThreatIntelEvidence.from_local_intel(

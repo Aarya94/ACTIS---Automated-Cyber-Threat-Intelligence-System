@@ -46,6 +46,8 @@ def is_safe_public_ip(ip_str: str) -> Tuple[bool, Optional[str]]:
         return False, f"Multicast address '{clean_ip}' is not an external routable host."
     if ip_obj.is_reserved:
         return False, f"Reserved IP address '{clean_ip}' cannot be queried externally."
+    if ip_obj.is_unspecified:
+        return False, f"Unspecified address '{clean_ip}' cannot be queried externally."
 
     return True, None
 

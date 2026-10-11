@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-11 08:31:17 UTC  
+**Generated:** 2026-10-11 08:31:54 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`7b5cd71`)  
+**Current Git Branch:** `main` (`8dba147`)  
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `7b5cd71`
-- **Working Tree:** 16 untracked/unstaged changes
+- **HEAD Commit:** `8dba147`
+- **Working Tree:** 9 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `8dba147` | Aaryan Suman | 2026-10-11 | test(security): add adversarial input and false-positive regression coverage |
 | `7b5cd71` | Aaryan Suman | 2026-10-10 | docs(changelog): align Day 14 commit history and generated changelog telemetry |
 | `331edd8` | Aaryan Suman | 2026-10-10 | docs(architecture): reconcile architectural documentation and test baselines with Day 14 |
 | `56151d9` | Aaryan Suman | 2026-10-10 | docs: document Day 14 grounded AI security assistant and update roadmap |
@@ -140,7 +141,6 @@
 | `a9f1dd4` | Aaryan Suman | 2026-10-10 | docs: update roadmap and project structure for Days 12 and 13 |
 | `3cfeb30` | Aaryan Suman | 2026-10-10 | docs: document central threat intelligence architecture, boundaries, and contracts |
 | `8e060a9` | Aaryan Suman | 2026-10-10 | docs: update verified ACTIS implementation status and quickstart guide |
-| `335a8b5` | Aaryan Suman | 2026-10-10 | docs: finalize Day 13 changelog verification hashes |
 
 ## Known Issues
 
