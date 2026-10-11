@@ -141,6 +141,9 @@ class ThreatDetector:
                 "file_name": path.name,
                 "file_size": static_info.get("file_size", 0),
                 "is_pe": static_info.get("is_pe", False),
+                "detected_format": static_info.get("detected_format", "UNKNOWN"),
+                "analysis_method": static_info.get("analysis_method", "UNKNOWN"),
+                "non_pe_features": static_info.get("non_pe_features", {}),
                 "threat_intel": intel_result,
             }
         )
@@ -185,6 +188,9 @@ class ThreatDetector:
             "md5": static_info.get("md5", ""),
             "file_size": static_info.get("file_size", 0),
             "is_pe": static_info.get("is_pe", False),
+            "detected_format": static_info.get("detected_format", "UNKNOWN"),
+            "analysis_method": static_info.get("analysis_method", "UNKNOWN"),
+            "non_pe_features": static_info.get("non_pe_features", {}),
             "entropy": static_info.get("entropy", 0.0),
             "is_signed": static_info.get("is_signed", False),
             "score": risk_res["score"],

@@ -411,6 +411,129 @@ class RuleEngine:
                     explanation=f"File exhibits unusually high Shannon entropy ({entropy:.2f}/8.0), suggesting encryption or packing.",
                     evidence_detail={"entropy": entropy}
                 ))
+
+            # Non-PE Archive & Script Static Heuristics
+            non_pe = static_info.get("non_pe_features", {})
+            archive_meta = non_pe.get("archive_metadata") or {}
+            script_meta = non_pe.get("script_metadata") or {}
+
+            # Archive Rules
+            if archive_meta:
+                if archive_meta.get("is_suspicious_bomb", False):
+                    matches.append(RuleMatch(
+                        rule_id="RULE_ARCHIVE_ZIP_BOMB",
+                        rule_name="Decompression Bomb Indicator",
+                        severity=RuleSeverity.CRITICAL,
+                        score_contribution=45.0,
+                        explanation=f"Archive exhibits dangerous compression ratio ({archive_meta.get('compression_ratio', 0)}:1) or excessive uncompressed payload size characteristic of a decompression bomb attack.",
+                        evidence_detail={"compression_ratio": archive_meta.get("compression_ratio"), "total_uncompressed": archive_meta.get("total_uncompressed_size")}
+                    ))
+                if archive_meta.get("has_double_extension", False):
+                    double_entries = archive_meta.get("double_extension_entries", [])
+                    matches.append(RuleMatch(
+                        rule_id="RULE_ARCHIVE_DOUBLE_EXTENSION",
+                        rule_name="Double Extension File Camouflage",
+                        severity=RuleSeverity.HIGH,
+                        score_contribution=30.0,
+                        explanation=f"Archive contains deceptive double-extension files commonly used in social engineering / phishing campaigns: {', '.join(double_entries[:3])}.",
+                        evidence_detail={"entries": list(double_entries)}
+                    ))
+                if archive_meta.get("has_executable_entries", False):
+                    exec_entries = archive_meta.get("executable_entries", [])
+                    matches.append(RuleMatch(
+                        rule_id="RULE_ARCHIVE_EXECUTABLE_CONTENT",
+                        rule_name="Executable Binaries or Scripts in Archive",
+                        severity=RuleSeverity.MEDIUM,
+                        score_contribution=20.0,
+                        explanation=f"Archive packages executable binaries or script files ({', '.join(exec_entries[:3])}).",
+                        evidence_detail={"executables": list(exec_entries)}
+                    ))
+                if archive_meta.get("entry_count", 0) > 5000:
+                    matches.append(RuleMatch(
+                        rule_id="RULE_ARCHIVE_EXCESSIVE_ENTRIES",
+                        rule_name="Excessive Archive Entry Count",
+                        severity=RuleSeverity.LOW,
+                        score_contribution=15.0,
+                        explanation=f"Archive contains unusually large number of file entries ({archive_meta.get('entry_count')}).",
+                        evidence_detail={"entry_count": archive_meta.get("entry_count")}
+                    ))
+                if archive_meta.get("has_encrypted_entries", False):
+                    matches.append(RuleMatch(
+                        rule_id="RULE_ARCHIVE_ENCRYPTED_ENTRIES",
+                        rule_name="Encrypted / Password-Protected Archive",
+                        severity=RuleSeverity.LOW,
+                        score_contribution=10.0,
+                        explanation="Archive contains encrypted entries that obscure content from static security inspection.",
+                        evidence_detail={"has_encrypted": True}
+                    ))
+
+            # Script Rules
+            if script_meta:
+                matched_ind = set(script_meta.get("matched_indicators", []))
+                if script_meta.get("has_download_cradle", False) and script_meta.get("has_dynamic_eval", False):
+                    matches.append(RuleMatch(
+                        rule_id="RULE_SCRIPT_POWERSHELL_DOWNLOAD_EXECUTE",
+                        rule_name="PowerShell Download-and-Execute Cradle",
+                        severity=RuleSeverity.CRITICAL,
+                        score_contribution=45.0,
+                        explanation="Script combines remote web download primitives (DownloadString/DownloadFile) with dynamic in-memory execution (IEX/Invoke-Expression).",
+                        evidence_detail={"indicators": list(matched_ind)}
+                    ))
+                if script_meta.get("has_shadow_copy_tampering", False):
+                    matches.append(RuleMatch(
+                        rule_id="RULE_SCRIPT_SHADOW_COPY_DELETION",
+                        rule_name="System Recovery & Shadow Copy Deletion",
+                        severity=RuleSeverity.CRITICAL,
+                        score_contribution=45.0,
+                        explanation="Script contains commands attempting to delete Volume Shadow Copies or disable Windows recovery (characteristic of ransomware defense inhibition).",
+                        evidence_detail={"indicators": list(matched_ind)}
+                    ))
+                if script_meta.get("has_encoded_payload", False):
+                    matches.append(RuleMatch(
+                        rule_id="RULE_SCRIPT_POWERSHELL_ENCODED_COMMAND",
+                        rule_name="Encoded PowerShell Command Payload",
+                        severity=RuleSeverity.HIGH,
+                        score_contribution=35.0,
+                        explanation="Script invokes PowerShell with base64-encoded command payload (-EncodedCommand) to obscure command intent.",
+                        evidence_detail={"indicators": list(matched_ind)}
+                    ))
+                if {"VBS_HTTP_DOWNLOAD", "VBS_ADODB_STREAM", "VBS_SHELL_EXEC"}.issubset(matched_ind):
+                    matches.append(RuleMatch(
+                        rule_id="RULE_SCRIPT_VBSCRIPT_DOWNLOAD_DROPPER",
+                        rule_name="VBScript Dropper Sequence",
+                        severity=RuleSeverity.HIGH,
+                        score_contribution=35.0,
+                        explanation="VBScript downloads remote stream via HTTP, writes to disk via ADODB.Stream, and invokes shell execution.",
+                        evidence_detail={"indicators": list(matched_ind)}
+                    ))
+                if "BATCH_CERTUTIL_DOWNLOAD" in matched_ind or "BATCH_BITSADMIN_DOWNLOAD" in matched_ind:
+                    matches.append(RuleMatch(
+                        rule_id="RULE_SCRIPT_BATCH_DOWNLOAD_EXECUTE",
+                        rule_name="Batch Ingress Download Utility",
+                        severity=RuleSeverity.HIGH,
+                        score_contribution=30.0,
+                        explanation="Batch script abuses Windows system tools (certutil or bitsadmin) to download external files from the network.",
+                        evidence_detail={"indicators": list(matched_ind)}
+                    ))
+                if "PY_DYNAMIC_EXEC" in matched_ind:
+                    matches.append(RuleMatch(
+                        rule_id="RULE_SCRIPT_PYTHON_DYNAMIC_EXECUTION",
+                        rule_name="Python Dynamic Execution with Network/Decode",
+                        severity=RuleSeverity.HIGH,
+                        score_contribution=30.0,
+                        explanation="Python script dynamically evaluates decoded base64 strings or remote network streams via exec() or eval().",
+                        evidence_detail={"indicators": list(matched_ind)}
+                    ))
+                if script_meta.get("has_execution_bypass", False):
+                    matches.append(RuleMatch(
+                        rule_id="RULE_SCRIPT_POWERSHELL_EXECUTION_BYPASS",
+                        rule_name="Execution Policy Bypass or Hidden Window",
+                        severity=RuleSeverity.MEDIUM,
+                        score_contribution=20.0,
+                        explanation="Script attempts to bypass PowerShell execution policy (-ExecutionPolicy Bypass) or hide console window from user.",
+                        evidence_detail={"indicators": list(matched_ind)}
+                    ))
+
             total_score = min(100.0, sum(m.score_contribution for m in matches))
             structured = RuleEvaluationResult(
                 target_identifier=target_name,
@@ -676,3 +799,6 @@ class RuleEngine:
             "reasons": [m.explanation for m in matches],
             "structured_result": structured
         }
+
+    # Alias for universal static file evaluation (supporting both PE and non-PE files)
+    evaluate_file = evaluate_pe_file
