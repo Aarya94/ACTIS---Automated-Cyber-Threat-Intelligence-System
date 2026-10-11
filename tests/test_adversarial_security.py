@@ -35,11 +35,15 @@ from scanners.file_feature_extractor import (
     PE_SIGNATURE,
     FileFeatureExtractor,
     calculate_entropy,
+    calculate_file_hashes,
     detect_pe_format,
     is_pe_file,
 )
 from scanners.pe_feature_contract import PEStaticFeatures
-from scanners.text_analyzer import MessageScanResult, TextAnalyzer
+from scanners.text_analyzer import MessageScanResult, TextAnalyzer, clean_url_token
+from scanners.file_scanner import scan_file
+from detection_engine.threat_detector import threat_detector
+from assistant.security_assistant import security_assistant, mask_sensitive_strings
 from scanners.url_scanner import (
     extract_domain,
     extract_url_features,
@@ -392,3 +396,87 @@ class TestClassificationAndFalsePositiveSafety:
         score, breakdown = RiskScoringEngine.score_evidence(evidence)
         assert score >= 90.0
         assert breakdown.threat_intel_score == 100.0
+
+
+class TestAdversarialInputRobustness:
+    """Verifies that public analysis and scanner interfaces handle None, invalid types, and edge inputs safely."""
+
+    def test_none_and_invalid_type_in_file_feature_extractor(self):
+        """detect_pe_format, is_pe_file, and extract_features safely handle None and non-path objects."""
+        is_pe, reason = detect_pe_format(None)
+        assert is_pe is False
+        assert reason == "INVALID_PATH_TYPE"
+        assert is_pe_file(None) is False
+
+        is_pe_num, reason_num = detect_pe_format(12345)
+        assert is_pe_num is False
+        assert reason_num == "INVALID_PATH_TYPE"
+
+        # extract_features must return structured failure without raising unhandled exceptions
+        res_none = FileFeatureExtractor.extract_features(None)
+        assert isinstance(res_none, dict)
+        assert res_none["is_valid"] is False
+        assert "None or invalid" in res_none["error"]
+
+        res_num = FileFeatureExtractor.extract_features(12345)
+        assert isinstance(res_num, dict)
+        assert res_num["is_valid"] is False
+
+        with pytest.raises(FileNotFoundError):
+            calculate_file_hashes(None)
+
+    def test_directory_path_in_file_scanner_and_detector(self, tmp_path):
+        """scan_file and threat_detector.analyze_file reject directory targets with structured contracts."""
+        dir_res = scan_file(tmp_path)
+        assert isinstance(dir_res, dict)
+        assert dir_res["is_valid"] is False
+        assert dir_res["is_threat"] is False
+        assert dir_res["score"] == 0.0
+        assert "directory" in dir_res["error"].lower()
+
+        detector_dir_res = threat_detector.analyze_file(tmp_path)
+        assert isinstance(detector_dir_res, dict)
+        assert detector_dir_res["is_valid"] is False
+        assert detector_dir_res["is_threat"] is False
+        assert "directory" in detector_dir_res["error"].lower()
+
+    def test_none_input_in_file_scanner_and_threat_detector(self):
+        """scan_file and threat_detector.analyze_file handle None safely."""
+        scan_none = scan_file(None)
+        assert isinstance(scan_none, dict)
+        assert scan_none["is_valid"] is False
+        assert scan_none["score"] == 0.0
+        assert scan_none["is_threat"] is False
+
+        detector_none = threat_detector.analyze_file(None)
+        assert isinstance(detector_none, dict)
+        assert detector_none["is_valid"] is False
+        assert detector_none["score"] == 0.0
+        assert detector_none["is_threat"] is False
+
+    def test_none_and_non_string_in_text_analyzer_social_engineering(self):
+        """clean_url_token and evaluate_social_engineering handle None and non-strings safely."""
+        assert clean_url_token(None) == ""
+        assert clean_url_token(12345) == ""
+
+        se_none = TextAnalyzer.evaluate_social_engineering(None)
+        assert isinstance(se_none, dict)
+        assert se_none["se_score"] == 0
+        assert se_none["has_urgency"] is False
+        assert se_none["has_credential_request"] is False
+        assert se_none["has_financial_lure"] is False
+
+        se_num = TextAnalyzer.evaluate_social_engineering(12345)
+        assert isinstance(se_num, dict)
+        assert se_num["se_score"] == 0
+
+    def test_none_and_non_string_in_security_assistant(self):
+        """mask_sensitive_strings and security_assistant.ask handle None and non-strings safely."""
+        assert mask_sensitive_strings(None) == ""
+        assert mask_sensitive_strings(12345) == "12345"
+
+        resp_none = security_assistant.ask(None)
+        assert "Please enter a security inquiry" in resp_none
+
+        resp_num = security_assistant.ask(12345)
+        assert "Please enter a security inquiry" in resp_num

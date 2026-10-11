@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-10-11 09:09:18 UTC  
+**Generated:** 2026-10-11 09:24:25 UTC  
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)  
 
 This document inventories all automated test files, test classes, and test functions
@@ -12,7 +12,7 @@ recorded only after confirmed execution.
 ## Test Suite Summary
 
 - **Total Test Files:** `31`
-- **Total Discovered Test Cases:** `414`
+- **Total Discovered Test Cases:** `419`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -22,7 +22,7 @@ recorded only after confirmed execution.
 
 | Test File | Test Cases | Status |
 |---|---|---|
-| `tests/test_adversarial_security.py` | 24 tests | `PASSING` |
+| `tests/test_adversarial_security.py` | 29 tests | `PASSING` |
 | `tests/test_backend_api.py` | 4 tests | `PASSING` |
 | `tests/test_branding_assets.py` | 6 tests | `PASSING` |
 | `tests/test_central_ti_service.py` | 30 tests | `PASSING` |
@@ -58,7 +58,7 @@ recorded only after confirmed execution.
 
 ## Test Functions Detail
 
-### `tests/test_adversarial_security.py` (24 tests)
+### `tests/test_adversarial_security.py` (29 tests)
 
 **Class `TestMalformedPEFiles`:**
 - `test_empty_file_handling()`
@@ -93,6 +93,13 @@ recorded only after confirmed execution.
 - `test_missing_intelligence_does_not_bias_classification()`
 - `test_single_weak_heuristic_does_not_force_critical()`
 - `test_confirmed_threat_intel_enforces_critical_floor()`
+
+**Class `TestAdversarialInputRobustness`:**
+- `test_none_and_invalid_type_in_file_feature_extractor()`
+- `test_directory_path_in_file_scanner_and_detector()`
+- `test_none_input_in_file_scanner_and_threat_detector()`
+- `test_none_and_non_string_in_text_analyzer_social_engineering()`
+- `test_none_and_non_string_in_security_assistant()`
 
 ### `tests/test_backend_api.py` (4 tests)
 

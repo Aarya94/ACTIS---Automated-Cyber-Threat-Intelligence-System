@@ -78,6 +78,9 @@ def detect_pe_format(file_path: Union[str, Path]) -> Tuple[bool, Optional[str]]:
     Tuple[bool, Optional[str]]
         (is_pe, format_description_or_rejection_reason)
     """
+    if not file_path or not isinstance(file_path, (str, Path)):
+        return False, "INVALID_PATH_TYPE"
+
     path = Path(file_path)
     if not path.is_file():
         return False, "NON_EXISTENT_FILE"
@@ -155,6 +158,8 @@ def calculate_file_hashes(
     ValueError
         If an unsupported hash algorithm is requested.
     """
+    if not file_path or not isinstance(file_path, (str, Path)):
+        raise FileNotFoundError(f"Target file path is None or invalid: {file_path}")
     path = Path(file_path)
     if not path.is_file():
         raise FileNotFoundError(f"Target file does not exist: {path}")
@@ -526,13 +531,11 @@ class FileFeatureExtractor:
         Never executes the target file.
         Hardened against nonexistent, empty, truncated, corrupted, and non-PE files.
         """
-        path = Path(file_path)
-
         # Basic metadata dictionary initialized with safe defaults
         result: Dict[str, Any] = {
-            "file_path": str(path),
-            "file_name": path.name if path.name else str(path),
-            "extension": path.suffix.lower() if path.suffix else "",
+            "file_path": str(file_path or ""),
+            "file_name": "",
+            "extension": "",
             "file_size": 0,
             "is_valid": False,
             "is_pe": False,
@@ -550,6 +553,15 @@ class FileFeatureExtractor:
             "is_signed": False,
             "warnings": []
         }
+
+        if not file_path or not isinstance(file_path, (str, Path)):
+            result["error"] = "Target file path is None or invalid."
+            return result
+
+        path = Path(file_path)
+        result["file_path"] = str(path)
+        result["file_name"] = path.name if path.name else str(path)
+        result["extension"] = path.suffix.lower() if path.suffix else ""
 
         # Validate path existence and file type
         try:

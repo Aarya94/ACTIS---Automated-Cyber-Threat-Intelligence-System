@@ -15,10 +15,28 @@ def scan_file(file_path: Path, scan_id: Optional[int] = None, check_external: bo
     """
     Scans a single file using safe, read-only static analysis and the risk engine.
     """
+    if not file_path or not isinstance(file_path, (str, Path)):
+        return {
+            "error": "File path is None or invalid.",
+            "is_valid": False,
+            "target": "",
+            "score": 0.0,
+            "risk_level": "LOW",
+            "is_threat": False
+        }
     path = Path(file_path)
     if not path.exists():
         return {
             "error": f"File does not exist: {path}",
+            "is_valid": False,
+            "target": str(path),
+            "score": 0.0,
+            "risk_level": "LOW",
+            "is_threat": False
+        }
+    if path.is_dir():
+        return {
+            "error": f"Path is a directory, not a regular file: {path}",
             "is_valid": False,
             "target": str(path),
             "score": 0.0,

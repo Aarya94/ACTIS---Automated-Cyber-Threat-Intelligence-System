@@ -47,10 +47,12 @@ SECRET_PATTERN = re.compile(
 )
 
 
-def mask_sensitive_strings(text: str) -> str:
+def mask_sensitive_strings(text: Any) -> str:
     """Masks potential credentials, API keys, and sensitive tokens from text."""
     if not text:
-        return text
+        return "" if text is None else str(text)
+    if not isinstance(text, str):
+        return str(text)
 
     def _repl(match):
         val = match.group(1)
@@ -178,13 +180,13 @@ class SecurityAssistant:
         self.fallback_provider = DeterministicAssistantProvider()
         self.provider = provider or self.fallback_provider
 
-    def ask(self, query: str) -> str:
+    def ask(self, query: Any) -> str:
         """
         Processes a user security inquiry and returns a factual, grounded explanation.
         Handles missing records honestly, avoids false safety claims, and enforces
         strict read-only security boundaries.
         """
-        if not query or not query.strip():
+        if not query or not isinstance(query, str) or not query.strip():
             return "Please enter a security inquiry or question regarding ACTIS scans, detections, or threat intelligence."
 
         # Bound query length to protect against resource exhaustion

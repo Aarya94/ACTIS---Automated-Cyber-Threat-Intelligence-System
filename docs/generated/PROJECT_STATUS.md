@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-11 09:09:18 UTC  
+**Generated:** 2026-10-11 09:24:25 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`d47becd`)  
+**Current Git Branch:** `main` (`58a79da`)  
 
 ---
 
@@ -118,19 +118,20 @@
 ## Test Status
 
 - **Total Test Files:** `31`
-- **Total Discovered Test Functions:** `414`
+- **Total Discovered Test Functions:** `419`
 - **Coverage Areas:** Configuration validation, SQLite database schema & CRUD, Phishing/Malware model contracts, PE feature extraction, API backend.
 
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `d47becd`
-- **Working Tree:** 2 untracked/unstaged changes
+- **HEAD Commit:** `58a79da`
+- **Working Tree:** 17 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `58a79da` | Aaryan Suman | 2026-10-11 | feat(release): implement safe offline demonstration workflow and release acceptance suite |
 | `d47becd` | Aaryan Suman | 2026-10-11 | docs(release): document Day 16 integration demonstration and update release baseline |
 | `21b9b1d` | Aaryan Suman | 2026-10-11 | test(integration): add end-to-end release integration acceptance tests |
 | `cdd89d8` | Aaryan Suman | 2026-10-11 | feat(demo): add reproducible offline demonstration workflow |
@@ -140,7 +141,6 @@
 | `7c2d263` | Aaryan Suman | 2026-10-11 | fix(detection): break module circular dependency and shield unspecified IPs |
 | `8dba147` | Aaryan Suman | 2026-10-11 | test(security): add adversarial input and false-positive regression coverage |
 | `7b5cd71` | Aaryan Suman | 2026-10-10 | docs(changelog): align Day 14 commit history and generated changelog telemetry |
-| `331edd8` | Aaryan Suman | 2026-10-10 | docs(architecture): reconcile architectural documentation and test baselines with Day 14 |
 
 ## Known Issues
 

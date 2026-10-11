@@ -14,12 +14,14 @@ logger = get_logger("TextAnalyzer")
 URL_REGEX = re.compile(r"(?:https?://|www\.)[^\s<>\"]+", re.IGNORECASE)
 
 
-def clean_url_token(raw_token: str) -> str:
+def clean_url_token(raw_token: Any) -> str:
     """
     Cleans an extracted URL token by removing surrounding punctuation,
     unbalanced enclosing parentheses/brackets/braces, and outer quotes.
     Preserves balanced parentheses inside URLs (e.g. Wikipedia links).
     """
+    if not raw_token or not isinstance(raw_token, str):
+        return ""
     token = raw_token.strip()
     while token:
         if token[-1] in ".,;:!?'\"":
@@ -151,8 +153,19 @@ class TextAnalyzer:
 
 
     @classmethod
-    def evaluate_social_engineering(cls, text: str) -> Dict[str, Any]:
+    def evaluate_social_engineering(cls, text: Any) -> Dict[str, Any]:
         """Identifies suspicious urgency, credential requests, and financial lure keywords."""
+        if not text or not isinstance(text, str):
+            return {
+                "se_score": 0,
+                "has_urgency": False,
+                "urgency_indicators": [],
+                "has_credential_request": False,
+                "credential_indicators": [],
+                "has_financial_lure": False,
+                "financial_indicators": []
+            }
+
         urgency_hits = []
         for pat in URGENCY_PATTERNS:
             if re.search(pat, text, re.IGNORECASE):
