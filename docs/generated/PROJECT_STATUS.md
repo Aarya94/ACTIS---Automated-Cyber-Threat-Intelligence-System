@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-11 09:24:52 UTC  
-**Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`12b397c`)  
+**Generated:** 2026-10-11 10:06:12 UTC
+**Current Milestone:** `v0.1.0 — Foundation`
+**Current Git Branch:** `main` (`6e166d5`)
 
 ---
 
@@ -28,7 +28,7 @@
 ## Current Development Day
 
 **Completed:** Day 2 (Configuration Subsystem & Schema Validation)  
-**Next Scheduled:** Day 3 (Structured Logging Infrastructure)  
+**Next Scheduled:** Day 3 (Structured Logging Infrastructure)
 
 ## Repository Structure
 
@@ -117,20 +117,21 @@
 
 ## Test Status
 
-- **Total Test Files:** `31`
-- **Total Discovered Test Functions:** `419`
+- **Total Test Files:** `34`
+- **Total Discovered Test Functions:** `447`
 - **Coverage Areas:** Configuration validation, SQLite database schema & CRUD, Phishing/Malware model contracts, PE feature extraction, API backend.
 
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `12b397c`
-- **Working Tree:** 5 untracked/unstaged changes
+- **HEAD Commit:** `6e166d5`
+- **Working Tree:** 23 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `6e166d5` | Aaryan Suman | 2026-10-11 | docs(release): reconcile Day 15 hardening baseline and Day 16 release verification |
 | `12b397c` | Aaryan Suman | 2026-10-11 | fix(security): harden analysis pipelines against non-string, None, and directory inputs |
 | `58a79da` | Aaryan Suman | 2026-10-11 | feat(release): implement safe offline demonstration workflow and release acceptance suite |
 | `d47becd` | Aaryan Suman | 2026-10-11 | docs(release): document Day 16 integration demonstration and update release baseline |
@@ -140,7 +141,6 @@
 | `5d86124` | Aaryan Suman | 2026-10-11 | docs(security): document Day 15 hardening baseline and operational boundaries |
 | `7cabdf4` | Aaryan Suman | 2026-10-11 | feat(security): add log credential redaction and privacy safeguards test suite |
 | `7c2d263` | Aaryan Suman | 2026-10-11 | fix(detection): break module circular dependency and shield unspecified IPs |
-| `8dba147` | Aaryan Suman | 2026-10-11 | test(security): add adversarial input and false-positive regression coverage |
 
 ## Known Issues
 

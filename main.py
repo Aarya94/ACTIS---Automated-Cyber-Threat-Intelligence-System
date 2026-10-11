@@ -136,6 +136,8 @@ def main():
     parser.add_argument("--scan-url", type=str, help="Scan a single URL")
     parser.add_argument("--scan-file", type=str, help="Scan a single file safely")
     parser.add_argument("--quick-scan", action="store_true", help="Execute Quick Scan")
+    parser.add_argument("--service", action="store_true", help="Run ACTIS Protection Service in host mode")
+    parser.add_argument("--service-status", action="store_true", help="Query ACTIS Protection Service status and telemetry")
     args = parser.parse_args()
 
     initialize_database()
@@ -147,6 +149,18 @@ def main():
     elif args.server:
         import uvicorn
         uvicorn.run("backend.api:app", host="127.0.0.1", port=8000, reload=False)
+    elif args.service:
+        from service.windows_host import create_windows_host
+        host = create_windows_host()
+        code = host.run_standalone()
+        sys.exit(code)
+    elif args.service_status:
+        from service.windows_host import create_windows_host
+        host = create_windows_host()
+        status = host.handle_scm_control_interrogate()
+        import json
+        print(json.dumps(status, indent=2))
+        sys.exit(0)
     elif args.scan_url:
         res = scan_url_logic(args.scan_url)
         import json

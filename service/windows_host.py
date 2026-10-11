@@ -108,6 +108,7 @@ class WindowsServiceHost:
         started = self.service.start()
         if not started:
             logger.error("Failed to start ProtectionService in standalone mode.")
+            self.service.stop()
             return 1
 
         try:
@@ -127,6 +128,16 @@ class WindowsServiceHost:
         return 0
 
 
+    def request_stop(self) -> None:
+        """Sets the stop requested event to signal run_standalone to exit."""
+        self._stop_requested.set()
+
+    @property
+    def is_stop_requested(self) -> bool:
+        """Returns True if a stop has been requested."""
+        return self._stop_requested.is_set()
+
+
 def create_windows_host(
     config: Optional[ServiceConfig] = None,
 ) -> WindowsServiceHost:
@@ -134,3 +145,24 @@ def create_windows_host(
     cfg = config or get_default_service_config()
     service = ProtectionService(config=cfg)
     return WindowsServiceHost(service=service, config=cfg)
+
+
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description="ACTIS Windows Protection Service Host")
+    parser.add_argument("--status", action="store_true", help="Print service host configuration and health")
+    parser.add_argument("--workers", type=int, default=None, help="Number of worker threads")
+    parsed_args = parser.parse_args()
+
+    service_cfg = get_default_service_config()
+    if parsed_args.workers:
+        service_cfg.worker_count = parsed_args.workers
+
+    host_instance = create_windows_host(config=service_cfg)
+    if parsed_args.status:
+        import json
+        print(json.dumps(host_instance.handle_scm_control_interrogate(), indent=2))
+        sys.exit(0)
+    else:
+        sys.exit(host_instance.run_standalone())

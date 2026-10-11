@@ -1,7 +1,7 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-10-11 09:24:52 UTC  
-**Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)  
+**Generated:** 2026-10-11 10:06:12 UTC
+**Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)
 
 This document inventories all automated test files, test classes, and test functions
 present in the `tests/` directory. Per ACTIS quality requirements, test passes are
@@ -11,8 +11,8 @@ recorded only after confirmed execution.
 
 ## Test Suite Summary
 
-- **Total Test Files:** `31`
-- **Total Discovered Test Cases:** `419`
+- **Total Test Files:** `34`
+- **Total Discovered Test Cases:** `447`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -44,6 +44,7 @@ recorded only after confirmed execution.
 | `tests/test_risk_engine.py` | 3 tests | `PASSING` |
 | `tests/test_risk_engine_day6.py` | 8 tests | `PASSING` |
 | `tests/test_security_assistant.py` | 27 tests | `PASSING` |
+| `tests/test_service_scripts.py` | 6 tests | `PASSING` |
 | `tests/test_static_pe.py` | 21 tests | `PASSING` |
 | `tests/test_text_analyzer.py` | 9 tests | `PASSING` |
 | `tests/test_threat_database.py` | 3 tests | `PASSING` |
@@ -53,6 +54,8 @@ recorded only after confirmed execution.
 | `tests/test_unified_architecture.py` | 12 tests | `PASSING` |
 | `tests/test_url_scanner.py` | 11 tests | `PASSING` |
 | `tests/test_week1_validation.py` | 4 tests | `PASSING` |
+| `tests/test_windows_notifications.py` | 13 tests | `PASSING` |
+| `tests/test_windows_service_host.py` | 9 tests | `PASSING` |
 
 ---
 
@@ -567,6 +570,18 @@ recorded only after confirmed execution.
 - `test_external_llm_provider_fallback_when_unconfigured()`
 - `test_external_llm_provider_fallback_on_exception()`
 
+### `tests/test_service_scripts.py` (6 tests)
+
+**Class `TestServiceScriptsIntegrity`:**
+- `test_scripts_exist_and_readable()`
+- `test_scripts_contain_no_hardcoded_credentials()`
+- `test_scripts_contain_no_defender_tampering()`
+
+**Class `TestServiceScriptsExecution`:**
+- `test_install_script_dry_run()`
+- `test_status_script_json_output()`
+- `test_uninstall_script_dry_run_or_uninstalled()`
+
 ### `tests/test_static_pe.py` (21 tests)
 
 **Standalone Test Functions:**
@@ -744,6 +759,44 @@ recorded only after confirmed execution.
 - `test_config_and_logger_load()`
 - `test_requirements_and_readme_exist()`
 - `test_phishing_model_metadata_contract()`
+
+### `tests/test_windows_notifications.py` (13 tests)
+
+**Class `TestNotificationSanitization`:**
+- `test_sanitize_empty_text()`
+- `test_sanitize_xml_special_characters()`
+- `test_sanitize_redacts_api_keys_and_tokens()`
+- `test_sanitize_bounds_length()`
+
+**Class `TestWindowsToastNotifier`:**
+- `test_notifier()`
+- `test_toast_dispatch_is_non_blocking()`
+- `test_test_mode_records_history()`
+- `test_rate_limiting_suppresses_rapid_duplicate_toasts()`
+- `test_notify_threat_event_labeling()`
+- `test_powershell_failure_isolated_safely()`
+
+**Class `TestNotificationManagerIntegration`:**
+- `test_notification_manager_triggers_toast_for_high_risk()`
+- `test_notification_manager_skips_toast_for_low_risk()`
+
+**Class `TestFileProtectionPipelineNotificationHandoff`:**
+- `test_pipeline_dispatches_notification_on_threat()`
+
+### `tests/test_windows_service_host.py` (9 tests)
+
+**Class `TestWindowsServiceHostLifecycle`:**
+- `test_host()`
+- `test_host_initialization()`
+- `test_request_stop_sets_event()`
+- `test_scm_control_handlers()`
+- `test_run_standalone_graceful_stop()`
+- `test_run_standalone_startup_failure()`
+- `test_run_standalone_fails_when_service_enters_failed_state()`
+
+**Class `TestServiceCliRouting`:**
+- `test_main_service_status_flag()`
+- `test_main_service_flag_dispatches_run_standalone()`
 
 ---
 
