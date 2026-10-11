@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-11 10:47:02 UTC
+**Generated:** 2026-10-11 11:46:14 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`fa0b8ee`)
+**Current Git Branch:** `main` (`61db8d4`)
 
 ---
 
@@ -117,20 +117,21 @@
 
 ## Test Status
 
-- **Total Test Files:** `34`
-- **Total Discovered Test Functions:** `458`
+- **Total Test Files:** `35`
+- **Total Discovered Test Functions:** `482`
 - **Coverage Areas:** Configuration validation, SQLite database schema & CRUD, Phishing/Malware model contracts, PE feature extraction, API backend.
 
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `fa0b8ee`
-- **Working Tree:** 10 untracked/unstaged changes
+- **HEAD Commit:** `61db8d4`
+- **Working Tree:** 15 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `61db8d4` | Aaryan Suman | 2026-10-11 | docs(day18): document enhanced PE import analysis, heuristic rules, and Day 18 milestone |
 | `fa0b8ee` | Aaryan Suman | 2026-10-11 | feat(detection): add enhanced PE heuristic rules for process hollowing, token impersonation, and section anomalies |
 | `3a1af8d` | Aaryan Suman | 2026-10-11 | feat(scanner): implement Mandiant imphash calculation and threat family API categorization |
 | `fb94e6b` | Aaryan Suman | 2026-10-11 | docs(day17): document Windows service management, native notifications, and Day 17 milestone |
@@ -140,7 +141,6 @@
 | `6e166d5` | Aaryan Suman | 2026-10-11 | docs(release): reconcile Day 15 hardening baseline and Day 16 release verification |
 | `12b397c` | Aaryan Suman | 2026-10-11 | fix(security): harden analysis pipelines against non-string, None, and directory inputs |
 | `58a79da` | Aaryan Suman | 2026-10-11 | feat(release): implement safe offline demonstration workflow and release acceptance suite |
-| `d47becd` | Aaryan Suman | 2026-10-11 | docs(release): document Day 16 integration demonstration and update release baseline |
 
 ## Known Issues
 

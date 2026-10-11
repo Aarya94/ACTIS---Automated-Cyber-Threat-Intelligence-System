@@ -675,6 +675,9 @@ class FileFeatureExtractor:
             "imphash": "",
             "api_categories_found": {},
             "entropy_distribution": {},
+            "non_pe_features": {},
+            "detected_format": "UNKNOWN",
+            "analysis_method": "STATIC_PE_PARSER",
             "is_signed": False,
             "warnings": []
         }
@@ -740,6 +743,21 @@ class FileFeatureExtractor:
         is_pe_candidate, pe_format_desc = detect_pe_format(path)
         if not is_pe_candidate:
             result["is_pe"] = False
+            try:
+                from scanners.non_pe_analyzer import NonPEAnalyzer
+                non_pe_res = NonPEAnalyzer.analyze_non_pe_file(
+                    path,
+                    hashes={"sha256": result["sha256"], "md5": result["md5"], "sha1": result["sha1"]},
+                    entropy=result["entropy"],
+                    file_size=file_size
+                )
+                result["non_pe_features"] = non_pe_res.to_dict()
+                result["detected_format"] = non_pe_res.detected_format.value
+                result["analysis_method"] = non_pe_res.analysis_method.value
+                if non_pe_res.warnings:
+                    result["warnings"].extend(non_pe_res.warnings)
+            except Exception as non_pe_err:
+                result["warnings"].append(f"Non-PE analysis exception: {non_pe_err.__class__.__name__}")
             return result
 
         # Attempt safe PE parsing
@@ -747,6 +765,8 @@ class FileFeatureExtractor:
         try:
             pe = pefile.PE(str(path), fast_load=True)
             result["is_pe"] = True
+            result["detected_format"] = "WINDOWS_PE"
+            result["analysis_method"] = "STATIC_PE_PARSER"
             try:
                 pe.parse_data_directories()
             except Exception as pe_dir_err:
@@ -754,6 +774,19 @@ class FileFeatureExtractor:
         except pefile.PEFormatError:
             result["is_pe"] = False
             result["warnings"].append("File headers contain invalid PE formatting.")
+            try:
+                from scanners.non_pe_analyzer import NonPEAnalyzer
+                non_pe_res = NonPEAnalyzer.analyze_non_pe_file(
+                    path,
+                    hashes={"sha256": result["sha256"], "md5": result["md5"], "sha1": result["sha1"]},
+                    entropy=result["entropy"],
+                    file_size=file_size
+                )
+                result["non_pe_features"] = non_pe_res.to_dict()
+                result["detected_format"] = non_pe_res.detected_format.value
+                result["analysis_method"] = non_pe_res.analysis_method.value
+            except Exception:
+                pass
             return result
         except Exception as e:
             result["is_pe"] = False

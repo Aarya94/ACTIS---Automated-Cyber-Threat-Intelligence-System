@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-10-11 10:47:02 UTC
+**Generated:** 2026-10-11 11:46:14 UTC
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)
 
 This document inventories all automated test files, test classes, and test functions
@@ -11,8 +11,8 @@ recorded only after confirmed execution.
 
 ## Test Suite Summary
 
-- **Total Test Files:** `34`
-- **Total Discovered Test Cases:** `458`
+- **Total Test Files:** `35`
+- **Total Discovered Test Cases:** `482`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -36,6 +36,7 @@ recorded only after confirmed execution.
 | `tests/test_file_protection_integration.py` | 7 tests | `PASSING` |
 | `tests/test_incremental_state.py` | 8 tests | `PASSING` |
 | `tests/test_malware_dataset.py` | 25 tests | `PASSING` |
+| `tests/test_non_pe_analysis.py` | 24 tests | `PASSING` |
 | `tests/test_privacy_safeguards.py` | 16 tests | `PASSING` |
 | `tests/test_protection_service_events.py` | 15 tests | `PASSING` |
 | `tests/test_protection_service_lifecycle.py` | 15 tests | `PASSING` |
@@ -382,6 +383,40 @@ recorded only after confirmed execution.
 - `test_get_class_distribution_raw_labels()`
 - `test_get_class_distribution_normalized_target()`
 - `test_get_class_distribution_empty_dataframe()`
+
+### `tests/test_non_pe_analysis.py` (24 tests)
+
+**Class `TestStreamingCryptographicHashing`:**
+- `test_hashing_empty_file()`
+- `test_hashing_chunk_boundaries()`
+- `test_hashing_determinism_and_content_isolation()`
+- `test_hashing_missing_and_invalid_inputs()`
+
+**Class `TestArchiveInspection`:**
+- `test_zip_benign_safe_inspection_no_extraction()`
+- `test_zip_with_executable_content_flagged()`
+- `test_zip_double_extension_camouflage_flagged()`
+- `test_zip_bomb_compression_ratio_detection()`
+- `test_tar_archive_safe_inspection()`
+- `test_gzip_archive_safe_inspection()`
+- `test_7z_unsupported_graceful_fallback_no_crash()`
+- `test_corrupted_archive_handled_gracefully()`
+
+**Class `TestStaticScriptHeuristics`:**
+- `test_powershell_download_and_execute_cradle()`
+- `test_powershell_encoded_command()`
+- `test_powershell_execution_bypass_and_hidden()`
+- `test_batch_certutil_download()`
+- `test_batch_shadow_copy_deletion()`
+- `test_vbscript_download_dropper()`
+- `test_python_dynamic_execution_with_network_decode()`
+- `test_benign_script_with_comments_not_flagged()`
+- `test_clean_benign_python_script()`
+
+**Class `TestNonPEPipelineIntegration`:**
+- `test_pe_routing_preserves_pe_pipeline()`
+- `test_non_pe_scan_file_integration_malicious_script()`
+- `test_non_pe_scan_file_integration_benign_text()`
 
 ### `tests/test_privacy_safeguards.py` (16 tests)
 
