@@ -146,6 +146,129 @@ class TestRuleEngineContractsAndEvaluation:
         assert res2.total_score == 15.0
         assert res2.max_severity == RuleSeverity.LOW
 
+    def test_pe_process_hollowing_rule_unmap(self):
+        info = {
+            "is_pe": True,
+            "filename": "hollow_unmap.exe",
+            "suspicious_apis_found": ["ZwUnmapViewOfSection", "CreateProcessW"],
+            "sections": [{"name": ".text", "raw_size": 1024, "virtual_size": 1024, "entropy": 5.0, "is_executable": True}],
+            "is_signed": True,
+        }
+        res = RuleEngine.evaluate_pe_file(info)
+        assert "RULE_PE_PROCESS_HOLLOWING" in res["rules_triggered"]
+        assert res["score"] >= 45
+
+    def test_pe_process_hollowing_rule_sequence(self):
+        info = {
+            "is_pe": True,
+            "filename": "hollow_seq.exe",
+            "suspicious_apis_found": ["VirtualAllocEx", "WriteProcessMemory", "ResumeThread"],
+            "sections": [{"name": ".text", "raw_size": 1024, "virtual_size": 1024, "entropy": 5.0, "is_executable": True}],
+            "is_signed": True,
+        }
+        res = RuleEngine.evaluate_pe_file(info)
+        assert "RULE_PE_PROCESS_HOLLOWING" in res["rules_triggered"]
+        assert res["score"] >= 45
+
+    def test_pe_token_impersonation_rule(self):
+        info = {
+            "is_pe": True,
+            "filename": "priv_escalate.exe",
+            "suspicious_apis_found": ["OpenProcessToken", "AdjustTokenPrivileges"],
+            "sections": [{"name": ".text", "raw_size": 1024, "virtual_size": 1024, "entropy": 5.0, "is_executable": True}],
+            "is_signed": True,
+        }
+        res = RuleEngine.evaluate_pe_file(info)
+        assert "RULE_PE_TOKEN_IMPERSONATION" in res["rules_triggered"]
+        assert res["score"] >= 30
+
+    def test_pe_dynamic_api_resolver_rule(self):
+        info = {
+            "is_pe": True,
+            "filename": "packed_loader.exe",
+            "suspicious_apis_found": ["LoadLibraryA", "GetProcAddress"],
+            "import_metadata": {"imported_function_count": 8},
+            "sections": [{"name": ".text", "raw_size": 1024, "virtual_size": 1024, "entropy": 5.0, "is_executable": True}],
+            "is_signed": True,
+        }
+        res = RuleEngine.evaluate_pe_file(info)
+        assert "RULE_PE_DYNAMIC_API_RESOLVER" in res["rules_triggered"]
+        assert res["score"] >= 25
+
+    def test_pe_anti_analysis_rule(self):
+        info = {
+            "is_pe": True,
+            "filename": "anti_debug.exe",
+            "suspicious_apis_found": ["IsDebuggerPresent", "CheckRemoteDebuggerPresent"],
+            "sections": [{"name": ".text", "raw_size": 1024, "virtual_size": 1024, "entropy": 5.0, "is_executable": True}],
+            "is_signed": True,
+        }
+        res = RuleEngine.evaluate_pe_file(info)
+        assert "RULE_PE_ANTI_ANALYSIS" in res["rules_triggered"]
+        assert res["score"] >= 20
+
+    def test_pe_persistence_apis_rule(self):
+        info = {
+            "is_pe": True,
+            "filename": "svc_installer.exe",
+            "suspicious_apis_found": ["CreateServiceW"],
+            "sections": [{"name": ".text", "raw_size": 1024, "virtual_size": 1024, "entropy": 5.0, "is_executable": True}],
+            "is_signed": True,
+        }
+        res = RuleEngine.evaluate_pe_file(info)
+        assert "RULE_PE_PERSISTENCE_APIS" in res["rules_triggered"]
+        assert res["score"] >= 20
+
+    def test_pe_section_entropy_anomaly_rule(self):
+        info = {
+            "is_pe": True,
+            "filename": "packed_entropy.exe",
+            "suspicious_apis_found": [],
+            "entropy_distribution": {
+                "is_likely_packed": True,
+                "section_entropy_std_dev": 2.4,
+                "max_section_entropy": 7.9,
+                "section_entropy_mean": 6.8,
+            },
+            "sections": [{"name": ".text", "raw_size": 1024, "virtual_size": 1024, "entropy": 7.9, "is_executable": True}],
+            "is_signed": True,
+        }
+        res = RuleEngine.evaluate_pe_file(info)
+        assert "RULE_PE_SECTION_ENTROPY_ANOMALY" in res["rules_triggered"]
+        assert res["score"] >= 25
+
+    def test_pe_section_unpacking_stub_rule(self):
+        info = {
+            "is_pe": True,
+            "filename": "unpack_stub.exe",
+            "suspicious_apis_found": [],
+            "sections": [
+                {"name": ".stub", "raw_size": 0, "virtual_size": 16384, "is_executable": True},
+                {"name": ".rdata", "raw_size": 2048, "virtual_size": 2048, "is_executable": False},
+            ],
+            "is_signed": True,
+        }
+        res = RuleEngine.evaluate_pe_file(info)
+        assert "RULE_PE_SECTION_UNPACKING_STUB" in res["rules_triggered"]
+        assert res["score"] >= 25
+
+    def test_pe_benign_executable_no_severe_rules(self):
+        info = {
+            "is_pe": True,
+            "filename": "benign.exe",
+            "is_signed": True,
+            "suspicious_apis_found": [],
+            "entropy_distribution": {"is_likely_packed": False},
+            "sections": [
+                {"name": ".text", "raw_size": 4096, "virtual_size": 4096, "entropy": 5.5, "is_executable": True},
+                {"name": ".rdata", "raw_size": 2048, "virtual_size": 2048, "entropy": 4.0, "is_executable": False},
+            ],
+        }
+        res = RuleEngine.evaluate_pe_file(info)
+        assert res["rules_triggered"] == []
+        assert res["score"] == 0
+
+
 
 class TestMLAndThreatIntelContracts:
     """Tests for ML prediction and threat intelligence evidence contracts."""

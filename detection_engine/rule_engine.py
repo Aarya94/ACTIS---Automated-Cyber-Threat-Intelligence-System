@@ -35,6 +35,24 @@ INJECTION_APIS = {"VirtualAlloc", "WriteProcessMemory", "CreateRemoteThread"}
 KEYLOGGER_APIS = {"SetWindowsHookExA", "SetWindowsHookExW", "GetAsyncKeyState"}
 DOWNLOADER_APIS = {"URLDownloadToFileA", "URLDownloadToFileW", "InternetOpenUrlA"}
 
+PROCESS_HOLLOWING_UNMAP = {"NtUnmapViewOfSection", "ZwUnmapViewOfSection"}
+PROCESS_HOLLOWING_EXEC = {"SetThreadContext", "ResumeThread", "QueueUserAPC", "CreateRemoteThread"}
+TOKEN_IMPERSONATION_APIS = {
+    "AdjustTokenPrivileges", "LookupPrivilegeValueA", "LookupPrivilegeValueW",
+    "DuplicateTokenEx", "ImpersonateLoggedOnUser", "ImpersonateSelf"
+}
+DYNAMIC_LOADER_APIS = {"LoadLibraryA", "LoadLibraryW", "LoadLibraryExA", "LoadLibraryExW", "LdrLoadDll"}
+DYNAMIC_RESOLVER_APIS = {"GetProcAddress", "LdrGetProcedureAddress"}
+ANTI_DEBUG_APIS = {
+    "IsDebuggerPresent", "CheckRemoteDebuggerPresent", "NtQueryInformationProcess",
+    "OutputDebugStringA", "OutputDebugStringW", "FindWindowA", "FindWindowW"
+}
+PERSISTENCE_APIS = {
+    "CreateServiceA", "CreateServiceW", "OpenSCManagerA", "OpenSCManagerW",
+    "RegSetValueExA", "RegSetValueExW"
+}
+
+
 
 class RuleSeverity(str, Enum):
     """Rule match severity tier."""
@@ -441,7 +459,7 @@ class RuleEngine:
 
         # Check: Writable + Executable section
         for sec in sections:
-            if sec.get("is_writable_and_executable", False):
+            if sec.get("is_writable_and_executable", False) or sec.get("is_write_and_execute", False):
                 matches.append(RuleMatch(
                     rule_id="RULE_PE_WX_SECTION",
                     rule_name="Writable and Executable Section",
@@ -452,8 +470,60 @@ class RuleEngine:
                 ))
                 break
 
+        # Check: Unpacking stub (raw_size near 0, large virtual size for executable section)
+        for sec in sections:
+            raw_sz = sec.get("raw_size", 0)
+            virt_sz = sec.get("virtual_size", 0)
+            is_exec = sec.get("is_executable", False) or bool(sec.get("characteristics", 0) & 0x20000000)
+            if is_exec and raw_sz < 512 and virt_sz >= 4096:
+                matches.append(RuleMatch(
+                    rule_id="RULE_PE_SECTION_UNPACKING_STUB",
+                    rule_name="Unpacking Stub Section Anomaly",
+                    severity=RuleSeverity.HIGH,
+                    score_contribution=25.0,
+                    explanation=f"Section '{sec.get('name')}' has negligible disk size ({raw_sz}B) but expands to {virt_sz}B in memory (unpacking stub).",
+                    evidence_detail={"section_name": sec.get("name"), "raw_size": raw_sz, "virtual_size": virt_sz}
+                ))
+                break
+
+        # Check: Section Entropy Distribution Anomaly
+        entropy_dist = static_info.get("entropy_distribution") or {}
+        if entropy_dist.get("is_likely_packed", False) or (
+            float(entropy_dist.get("section_entropy_std_dev", 0.0) or 0.0) >= 2.0
+            and float(entropy_dist.get("max_section_entropy", 0.0) or 0.0) >= 7.2
+        ):
+            matches.append(RuleMatch(
+                rule_id="RULE_PE_SECTION_ENTROPY_ANOMALY",
+                rule_name="Section Entropy Distribution Anomaly",
+                severity=RuleSeverity.HIGH,
+                score_contribution=25.0,
+                explanation="Anomalous section entropy dispersion detected across binary sections indicative of packing or payload encryption.",
+                evidence_detail={
+                    "std_dev": entropy_dist.get("section_entropy_std_dev"),
+                    "max_entropy": entropy_dist.get("max_section_entropy"),
+                    "mean_entropy": entropy_dist.get("section_entropy_mean"),
+                }
+            ))
+
         # 2. Suspicious APIs combinations
         suspicious_apis = set(static_info.get("suspicious_apis_found", []))
+
+        # Check: Process Hollowing / Injection Sequence
+        has_unmap = bool(PROCESS_HOLLOWING_UNMAP.intersection(suspicious_apis))
+        has_alloc = bool({"VirtualAllocEx", "VirtualAlloc"}.intersection(suspicious_apis))
+        has_write = "WriteProcessMemory" in suspicious_apis
+        has_exec_ctrl = bool(PROCESS_HOLLOWING_EXEC.intersection(suspicious_apis))
+        if has_unmap or (has_alloc and has_write and has_exec_ctrl):
+            hollowing_matched = list((PROCESS_HOLLOWING_UNMAP | {"VirtualAllocEx", "VirtualAlloc", "WriteProcessMemory"} | PROCESS_HOLLOWING_EXEC).intersection(suspicious_apis))
+            matches.append(RuleMatch(
+                rule_id="RULE_PE_PROCESS_HOLLOWING",
+                rule_name="Process Hollowing API Sequence",
+                severity=RuleSeverity.CRITICAL,
+                score_contribution=45.0,
+                explanation="Executable imports API sequence characteristic of process hollowing or injection (memory allocation, remote write, thread context/execution manipulation, or section unmapping).",
+                evidence_detail={"apis": sorted(hollowing_matched)}
+            ))
+
         if INJECTION_APIS.issubset(suspicious_apis):
             matches.append(RuleMatch(
                 rule_id="RULE_PE_PROCESS_INJECTION",
@@ -471,6 +541,58 @@ class RuleEngine:
                 score_contribution=25.0,
                 explanation=f"High number of sensitive/dangerous Windows APIs imported ({len(suspicious_apis)} APIs).",
                 evidence_detail={"api_count": len(suspicious_apis)}
+            ))
+
+        # Check: Token Impersonation / Privilege Adjustment
+        if "OpenProcessToken" in suspicious_apis and TOKEN_IMPERSONATION_APIS.intersection(suspicious_apis):
+            matched_token = list((TOKEN_IMPERSONATION_APIS | {"OpenProcessToken"}).intersection(suspicious_apis))
+            matches.append(RuleMatch(
+                rule_id="RULE_PE_TOKEN_IMPERSONATION",
+                rule_name="Access Token Manipulation APIs",
+                severity=RuleSeverity.HIGH,
+                score_contribution=30.0,
+                explanation="Executable imports access token and privilege adjustment APIs for process token impersonation.",
+                evidence_detail={"apis": sorted(matched_token)}
+            ))
+
+        # Check: Dynamic API Resolver (LoadLibrary + GetProcAddress with small import footprint)
+        imp_meta = static_info.get("import_metadata") or {}
+        imp_func_count = imp_meta.get("imported_function_count", 0)
+        has_dyn_loader = bool(DYNAMIC_LOADER_APIS.intersection(suspicious_apis))
+        has_dyn_resolver = bool(DYNAMIC_RESOLVER_APIS.intersection(suspicious_apis))
+        if has_dyn_loader and has_dyn_resolver and imp_func_count <= 25:
+            matched_dyn = list((DYNAMIC_LOADER_APIS | DYNAMIC_RESOLVER_APIS).intersection(suspicious_apis))
+            matches.append(RuleMatch(
+                rule_id="RULE_PE_DYNAMIC_API_RESOLVER",
+                rule_name="Dynamic API Resolution Pattern",
+                severity=RuleSeverity.HIGH,
+                score_contribution=25.0,
+                explanation=f"Executable relies on runtime dynamic API loading (LoadLibrary + GetProcAddress) with minimal static imports ({imp_func_count} functions), characteristic of packed or obfuscated payloads.",
+                evidence_detail={"apis": sorted(matched_dyn), "imported_function_count": imp_func_count}
+            ))
+
+        # Check: Anti-Analysis / Anti-Debugging APIs (>= 2 APIs)
+        matched_anti = ANTI_DEBUG_APIS.intersection(suspicious_apis)
+        if len(matched_anti) >= 2:
+            matches.append(RuleMatch(
+                rule_id="RULE_PE_ANTI_ANALYSIS",
+                rule_name="Anti-Analysis / Anti-Debugging APIs",
+                severity=RuleSeverity.MEDIUM,
+                score_contribution=20.0,
+                explanation=f"Executable imports multiple anti-debugging and environment inspection APIs ({len(matched_anti)} APIs detected).",
+                evidence_detail={"apis": sorted(list(matched_anti)), "count": len(matched_anti)}
+            ))
+
+        # Check: Persistence APIs (Service / Registry creation or modification)
+        matched_pers = PERSISTENCE_APIS.intersection(suspicious_apis)
+        if matched_pers:
+            matches.append(RuleMatch(
+                rule_id="RULE_PE_PERSISTENCE_APIS",
+                rule_name="Service / Registry Persistence APIs",
+                severity=RuleSeverity.MEDIUM,
+                score_contribution=20.0,
+                explanation="Executable imports Windows service creation or registry modification APIs commonly used to establish system persistence.",
+                evidence_detail={"apis": sorted(list(matched_pers))}
             ))
 
         if KEYLOGGER_APIS.intersection(suspicious_apis):

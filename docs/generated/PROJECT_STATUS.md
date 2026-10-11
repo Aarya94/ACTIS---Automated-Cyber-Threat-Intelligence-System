@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-11 10:45:47 UTC
+**Generated:** 2026-10-11 10:46:33 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`fb94e6b`)
+**Current Git Branch:** `main` (`3a1af8d`)
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `fb94e6b`
-- **Working Tree:** 15 untracked/unstaged changes
+- **HEAD Commit:** `3a1af8d`
+- **Working Tree:** 6 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `3a1af8d` | Aaryan Suman | 2026-10-11 | feat(scanner): implement Mandiant imphash calculation and threat family API categorization |
 | `fb94e6b` | Aaryan Suman | 2026-10-11 | docs(day17): document Windows service management, native notifications, and Day 17 milestone |
 | `0ea1677` | Aaryan Suman | 2026-10-11 | feat(notifications): add native Windows desktop toast notifier with async dispatch and secret redaction |
 | `9d8001f` | Aaryan Suman | 2026-10-11 | feat(service): implement safe Windows SCM installation, status, and removal scripts |
@@ -140,7 +141,6 @@
 | `58a79da` | Aaryan Suman | 2026-10-11 | feat(release): implement safe offline demonstration workflow and release acceptance suite |
 | `d47becd` | Aaryan Suman | 2026-10-11 | docs(release): document Day 16 integration demonstration and update release baseline |
 | `21b9b1d` | Aaryan Suman | 2026-10-11 | test(integration): add end-to-end release integration acceptance tests |
-| `cdd89d8` | Aaryan Suman | 2026-10-11 | feat(demo): add reproducible offline demonstration workflow |
 
 ## Known Issues
 
