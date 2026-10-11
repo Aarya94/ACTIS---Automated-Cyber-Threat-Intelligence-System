@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-10-11 08:32:50 UTC  
+**Generated:** 2026-10-11 08:50:54 UTC  
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)  
 
 This document inventories all automated test files, test classes, and test functions
@@ -11,8 +11,8 @@ recorded only after confirmed execution.
 
 ## Test Suite Summary
 
-- **Total Test Files:** `30`
-- **Total Discovered Test Cases:** `401`
+- **Total Test Files:** `31`
+- **Total Discovered Test Cases:** `414`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -40,6 +40,7 @@ recorded only after confirmed execution.
 | `tests/test_protection_service_events.py` | 15 tests | `PASSING` |
 | `tests/test_protection_service_lifecycle.py` | 15 tests | `PASSING` |
 | `tests/test_protection_service_workers.py` | 9 tests | `PASSING` |
+| `tests/test_release_integration.py` | 13 tests | `PASSING` |
 | `tests/test_risk_engine.py` | 3 tests | `PASSING` |
 | `tests/test_risk_engine_day6.py` | 8 tests | `PASSING` |
 | `tests/test_security_assistant.py` | 27 tests | `PASSING` |
@@ -457,6 +458,41 @@ recorded only after confirmed execution.
 - `test_service_degrades_when_single_worker_fails_in_pool()`
 - `test_service_fails_when_all_workers_fail()`
 - `test_service_bounded_recovery_policy()`
+
+### `tests/test_release_integration.py` (13 tests)
+
+**Class `TestCoreAnalysisAndResultContracts`:**
+- `test_url_analysis_entry_point_and_contract()`
+- `test_file_analysis_entry_point_and_contract()`
+
+**Class `TestNegativeEvidenceProtection`:**
+- `test_missing_intelligence_not_reported_as_safe_in_lookup()`
+- `test_missing_intelligence_in_assistant_explains_uncertainty()`
+
+**Class `TestCandidateIndicatorProtection`:**
+- `test_candidate_indicator_retains_candidate_status()`
+
+**Class `TestProviderTimeoutHandling`:**
+- `test_provider_timeout_produces_documented_outcome()`
+
+**Class `TestLocalAnalysisResilience`:**
+- `test_local_analysis_resilient_to_central_backend_outage()`
+
+**Class `TestPrivacySafeguards`:**
+- `test_local_filepath_rejected_from_indicator_validation()`
+- `test_private_ip_rejected_from_external_indicator_validation()`
+
+**Class `TestGroundedAssistantExplanations`:**
+- `test_assistant_explains_recorded_detection_accurately()`
+
+**Class `TestMalformedFileHandling`:**
+- `test_malformed_truncated_binary_handled_safely()`
+
+**Class `TestReportingAndCleanup`:**
+- `test_reports_generate_in_isolated_dir_and_clean_up()`
+
+**Class `TestDemonstrationExecution`:**
+- `test_demo_script_runs_successfully()`
 
 ### `tests/test_risk_engine.py` (3 tests)
 

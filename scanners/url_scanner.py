@@ -42,6 +42,9 @@ def validate_url(url: Any) -> Tuple[bool, Optional[str]]:
     if CONTROL_CHARS_PATTERN.search(cleaned):
         return False, "URL contains illegal control characters or null bytes."
 
+    if "\\" in cleaned:
+        return False, "URL contains illegal backslashes or filesystem path separators."
+
     # Prepend scheme if missing for parsing check
     candidate = cleaned
     if not candidate.lower().startswith(("http://", "https://")):
@@ -51,6 +54,7 @@ def validate_url(url: Any) -> Tuple[bool, Optional[str]]:
 
     try:
         parsed = urlparse(candidate)
+        _ = parsed.port
     except Exception as e:
         return False, f"URL parsing failed: {e}"
 
@@ -131,7 +135,10 @@ def normalize_url(url: Any) -> str:
         hostname = hostname[4:]
 
     # Canonical port handling
-    port = parsed.port
+    try:
+        port = parsed.port
+    except (ValueError, Exception):
+        port = None
     is_default_port = (scheme == "http" and port == 80) or (scheme == "https" and port == 443)
     if port and not is_default_port:
         netloc = f"{hostname}:{port}"

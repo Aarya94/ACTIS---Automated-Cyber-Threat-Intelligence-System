@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-11 08:32:50 UTC  
+**Generated:** 2026-10-11 08:50:54 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`7cabdf4`)  
+**Current Git Branch:** `main` (`5d86124`)  
 
 ---
 
@@ -117,20 +117,21 @@
 
 ## Test Status
 
-- **Total Test Files:** `30`
-- **Total Discovered Test Functions:** `401`
+- **Total Test Files:** `31`
+- **Total Discovered Test Functions:** `414`
 - **Coverage Areas:** Configuration validation, SQLite database schema & CRUD, Phishing/Malware model contracts, PE feature extraction, API backend.
 
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `7cabdf4`
-- **Working Tree:** 5 untracked/unstaged changes
+- **HEAD Commit:** `5d86124`
+- **Working Tree:** 14 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `5d86124` | Aaryan Suman | 2026-10-11 | docs(security): document Day 15 hardening baseline and operational boundaries |
 | `7cabdf4` | Aaryan Suman | 2026-10-11 | feat(security): add log credential redaction and privacy safeguards test suite |
 | `7c2d263` | Aaryan Suman | 2026-10-11 | fix(detection): break module circular dependency and shield unspecified IPs |
 | `8dba147` | Aaryan Suman | 2026-10-11 | test(security): add adversarial input and false-positive regression coverage |
@@ -140,7 +141,6 @@
 | `332e3cf` | Aaryan Suman | 2026-10-10 | test(assistant): add comprehensive test suite for grounded security assistant and safety boundaries |
 | `5e6e55f` | Aaryan Suman | 2026-10-10 | feat(dashboard): integrate grounded security assistant with session history and native markdown |
 | `b22965f` | Aaryan Suman | 2026-10-10 | feat(assistant): implement grounded security assistant with evidence breakdown and read-only boundaries |
-| `a9f1dd4` | Aaryan Suman | 2026-10-10 | docs: update roadmap and project structure for Days 12 and 13 |
 
 ## Known Issues
 
