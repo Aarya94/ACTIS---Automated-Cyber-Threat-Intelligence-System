@@ -170,8 +170,8 @@ pytest tests/ -v
 ```
 
 **Current Verification Status:**
-- **461 tests collected**
-- **461 tests passed (100% success rate)**
+- **472 tests collected**
+- **472 tests passed (100% success rate)**
 - **0 failures / 0 errors / 4 warnings**
 
 ### Run Safe Offline System Demonstration

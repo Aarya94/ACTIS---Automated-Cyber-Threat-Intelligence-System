@@ -21,14 +21,22 @@ Month 2 integrates production Windows Service Control Manager (SCM) deployment a
 
 ## Week 5: Static File Analysis Refinement
 
-### Days 29–31: Enhanced PE Section & Import Analysis
-- **Goal**: Expand heuristic rules for suspicious Windows API import combinations (process hollowing, memory manipulation, token impersonation).
-- **Tasks**: Map API import hashes, flag dangerous API sequences (`VirtualAlloc`, `WriteProcessMemory`, `CreateRemoteThread`, `SetWindowsHookEx`), calculate per-section entropy.
-- **Expected Output**: Deepened structural PE security analysis.
-- **Files/Components**: `scanners/file_feature_extractor.py`, `detection_engine/rule_engine.py`.
-- **Validation**: `pytest tests/test_static_pe.py`.
-- **Dependencies**: Month 1 PE feature extractor.
-- **Not Included**: Live process inspection or kernel drivers.
+### Days 29–31: Enhanced PE Section & Import Analysis (`COMPLETED` — Day 18)
+- **Delivered**:
+  1. *Standard Mandiant Import Hash (`imphash`)*: Computes standard Mandiant import hash with fallback for ordinals and headless synthetic binaries (`calculate_imphash`).
+  2. *Threat Family API Categorization*: Structured classification of imported Windows APIs into 10 threat categories (`PROCESS_HOLLOWING`, `TOKEN_IMPERSONATION`, `DYNAMIC_RESOLUTION`, `ANTI_DEBUGGING`, `PERSISTENCE_SERVICE`, `KEYLOGGING_INPUT`, `NETWORK_DOWNLOAD`, `EXECUTION_COMMAND`, `MEMORY_PROTECTION`, `CRYPTOGRAPHY`).
+  3. *Heuristic PE Security Rules (`detection_engine/rule_engine.py`)*:
+     - `RULE_PE_PROCESS_HOLLOWING` (CRITICAL, 45.0): Unmapping API sequence or memory allocation + remote write + thread execution/context manipulation.
+     - `RULE_PE_TOKEN_IMPERSONATION` (HIGH, 30.0): Process access token retrieval with privilege escalation adjustments.
+     - `RULE_PE_DYNAMIC_API_RESOLVER` (HIGH, 25.0): Dynamic API loading (`LoadLibrary` + `GetProcAddress`) with minimal static imports (packing indicator).
+     - `RULE_PE_ANTI_ANALYSIS` (MEDIUM, 20.0): Multiple anti-debugging or environment inspection APIs.
+     - `RULE_PE_PERSISTENCE_APIS` (MEDIUM, 20.0): Windows service creation or registry run persistence APIs.
+     - `RULE_PE_SECTION_ENTROPY_ANOMALY` (HIGH, 25.0): Anomalous section entropy dispersion across binary sections.
+     - `RULE_PE_SECTION_UNPACKING_STUB` (HIGH, 25.0): Executable section with negligible disk size (<512B) expanding to large virtual memory (>=4096B).
+  4. *Contract & Pipeline Integration*: Updated `PEImportFeature` dataclass with `imphash`, `api_categories_found`, and `to_dict()`; enriched `extract_features()` dictionary with `entropy_distribution`.
+- **Files/Components**: `scanners/file_feature_extractor.py`, `scanners/pe_feature_contract.py`, `detection_engine/rule_engine.py`, `tests/test_static_pe.py`, `tests/test_detection_engine.py`.
+- **Validation**: 472 automated tests passing with 100% success rate (+11 new unit and rule verification tests).
+- **Not Included**: Live process memory inspection, driver loading, or code execution.
 
 ### Days 32–34: Non-PE File Fallback Analysis
 - **Goal**: Provide safe static evaluation for non-PE files (scripts, archives, office documents).

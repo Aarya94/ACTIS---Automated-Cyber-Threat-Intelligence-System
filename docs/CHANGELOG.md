@@ -10,6 +10,36 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 Milestone Scope: Complete core defensive architecture, configuration, logging, database schemas, static PE analysis, URL/message analysis, device scanning, resident Windows service foundation, file watcher pipeline, threat intel integration, scheduled sync, central TI API, grounded AI assistant, security hardening, and release demonstration.
 
+### 2026-10-11 — Day 18: Enhanced Windows PE Static Import, Dangerous API Sequence & Section Heuristic Analysis
+
+Implemented standard Mandiant import hashing (`imphash`), 10-category threat family API mapping, and advanced section/import heuristic rules for static Windows PE analysis. Preserved all existing Day 1–17 architectures, offline resilience, and defensive read-only contracts. Implemented and verified:
+1. **Mandiant Import Hashing (`calculate_imphash` in `scanners/file_feature_extractor.py`):**
+   - Implemented standard Mandiant import hash algorithm: sequential import parsing, lowercase DLL name with `.dll`/`.sys`/`.ocx` extension stripping, lowercase function or `ordN` ordinal formatting, comma concatenation, and MD5 digest calculation.
+   - Built deterministic fallback algorithm for synthetic or headless binaries where `pefile.PE.get_imphash()` is unavailable or returns non-MD5 objects.
+2. **Threat Family API Categorization (`API_CATEGORIES` in `scanners/file_feature_extractor.py`):**
+   - Categorized dangerous Windows APIs across 10 distinct threat families: `PROCESS_HOLLOWING`, `TOKEN_IMPERSONATION`, `DYNAMIC_RESOLUTION`, `ANTI_DEBUGGING`, `PERSISTENCE_SERVICE`, `KEYLOGGING_INPUT`, `NETWORK_DOWNLOAD`, `EXECUTION_COMMAND`, `MEMORY_PROTECTION`, and `CRYPTOGRAPHY`.
+   - Populated `api_categories_found` in `extract_pe_import_features` and `extract_features` mapping threat categories to detected function imports.
+3. **Advanced Heuristic PE Detection Rules (`detection_engine/rule_engine.py`):**
+   - `RULE_PE_PROCESS_HOLLOWING` (CRITICAL, +45.0): Flags unmapping APIs (`NtUnmapViewOfSection`, `ZwUnmapViewOfSection`) or the combined sequence of memory allocation (`VirtualAllocEx`/`VirtualAlloc`), remote write (`WriteProcessMemory`), and thread execution/context manipulation (`SetThreadContext`, `ResumeThread`, `QueueUserAPC`, `CreateRemoteThread`).
+   - `RULE_PE_TOKEN_IMPERSONATION` (HIGH, +30.0): Flags process token retrieval (`OpenProcessToken`) combined with privilege adjustment APIs (`AdjustTokenPrivileges`, `LookupPrivilegeValue*`, `DuplicateTokenEx`, `ImpersonateLoggedOnUser`).
+   - `RULE_PE_DYNAMIC_API_RESOLVER` (HIGH, +25.0): Flags runtime dynamic API loading (`LoadLibrary*` + `GetProcAddress`) combined with small import footprint (<= 25 functions), characteristic of stealth loaders.
+   - `RULE_PE_ANTI_ANALYSIS` (MEDIUM, +20.0): Flags presence of 2 or more anti-debugging/anti-analysis APIs.
+   - `RULE_PE_PERSISTENCE_APIS` (MEDIUM, +20.0): Flags Windows service installation or registry run key persistence APIs.
+   - `RULE_PE_SECTION_ENTROPY_ANOMALY` (HIGH, +25.0): Evaluates entropy dispersion across sections; flags binaries with packed entropy indicators or high standard deviation with high maximum entropy.
+   - `RULE_PE_SECTION_UNPACKING_STUB` (HIGH, +25.0): Flags executable sections with negligible raw disk size (<512 bytes) expanding to large virtual memory (>= 4096 bytes).
+4. **Contract & Pipeline Integration (`scanners/pe_feature_contract.py`):**
+   - Updated `PEImportFeature` dataclass to include `imphash: str`, `api_categories_found: Dict[str, Tuple[str, ...]]`, and `to_dict() -> Dict[str, Any]`.
+   - Wired `entropy_distribution` from `analyze_pe_entropy_distribution` directly into `FileFeatureExtractor.extract_features` return dictionary for direct consumption by `RuleEngine.evaluate_pe_file`.
+5. **Test Suite Expansion:**
+   - Added 11 new automated unit and integration tests across `tests/test_static_pe.py` and `tests/test_detection_engine.py`:
+     - Tested deterministic `imphash` calculation on named functions and ordinals.
+     - Tested threat family category mapping.
+     - Tested structured `PEImportFeature` contract serialization.
+     - Tested each new PE heuristic rule and verified benign PE binaries trigger zero spurious rules.
+   - Verified 472 passing tests with 100% success rate (expanded from 461 baseline, 0 failed, 0 errors, 4 third-party warnings).
+
+---
+
 ### 2026-10-11 — Day 17: Windows Service Integration, Operational Reliability & Native Windows Notifications
 
 Implemented production Windows Service Control Manager (SCM) deployment tooling, operational reliability enhancements, and native Windows desktop toast notifications with async non-blocking dispatch, automated secret redaction, and flood protection. Preserved all existing Day 1–16 architectures and read-only defensive contracts. Implemented and verified:

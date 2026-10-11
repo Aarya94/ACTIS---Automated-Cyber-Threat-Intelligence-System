@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-11 10:46:33 UTC
+**Generated:** 2026-10-11 10:47:02 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`3a1af8d`)
+**Current Git Branch:** `main` (`fa0b8ee`)
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `3a1af8d`
-- **Working Tree:** 6 untracked/unstaged changes
+- **HEAD Commit:** `fa0b8ee`
+- **Working Tree:** 10 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `fa0b8ee` | Aaryan Suman | 2026-10-11 | feat(detection): add enhanced PE heuristic rules for process hollowing, token impersonation, and section anomalies |
 | `3a1af8d` | Aaryan Suman | 2026-10-11 | feat(scanner): implement Mandiant imphash calculation and threat family API categorization |
 | `fb94e6b` | Aaryan Suman | 2026-10-11 | docs(day17): document Windows service management, native notifications, and Day 17 milestone |
 | `0ea1677` | Aaryan Suman | 2026-10-11 | feat(notifications): add native Windows desktop toast notifier with async dispatch and secret redaction |
@@ -140,7 +141,6 @@
 | `12b397c` | Aaryan Suman | 2026-10-11 | fix(security): harden analysis pipelines against non-string, None, and directory inputs |
 | `58a79da` | Aaryan Suman | 2026-10-11 | feat(release): implement safe offline demonstration workflow and release acceptance suite |
 | `d47becd` | Aaryan Suman | 2026-10-11 | docs(release): document Day 16 integration demonstration and update release baseline |
-| `21b9b1d` | Aaryan Suman | 2026-10-11 | test(integration): add end-to-end release integration acceptance tests |
 
 ## Known Issues
 

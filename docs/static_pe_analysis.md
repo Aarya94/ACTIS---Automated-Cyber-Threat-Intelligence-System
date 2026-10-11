@@ -70,10 +70,24 @@ Candidate File
 - Extracts CPU architecture, subsystem (GUI vs Console), entry point RVA, image base, linker versions, and stack sizes.
 - Extracts per-section virtual and raw sizes, section characteristics, and flags risky memory attributes such as combined Write + Execute (`W+X`).
 
-### 5. Import Table & Suspicious API Detection
-- **Function:** `extract_pe_import_features(pe)`
+### 5. Import Table, Imphash & Suspicious API Detection
+- **Function:** `extract_pe_import_features(pe)` and `calculate_imphash(pe)`
 - Catalogs imported dynamic-link libraries and function names.
-- Flags suspicious Windows APIs commonly abused by malware loaders and ransomware (e.g., `VirtualAlloc`, `VirtualProtect`, `WriteProcessMemory`, `CreateRemoteThread`, `IsDebuggerPresent`, `WinExec`, `CryptEncrypt`).
+- Computes standard Mandiant import hash (`imphash`) for clustering and binary classification, with fallback support for ordinal imports.
+- Categorizes dangerous Windows APIs across 10 threat categories (`PROCESS_HOLLOWING`, `TOKEN_IMPERSONATION`, `DYNAMIC_RESOLUTION`, `ANTI_DEBUGGING`, `PERSISTENCE_SERVICE`, `KEYLOGGING_INPUT`, `NETWORK_DOWNLOAD`, `EXECUTION_COMMAND`, `MEMORY_PROTECTION`, `CRYPTOGRAPHY`).
+
+### 6. Advanced PE Heuristic Rules (`detection_engine/rule_engine.py`)
+- Evaluates extracted structural metrics against heuristic detection rules:
+  - `RULE_PE_PROCESS_HOLLOWING` (CRITICAL, +45.0)
+  - `RULE_PE_TOKEN_IMPERSONATION` (HIGH, +30.0)
+  - `RULE_PE_DYNAMIC_API_RESOLVER` (HIGH, +25.0)
+  - `RULE_PE_ANTI_ANALYSIS` (MEDIUM, +20.0)
+  - `RULE_PE_PERSISTENCE_APIS` (MEDIUM, +20.0)
+  - `RULE_PE_SECTION_ENTROPY_ANOMALY` (HIGH, +25.0)
+  - `RULE_PE_SECTION_UNPACKING_STUB` (HIGH, +25.0)
+  - `RULE_PE_WX_SECTION` (CRITICAL, +40.0)
+  - `RULE_PE_PACKER_SECTION` (HIGH, +30.0)
+  - `RULE_PE_BITCOIN_ADDRESS` (CRITICAL, +40.0)
 
 ---
 
@@ -87,7 +101,7 @@ To prevent machine learning data leakage and maintain high code quality, extract
 | `FileMetadata` | `file_size`, `extension`, `entropy`, `is_pe`, `is_valid` | Generic file system and binary properties. |
 | `PEMetadata` | `architecture`, `machine`, `entry_point`, `image_base`, `subsystem`, `dll_characteristics`, `size_of_stack_reserve` | Header-level architectural attributes. |
 | `PESectionFeature` | `name`, `virtual_size`, `raw_size`, `characteristics`, `entropy`, `is_write_and_execute`, `is_high_entropy` | Granular per-section metrics. |
-| `PEImportFeature` | `imported_dll_count`, `imported_function_count`, `imported_dlls`, `imported_functions`, `suspicious_apis_found` | API interaction heuristics. |
+| `PEImportFeature` | `imported_dll_count`, `imported_function_count`, `imported_dlls`, `imported_functions`, `suspicious_apis_found`, `imphash`, `api_categories_found` | API interaction heuristics, import hashing, and threat family mapping. |
 | `PEStaticFeatures` | Aggregates all above + `pe_features_15` + `to_ml_feature_vector()` | Master structured contract with export helpers. |
 
 ---
@@ -106,13 +120,14 @@ The analyzer incorporates defense-in-depth error handling:
 
 ## 5. Verification & Test Suite
 
-The subsystem is verified by **21 automated unit tests** in `tests/test_static_pe.py`:
-- `TestSafeFileHashing` (3 tests): Multi-algorithm correctness, missing file handling, invalid algorithm rejection.
-- `TestShannonEntropyCalculations` (6 tests): Empty, homogeneous, and uniform bytes; file-level entropy; PE section entropy distributions.
-- `TestWindowsPEFileDetection` (4 tests): Synthetic PE detection, text files, random binaries, truncated DOS headers.
-- `TestPEMetadataAndSectionExtraction` (2 tests): Synthetic header/section extraction, mocked import heuristics.
-- `TestStructuredPEFeatureContract` (1 test): Separation of threat identifiers from ML feature vectors.
-- `TestMalformedAndEdgeCaseHandling` (4 tests): Nonexistent files, empty files, corrupted PE signatures, directories.
-- `test_pe_static_analysis_notepad` (1 test): System executable integration test.
+The subsystem is verified by automated unit tests in `tests/test_static_pe.py` and `tests/test_detection_engine.py`:
+- `TestSafeFileHashing`: Multi-algorithm correctness, missing file handling, invalid algorithm rejection.
+- `TestShannonEntropyCalculations`: Empty, homogeneous, and uniform bytes; file-level entropy; PE section entropy distributions.
+- `TestWindowsPEFileDetection`: Synthetic PE detection, text files, random binaries, truncated DOS headers.
+- `TestPEMetadataAndSectionExtraction`: Synthetic header/section extraction, mocked import heuristics, imphash calculation, ordinal handling.
+- `TestStructuredPEFeatureContract`: Separation of threat identifiers from ML feature vectors, import contract serialization.
+- `TestMalformedAndEdgeCaseHandling`: Nonexistent files, empty files, corrupted PE signatures, directories.
+- `TestRuleEngineContractsAndEvaluation`: Process hollowing, token impersonation, dynamic API resolver, anti-analysis, persistence, unpacking stub, and entropy anomaly rules.
+- `test_pe_static_analysis_notepad`: Windows host executable integration test.
 
-All **109 unit tests** in the ACTIS test suite pass with 100% success.
+All 472 automated tests in the ACTIS test suite pass with 100% success.
