@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-11 10:06:12 UTC
+**Generated:** 2026-10-11 10:06:52 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`6e166d5`)
+**Current Git Branch:** `main` (`8f62018`)
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `6e166d5`
-- **Working Tree:** 23 untracked/unstaged changes
+- **HEAD Commit:** `8f62018`
+- **Working Tree:** 14 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `8f62018` | Aaryan Suman | 2026-10-11 | feat(service): enhance Windows service host lifecycle and CLI integration |
 | `6e166d5` | Aaryan Suman | 2026-10-11 | docs(release): reconcile Day 15 hardening baseline and Day 16 release verification |
 | `12b397c` | Aaryan Suman | 2026-10-11 | fix(security): harden analysis pipelines against non-string, None, and directory inputs |
 | `58a79da` | Aaryan Suman | 2026-10-11 | feat(release): implement safe offline demonstration workflow and release acceptance suite |
@@ -140,7 +141,6 @@
 | `cb15428` | Aaryan Suman | 2026-10-11 | fix(scanners): harden URL parser against path separators and invalid ports |
 | `5d86124` | Aaryan Suman | 2026-10-11 | docs(security): document Day 15 hardening baseline and operational boundaries |
 | `7cabdf4` | Aaryan Suman | 2026-10-11 | feat(security): add log credential redaction and privacy safeguards test suite |
-| `7c2d263` | Aaryan Suman | 2026-10-11 | fix(detection): break module circular dependency and shield unspecified IPs |
 
 ## Known Issues
 
