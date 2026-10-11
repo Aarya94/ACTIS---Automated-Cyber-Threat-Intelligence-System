@@ -6,6 +6,7 @@ Provides centralized settings, environment variable management, paths, and loggi
 
 import os
 import sys
+import re
 import logging
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
@@ -286,14 +287,54 @@ MAX_FILE_SIZE_BYTES = config.scanner.max_file_size_bytes
 HASH_CHUNK_SIZE = config.scanner.hash_chunk_size
 WATCHDOG_DEBOUNCE_SECONDS = config.scanner.watchdog_debounce_seconds
 
+# Regex for sensitive token masking
+SECRET_PATTERN = re.compile(
+    r'(?:api[_-]?key|secret|token|password|bearer)[\s:=]+([a-zA-Z0-9_\-\.]{8,})',
+    re.IGNORECASE
+)
+
+
+def mask_sensitive_strings(text: str) -> str:
+    """Masks potential credentials, API keys, and sensitive tokens from text."""
+    if not text or not isinstance(text, str):
+        return text
+
+    def _repl(match):
+        val = match.group(1)
+        if len(val) <= 4:
+            masked = "****"
+        else:
+            masked = f"{val[:2]}****{val[-2:]}"
+        return match.group(0).replace(val, masked)
+
+    return SECRET_PATTERN.sub(_repl, text)
+
+
+class SecretMaskingFilter(logging.Filter):
+    """Redacts credentials, API keys, bearer tokens, and passwords from log records."""
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        if isinstance(record.msg, str):
+            record.msg = mask_sensitive_strings(record.msg)
+        if record.args:
+            if isinstance(record.args, dict):
+                record.args = {k: mask_sensitive_strings(v) if isinstance(v, str) else v for k, v in record.args.items()}
+            elif isinstance(record.args, tuple):
+                record.args = tuple(mask_sensitive_strings(a) if isinstance(a, str) else a for a in record.args)
+        return True
+
 
 def get_logger(name: str = "ACTIS") -> logging.Logger:
-    """Configures and returns a structured logger for ACTIS."""
+    """Configures and returns a structured logger for ACTIS with credential masking."""
     logger = logging.getLogger(name)
     if not logger.handlers:
         level_name = config.log_level.upper()
         level = getattr(logging, level_name, logging.INFO)
         logger.setLevel(level)
+
+        redaction_filter = SecretMaskingFilter()
+        logger.addFilter(redaction_filter)
+
         formatter = logging.Formatter(
             "[%(asctime)s] [%(levelname)s] [%(name)s] %(message)s",
             datefmt="%Y-%m-%d %H:%M:%S"
@@ -302,6 +343,7 @@ def get_logger(name: str = "ACTIS") -> logging.Logger:
         # Console handler
         ch = logging.StreamHandler(sys.stdout)
         ch.setFormatter(formatter)
+        ch.addFilter(redaction_filter)
         logger.addHandler(ch)
 
         # File handler
@@ -313,6 +355,7 @@ def get_logger(name: str = "ACTIS") -> logging.Logger:
             encoding="utf-8",
         )
         fh.setFormatter(formatter)
+        fh.addFilter(redaction_filter)
         logger.addHandler(fh)
 
     return logger
