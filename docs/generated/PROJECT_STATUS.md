@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-10 15:06:49 UTC  
+**Generated:** 2026-10-11 08:31:17 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`331edd8`)  
+**Current Git Branch:** `main` (`7b5cd71`)  
 
 ---
 
@@ -117,20 +117,21 @@
 
 ## Test Status
 
-- **Total Test Files:** `28`
-- **Total Discovered Test Functions:** `361`
+- **Total Test Files:** `30`
+- **Total Discovered Test Functions:** `401`
 - **Coverage Areas:** Configuration validation, SQLite database schema & CRUD, Phishing/Malware model contracts, PE feature extraction, API backend.
 
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `331edd8`
-- **Working Tree:** 7 untracked/unstaged changes
+- **HEAD Commit:** `7b5cd71`
+- **Working Tree:** 16 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `7b5cd71` | Aaryan Suman | 2026-10-10 | docs(changelog): align Day 14 commit history and generated changelog telemetry |
 | `331edd8` | Aaryan Suman | 2026-10-10 | docs(architecture): reconcile architectural documentation and test baselines with Day 14 |
 | `56151d9` | Aaryan Suman | 2026-10-10 | docs: document Day 14 grounded AI security assistant and update roadmap |
 | `332e3cf` | Aaryan Suman | 2026-10-10 | test(assistant): add comprehensive test suite for grounded security assistant and safety boundaries |
@@ -140,7 +141,6 @@
 | `3cfeb30` | Aaryan Suman | 2026-10-10 | docs: document central threat intelligence architecture, boundaries, and contracts |
 | `8e060a9` | Aaryan Suman | 2026-10-10 | docs: update verified ACTIS implementation status and quickstart guide |
 | `335a8b5` | Aaryan Suman | 2026-10-10 | docs: finalize Day 13 changelog verification hashes |
-| `04691b3` | Aaryan Suman | 2026-10-10 | docs: document central threat intelligence service architecture and contracts |
 
 ## Known Issues
 

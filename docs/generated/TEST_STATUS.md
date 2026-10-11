@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-10-10 15:06:49 UTC  
+**Generated:** 2026-10-11 08:31:17 UTC  
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)  
 
 This document inventories all automated test files, test classes, and test functions
@@ -11,8 +11,8 @@ recorded only after confirmed execution.
 
 ## Test Suite Summary
 
-- **Total Test Files:** `28`
-- **Total Discovered Test Cases:** `361`
+- **Total Test Files:** `30`
+- **Total Discovered Test Cases:** `401`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -22,6 +22,7 @@ recorded only after confirmed execution.
 
 | Test File | Test Cases | Status |
 |---|---|---|
+| `tests/test_adversarial_security.py` | 24 tests | `PASSING` |
 | `tests/test_backend_api.py` | 4 tests | `PASSING` |
 | `tests/test_branding_assets.py` | 6 tests | `PASSING` |
 | `tests/test_central_ti_service.py` | 30 tests | `PASSING` |
@@ -35,6 +36,7 @@ recorded only after confirmed execution.
 | `tests/test_file_protection_integration.py` | 7 tests | `PASSING` |
 | `tests/test_incremental_state.py` | 8 tests | `PASSING` |
 | `tests/test_malware_dataset.py` | 25 tests | `PASSING` |
+| `tests/test_privacy_safeguards.py` | 16 tests | `PASSING` |
 | `tests/test_protection_service_events.py` | 15 tests | `PASSING` |
 | `tests/test_protection_service_lifecycle.py` | 15 tests | `PASSING` |
 | `tests/test_protection_service_workers.py` | 9 tests | `PASSING` |
@@ -54,6 +56,42 @@ recorded only after confirmed execution.
 ---
 
 ## Test Functions Detail
+
+### `tests/test_adversarial_security.py` (24 tests)
+
+**Class `TestMalformedPEFiles`:**
+- `test_empty_file_handling()`
+- `test_truncated_dos_header()`
+- `test_invalid_dos_magic()`
+- `test_pe_offset_out_of_bounds()`
+- `test_pe_offset_below_dos_header()`
+- `test_invalid_pe_signature()`
+- `test_truncated_pe_header_body()`
+- `test_random_bytes_with_exe_extension()`
+
+**Class `TestOversizedFileBoundaries`:**
+- `test_file_size_limit_constant()`
+- `test_oversized_file_rejection()`
+
+**Class `TestMalformedURLs`:**
+- `test_extremely_long_url_rejected()`
+- `test_null_byte_in_url_rejected()`
+- `test_unsupported_schemes_rejected()`
+- `test_missing_and_invalid_hostname()`
+- `test_embedded_credentials_and_ports()`
+- `test_multiple_at_symbols()`
+- `test_url_feature_extraction_never_crashes()`
+
+**Class `TestMessageAndRegexSafety`:**
+- `test_large_message_processing()`
+- `test_nested_quotes_and_brackets_url_cleaning()`
+- `test_pathological_repetition_does_not_redos()`
+
+**Class `TestClassificationAndFalsePositiveSafety`:**
+- `test_benign_pe_with_no_findings_is_low_risk()`
+- `test_missing_intelligence_does_not_bias_classification()`
+- `test_single_weak_heuristic_does_not_force_critical()`
+- `test_confirmed_threat_intel_enforces_critical_floor()`
 
 ### `tests/test_backend_api.py` (4 tests)
 
@@ -324,6 +362,36 @@ recorded only after confirmed execution.
 - `test_get_class_distribution_raw_labels()`
 - `test_get_class_distribution_normalized_target()`
 - `test_get_class_distribution_empty_dataframe()`
+
+### `tests/test_privacy_safeguards.py` (16 tests)
+
+**Class `TestLocalFilePathPrivacy`:**
+- `test_file_analysis_never_sends_path_to_providers()`
+
+**Class `TestCredentialAndSecretMasking`:**
+- `test_mask_sensitive_strings_helper()`
+- `test_assistant_output_masks_sensitive_tokens()`
+- `test_logger_redacts_sensitive_credentials()`
+- `test_independent_threat_intelligence_import()`
+
+**Class `TestPrivateAndSpecialPurposeIPProtection`:**
+- `test_special_purpose_ips_rejected_by_validator()`
+- `test_public_ips_accepted_by_validator()`
+- `test_abuseipdb_shields_private_ips_without_network_call()`
+- `test_virustotal_shields_private_ips_without_network_call()`
+
+**Class `TestAssistantSecurityBoundaries`:**
+- `test_assistant_rejects_command_execution()`
+- `test_assistant_rejects_rule_override_injection()`
+- `test_missing_intelligence_includes_defensive_caveat()`
+
+**Class `TestEventQueueSaturationAndStress`:**
+- `test_queue_capacity_bound_and_drop_telemetry()`
+- `test_burst_of_500_events_multithreaded()`
+- `test_queue_cancellation_rejects_subsequent_puts()`
+
+**Class `TestSQLiteConcurrencyAndTransactionSafety`:**
+- `test_concurrent_reads_and_writes_in_isolated_db()`
 
 ### `tests/test_protection_service_events.py` (15 tests)
 
