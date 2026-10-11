@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-11 11:46:44 UTC
+**Generated:** 2026-10-11 11:47:00 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`80d069b`)
+**Current Git Branch:** `main` (`31e8a12`)
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `80d069b`
-- **Working Tree:** 6 untracked/unstaged changes
+- **HEAD Commit:** `31e8a12`
+- **Working Tree:** 4 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `31e8a12` | Aaryan Suman | 2026-10-11 | feat(detection): add heuristic rules for archives and malicious scripts |
 | `80d069b` | Aaryan Suman | 2026-10-11 | feat(scanner): add non-pe archive and script static analysis subsystem |
 | `61db8d4` | Aaryan Suman | 2026-10-11 | docs(day18): document enhanced PE import analysis, heuristic rules, and Day 18 milestone |
 | `fa0b8ee` | Aaryan Suman | 2026-10-11 | feat(detection): add enhanced PE heuristic rules for process hollowing, token impersonation, and section anomalies |
@@ -140,7 +141,6 @@
 | `9d8001f` | Aaryan Suman | 2026-10-11 | feat(service): implement safe Windows SCM installation, status, and removal scripts |
 | `8f62018` | Aaryan Suman | 2026-10-11 | feat(service): enhance Windows service host lifecycle and CLI integration |
 | `6e166d5` | Aaryan Suman | 2026-10-11 | docs(release): reconcile Day 15 hardening baseline and Day 16 release verification |
-| `12b397c` | Aaryan Suman | 2026-10-11 | fix(security): harden analysis pipelines against non-string, None, and directory inputs |
 
 ## Known Issues
 
