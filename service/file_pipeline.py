@@ -92,11 +92,13 @@ class FileProtectionPipeline(IAnalysisOrchestrationBoundary):
         max_file_size_bytes: int = 100 * 1024 * 1024,
         analysis_fn: Optional[Callable[[Path], Dict[str, Any]]] = None,
         only_executables: bool = False,
+        notifier: Optional[Any] = None,
     ):
         self.state_manager = state_manager or IncrementalStateManager(auto_load=True)
         self.max_file_size_bytes = max_file_size_bytes
         self.analysis_fn = analysis_fn or default_file_analysis
         self.only_executables = only_executables
+        self.notifier = notifier
         self.name = "FileProtectionPipeline"
 
         self._lock = threading.Lock()
@@ -437,6 +439,24 @@ class FileProtectionPipeline(IAnalysisOrchestrationBoundary):
             detection_reasons=reasons,
         )
         self.state_manager.record_state(new_state)
+
+        # 5. Dispatch threat notification if flagged as threat
+        if is_threat:
+            try:
+                active_notifier = self.notifier
+                if active_notifier is None:
+                    from notifications.notifier import notifier as default_notifier
+                    active_notifier = default_notifier
+                active_notifier.notify_threat(
+                    target=canonical_path,
+                    target_type="file",
+                    risk_level=risk_level,
+                    score=risk_score,
+                    reasons=reasons,
+                    recommended_action=str(analysis.get("recommended_action", "Isolate file or inspect static analysis details.")),
+                )
+            except Exception as notif_err:
+                logger.warning(f"FileProtectionPipeline: Failed to dispatch threat notification: {notif_err}")
 
         res = EventProcessingResult(
             event_id=event.event_id,

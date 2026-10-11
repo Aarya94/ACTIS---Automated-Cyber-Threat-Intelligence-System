@@ -13,15 +13,25 @@ logger = get_logger("Notifier")
 
 
 class NotificationManager:
-    """Manages active threat notifications and alert history."""
+    """Manages active threat notifications, alert history, and native desktop toasts."""
 
     _instance = None
 
-    def __new__(cls):
+    def __new__(cls, toast_notifier: Optional[Any] = None):
         if cls._instance is None:
             cls._instance = super(NotificationManager, cls).__new__(cls)
             cls._instance.alerts = []
+            from notifications.windows_toast import windows_toast
+            cls._instance.toast_notifier = toast_notifier or windows_toast
         return cls._instance
+
+    def set_toast_notifier(self, toast_notifier: Any) -> None:
+        """Configures or replaces the active toast notification provider."""
+        self.toast_notifier = toast_notifier
+
+    def get_toast_notifier(self) -> Any:
+        """Returns the active toast notification provider."""
+        return getattr(self, "toast_notifier", None)
 
     def notify_threat(
         self,
@@ -32,7 +42,7 @@ class NotificationManager:
         reasons: List[str],
         recommended_action: str
     ) -> Dict[str, Any]:
-        """Creates, formats, logs, and stores a security notification."""
+        """Creates, formats, logs, stores, and dispatches a security notification."""
         now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         alert = {
@@ -56,6 +66,14 @@ class NotificationManager:
             f"SECURITY ALERT [{risk_level} - {score}/100] on {target_type.upper()}: {target} | "
             f"Action: {recommended_action}"
         )
+
+        # Dispatch native toast for HIGH and CRITICAL security events asynchronously
+        if self.toast_notifier is not None and str(risk_level).upper() in ("HIGH", "CRITICAL"):
+            try:
+                self.toast_notifier.notify_threat_event(alert)
+            except Exception as e:
+                logger.warning(f"Failed to dispatch desktop toast notification: {e}")
+
         return alert
 
     def get_unread_alerts(self) -> List[Dict[str, Any]]:
