@@ -10,6 +10,36 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 Milestone Scope: Complete core defensive architecture, configuration, logging, database schemas, static PE analysis, URL/message analysis, device scanning, resident Windows service foundation, file watcher pipeline, threat intel integration, scheduled sync, central TI API, grounded AI assistant, security hardening, and release demonstration.
 
+### 2026-10-11 — Day 17: Windows Service Integration, Operational Reliability & Native Windows Notifications
+
+Implemented production Windows Service Control Manager (SCM) deployment tooling, operational reliability enhancements, and native Windows desktop toast notifications with async non-blocking dispatch, automated secret redaction, and flood protection. Preserved all existing Day 1–16 architectures and read-only defensive contracts. Implemented and verified:
+1. **Windows Service Host & SCM Lifecycle Integration (`service/windows_host.py`, `main.py`):**
+   - Enhanced `WindowsServiceHost` with explicit stop signaling (`request_stop`, `is_stop_requested`), resource cleanup on startup failures, and standalone execution entrypoint via `__main__`.
+   - Wired `--service` (starts resident SCM service host loop with SIGINT/SIGTERM handlers) and `--service-status` (queries and outputs structured health telemetry JSON) into `main.py`.
+2. **Safe Windows Service Management Tooling (`scripts/`):**
+   - Created `scripts/install_windows_service.ps1`: validates Windows platform, verifies project paths (`venv\Scripts\python.exe`, `main.py`), validates Administrator elevation, prevents duplicate SCM registrations, registers `ACTISProtectionService` via `sc.exe`, and supports `-DryRun` for non-privileged CI/validation runs.
+   - Created `scripts/status_windows_service.ps1`: non-privileged status inspector checking SCM registration, service state (Running/Stopped/Paused), process ID and memory usage via CIM/WMI, recent log history, and structured JSON output via `-AsJson`.
+   - Created `scripts/uninstall_windows_service.ps1`: validates elevation, cleanly stops running service instances, unregisters the service via `sc.exe delete`, and explicitly preserves threat databases (`data/`) and logs (`logs/`).
+3. **Native Windows Desktop Notifications (`notifications/windows_toast.py`, `notifications/notifier.py`):**
+   - Implemented `WindowsToastNotifier`: asynchronous non-blocking notification dispatch powered by `ThreadPoolExecutor` (guaranteed dispatch time < 50ms, never blocking the scanning pipeline).
+   - Automated secret and credential sanitization (`sanitize_notification_text`) scrubbing API keys, bearer tokens, passwords, and sensitive tokens from notification text; escaped XML characters for Windows toast templates.
+   - Sliding-window cooldown rate limiting per target/indicator suppressing notification floods during burst operations.
+   - Truth in advertising: unconfirmed or candidate threats are labeled as suspicious alerts, never mislabeled as confirmed malware.
+   - Robust Windows execution: dynamic `powershell.exe` path resolution (`get_powershell_executable`), non-interactive execution, and error isolation preventing OS/subprocess exceptions from leaking.
+   - Test mode support (`test_mode=True`): facilitates headless and automated test validation without spawning OS UI popups.
+   - Integrated with `NotificationManager.notify_threat(...)` for `HIGH` and `CRITICAL` risk alerts.
+4. **File Protection Pipeline Threat Notification Handoff (`service/file_pipeline.py`):**
+   - Integrated `FileProtectionPipeline` to automatically trigger `notifier.notify_threat(...)` when static analysis classifies a changed or new binary with `is_threat=True`.
+5. **Comprehensive Test Expansion:**
+   - Added 26 automated unit and integration tests across 3 new test suites:
+     - `tests/test_windows_service_host.py` (8 tests)
+     - `tests/test_service_scripts.py` (6 tests)
+     - `tests/test_windows_notifications.py` (12 tests)
+   - Verified that ordinary tests require zero Administrator elevation.
+   - Verified full regression test suite: 461 tests passed with 100% success rate (expanded from 435 baseline).
+
+---
+
 ### 2026-10-11 — Day 16: Final Integration, Demonstration & Release Verification
 
 Conducted comprehensive system integration, release acceptance testing, and safe demonstration workflow verification across all 15 core subsystems of the ACTIS platform. Validated that all subsystems interface safely, deterministically, and in full alignment with documented defensive contracts. Implemented and verified:

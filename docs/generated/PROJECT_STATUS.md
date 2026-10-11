@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-11 10:08:04 UTC
+**Generated:** 2026-10-11 10:08:44 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`9d8001f`)
+**Current Git Branch:** `main` (`0ea1677`)
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `9d8001f`
-- **Working Tree:** 10 untracked/unstaged changes
+- **HEAD Commit:** `0ea1677`
+- **Working Tree:** 5 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `0ea1677` | Aaryan Suman | 2026-10-11 | feat(notifications): add native Windows desktop toast notifier with async dispatch and secret redaction |
 | `9d8001f` | Aaryan Suman | 2026-10-11 | feat(service): implement safe Windows SCM installation, status, and removal scripts |
 | `8f62018` | Aaryan Suman | 2026-10-11 | feat(service): enhance Windows service host lifecycle and CLI integration |
 | `6e166d5` | Aaryan Suman | 2026-10-11 | docs(release): reconcile Day 15 hardening baseline and Day 16 release verification |
@@ -140,7 +141,6 @@
 | `21b9b1d` | Aaryan Suman | 2026-10-11 | test(integration): add end-to-end release integration acceptance tests |
 | `cdd89d8` | Aaryan Suman | 2026-10-11 | feat(demo): add reproducible offline demonstration workflow |
 | `cb15428` | Aaryan Suman | 2026-10-11 | fix(scanners): harden URL parser against path separators and invalid ports |
-| `5d86124` | Aaryan Suman | 2026-10-11 | docs(security): document Day 15 hardening baseline and operational boundaries |
 
 ## Known Issues
 

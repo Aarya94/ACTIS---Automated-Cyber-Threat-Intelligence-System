@@ -125,9 +125,10 @@ ACTIS operates under strict defensive boundaries:
 - **Grounded AI Security Assistant & Explainable Threat Analysis (Day 14, `assistant/`, `dashboard/`):** Read-only security assistant providing explainable detection breakdowns, multi-factor scoring provenance (Intel 35%, ML 30%, Rules 20%), candidate indicator anti-poisoning caveats, deterministic target disambiguation, secret masking (`mask_sensitive_strings`), and safe defensive incident response recommendations without arbitrary shell or file modifications. Integrated with the Streamlit dashboard via session conversation history and native Markdown.
 - **Security Hardening & Adversarial Robustness (Day 15, `tests/`):** Comprehensive boundary verification against malformed PE binaries, oversized files (>50MB), malformed/adversarial URLs, non-string/None inputs, regex resource safety, private IP and local directory leakage prevention across all provider lookups, prompt injection rejection, queue saturation burst testing (500–1,000 events), and SQLite multi-threaded transaction concurrency.
 - **Final Integration, Demonstration & Release Verification (Day 16, `scripts/`, `tests/`):** Comprehensive end-to-end integration across all 15 core subsystems, reproducible safe offline demonstration workflow (`scripts/demo_actis.py`) covering 7 representative flows (Demos A–G), and 13 release acceptance tests (`tests/test_release_integration.py`).
-- **Automated Test Infrastructure (`tests/`):** 435 unit, integration, adversarial security, and release verification tests passing with 100% success rate (+18 new tests for Days 15–16).
+- **Windows Service Integration & Native Windows Notifications (Day 17, `service/`, `scripts/`, `notifications/`):** Production Windows Service Control Manager (SCM) deployment tooling (`install_windows_service.ps1`, `status_windows_service.ps1`, `uninstall_windows_service.ps1`), standalone host lifecycle routing via CLI (`main.py --service`, `main.py --service-status`), graceful worker cleanup on failure, and native Windows desktop toast notifications (`notifications/windows_toast.py`) with non-blocking async dispatch (<50ms), automated secret/credential redaction, rate limiting flood protection, and silent test mode.
+- **Automated Test Infrastructure (`tests/`):** 461 unit, integration, adversarial security, service lifecycle, and notification verification tests passing with 100% success rate (+26 new tests for Day 17).
 
-*(Note: ACTIS is a development-stage cybersecurity platform and release candidate prototype, not a commercial antivirus or EDR product. Resident Windows Service integration is verified through modular architecture and mocks; production enterprise deployment requires deployment environment hardening.)*
+*(Note: ACTIS is a defensive cybersecurity platform and release candidate prototype, not a commercial antivirus or EDR product. Resident Windows Service integration is supported via standard Windows SCM facilities; real SCM registration requires administrative privileges and is fully removable via documented scripts.)*
 
 ---
 
@@ -139,17 +140,17 @@ ACTIS/
 ├── config/                   # Type-safe configuration, environment loader, logging
 ├── data/                     # Local SQLite databases, training datasets
 ├── models/                   # Serialized ML model artifacts (*.pkl) and JSON metadata
-├── service/                  # Windows Protection Service & file protection pipeline (lifecycle, state, workers, queue, dispatcher, debouncer)
+├── service/                  # Windows Protection Service & file protection pipeline (lifecycle, state, workers, queue, dispatcher, debouncer, windows_host)
 ├── scanners/                 # Event/input providers (URL, text, PE static analyzer, device scanner, file watcher)
 ├── detection_engine/         # Decision engine, risk engine, heuristic rule engine
 ├── threat_intelligence/      # Local indicator lookup, external API clients, sync manager, feed adapters
 ├── reports/                  # SQLite threat database schemas, query interfaces, reports
-├── notifications/            # Alert formatting and user dispatch queue
+├── notifications/            # Alert formatting, user dispatch queue, and native Windows desktop toast notifications
 ├── dashboard/                # Streamlit web command center UI
 ├── assistant/                # Grounded AI security assistant & explainable analysis (Day 14)
 ├── backend/                  # Central FastAPI intelligence sharing service
-├── scripts/                  # Safe system demonstration (`demo_actis.py`) and doc generation
-├── tests/                    # Automated unit, integration, adversarial, and release verification suites
+├── scripts/                  # Service management scripts (install, status, uninstall), demo (`demo_actis.py`), doc generator
+├── tests/                    # Automated unit, integration, adversarial, service, and notification suites
 ├── docs/                     # Architectural source of truth, roadmaps, and generated reports
 │   ├── architecture/         # System design, module contracts, workflows, security rules
 │   ├── roadmap/              # Authoritative daily execution roadmaps
@@ -169,8 +170,8 @@ pytest tests/ -v
 ```
 
 **Current Verification Status:**
-- **435 tests collected**
-- **435 tests passed (100% success rate)**
+- **461 tests collected**
+- **461 tests passed (100% success rate)**
 - **0 failures / 0 errors / 4 warnings**
 
 ### Run Safe Offline System Demonstration

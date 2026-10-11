@@ -161,13 +161,48 @@ python scripts/demo_actis.py
 
 ---
 
+## 🛡️ Windows Service Management & Background Protection
+
+ACTIS includes native Windows Service Control Manager (SCM) deployment scripts and CLI controls:
+
+```powershell
+# 1. Validate service installation without administrator privileges (Dry-Run)
+powershell -ExecutionPolicy Bypass -File scripts\install_windows_service.ps1 -DryRun
+
+# 2. Check service status, process ID, memory working set, and recent logs (no admin required)
+powershell -ExecutionPolicy Bypass -File scripts\status_windows_service.ps1
+# Or retrieve structured JSON:
+powershell -ExecutionPolicy Bypass -File scripts\status_windows_service.ps1 -AsJson
+
+# 3. Query service status via Python CLI
+python main.py --service-status
+
+# 4. Run Protection Service in host mode interactively
+python main.py --service
+
+# 5. Production SCM Installation (requires Administrator PowerShell):
+powershell -ExecutionPolicy Bypass -File scripts\install_windows_service.ps1
+Start-Service -Name ACTISProtectionService
+
+# 6. Clean Uninstallation (preserves databases and logs):
+powershell -ExecutionPolicy Bypass -File scripts\uninstall_windows_service.ps1
+```
+
+---
+
 ## 🧪 Running Automated Tests
 
 ACTIS includes an automated test suite with 100% pass rate:
 
 ```powershell
-# Run the complete test suite (435 tests)
+# Run the complete test suite (461 tests)
 pytest tests/ -q
+
+# Run Windows Service & PowerShell script tests
+pytest tests/test_windows_service_host.py tests/test_service_scripts.py -v
+
+# Run native Windows toast notification tests
+pytest tests/test_windows_notifications.py -v
 
 # Run the release candidate integration suite
 pytest tests/test_release_integration.py -v
@@ -175,12 +210,6 @@ pytest tests/test_release_integration.py -v
 # Run adversarial security & privacy safeguard suites
 pytest tests/test_adversarial_security.py -v
 pytest tests/test_privacy_safeguards.py -v
-
-# Run specific subsystem tests
-pytest tests/test_security_assistant.py -v
-pytest tests/test_central_ti_service.py -v
-pytest tests/test_url_scanner.py -v
-pytest tests/test_static_pe.py -v
 ```
 
 ---
