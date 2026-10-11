@@ -20,7 +20,7 @@ The roadmap is strictly structured into three distinct chronological phases:
 
 ```text
 ┌────────────────────────────────────────────────────────────────────────┐
-│ COMPLETED: DAYS 1 – 15 (Core Foundation, Central Sync, AI & Hardening) │
+│ COMPLETED: DAYS 1 – 16 (Full Core Foundation & Release Candidate)      │
 │ • Architecture, Configuration, Logging, SQLite Database Schemas       │
 │ • Machine Learning Contracts & 19-Feature Phishing Random Forest Model │
 │ • Static Windows PE Feature Extraction & Safe Binary Parsing           │
@@ -34,12 +34,7 @@ The roadmap is strictly structured into three distinct chronological phases:
 │ • Central Threat Intelligence REST API (/api/v1) & Secure Feed Sync    │
 │ • Grounded AI Security Assistant & Explainable Analysis (Offline)      │
 │ • Security Hardening, Adversarial Robustness & Broad Threat Coverage   │
-└───────────────────────────────────┬────────────────────────────────────┘
-                                    │
-                                    ▼
-┌────────────────────────────────────────────────────────────────────────┐
-│ NEXT: DAY 16 (Final Integration, Release Verification, & Live Demo)    │
-│ • Day 16: Final Integration, Release Verification, & Live Demo         │
+│ • Final Integration, 7-Flow Safe Demo Workflow & Release Acceptance    │
 └────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -123,8 +118,11 @@ Detailed design is documented in [`docs/architecture/architecture-evolution.md`]
 - **Components:** `tests/test_adversarial_security.py`, `tests/test_privacy_safeguards.py`, `config/config.py`, `detection_engine/threat_detector.py`, `threat_intelligence/indicator_validator.py`.
 - **Baseline:** 417 automated unit, integration, and security tests passing with 100% success rate (+57 new tests added).
 
-### Day 16: Final Integration + Demo + Release (`PLANNED`)
-- **Goals:** Complete system integration, reproducible deployment verification, documentation finalization, demonstration scripts, and milestone release preparation.
+### Day 16: Final Integration, Demonstration & Release Verification (`COMPLETED`)
+- **Delivered:** End-to-end integration audit across all 15 core subsystems, URL parser hardening against illegal path separators and port exceptions, reproducible and deterministic offline demonstration workflow (`scripts/demo_actis.py`) covering 7 representative flows (Demos A–G), isolated database and filesystem sandboxing, and 13 release acceptance tests (`tests/test_release_integration.py`) verifying core analysis entry points, structured result contracts, missing intelligence negative-evidence trap protection, candidate indicator anti-poisoning lifecycle, external provider timeout outcome states, local analysis resilience during central backend outages, sensitive path and private IP shielding, grounded AI assistant explanations, safe malformed binary handling without execution, isolated report generation and cleanup, and demo script execution.
+- **Constraints Verified:** 100% offline demonstration by default; zero execution of suspicious binaries, zero automatic file deletion/quarantine, zero mutation of user databases or files during testing/demonstrations, zero upload of user files or documents to external services, and zero unrestricted command execution.
+- **Components:** `scripts/demo_actis.py`, `tests/test_release_integration.py`, `scanners/url_scanner.py`, `README.md`, `docs/quickstart.md`, `docs/CHANGELOG.md`.
+- **Baseline:** 430 automated unit, integration, adversarial, and release verification tests passing with 100% success rate (+13 new tests added). Milestone Month 1 Release Candidate established.
 
 ---
 

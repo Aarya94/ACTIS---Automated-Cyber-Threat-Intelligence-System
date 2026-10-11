@@ -6,9 +6,30 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ---
 
-## [v0.1.0] — Foundation (In Progress)
+## [v0.1.0] — Foundation (Release Candidate 1)
 
-Milestone Scope: Architecture planning, configuration management, logging infrastructure, database/ML contracts, initial validation tests, and project foundations.
+Milestone Scope: Complete core defensive architecture, configuration, logging, database schemas, static PE analysis, URL/message analysis, device scanning, resident Windows service foundation, file watcher pipeline, threat intel integration, scheduled sync, central TI API, grounded AI assistant, security hardening, and release demonstration.
+
+### 2026-10-11 — Day 16: Final Integration, Demonstration & Release Verification
+
+Conducted comprehensive system integration, release acceptance testing, and safe demonstration workflow verification across all 15 core subsystems of the ACTIS platform. Validated that all subsystems interface safely, deterministically, and in full alignment with documented defensive contracts. Implemented and verified:
+1. **System Integration Audit:** Completed and verified integration matrix across all 15 subsystem boundaries: scanners -> orchestrator -> decision engine -> risk engine -> threat intel -> sync service -> central TI backend -> reporting -> grounded AI assistant -> dashboard.
+2. **Safe End-to-End System Demonstration Workflow (`scripts/demo_actis.py`):** Implemented an automated, 100% offline demonstration runner exercising 7 representative security scenarios inside an isolated sandbox with zero mutation of user databases or filesystem assets:
+   - *DEMO A (Benign URL Inspection):* Real lexical feature extraction (19 features), normalization, Random Forest inference, and LOW/MEDIUM risk classification.
+   - *DEMO B (Synthetic Phishing URL Detection):* Lexical heuristic rules, brand keyword lure detection, and HIGH severity classification with itemized explanations.
+   - *DEMO C (Safe Static Malformed PE Inspection):* Non-executing static inspection of corrupt PE headers with graceful error handling and immediate artifact cleanup.
+   - *DEMO D (Threat Intelligence Provenance & Anti-Poisoning):* Differentiating verified `CONFIRMED` intelligence from client `CANDIDATE` submissions and `UNKNOWN` indicators, avoiding the negative-evidence trap.
+   - *DEMO E (Grounded AI Security Assistant):* Truthful evidence-backed explanations of recorded detections, absence-of-evidence safety warnings, prompt injection resistance, and automated credential masking.
+   - *DEMO F (Structured Security Audit Reporting):* Validated generation and schema compliance of multi-format reports (JSON, CSV, Markdown) in an isolated export directory.
+   - *DEMO G (Incremental Scan State Optimization):* Demonstrating change classification (`NEW_FILE` vs `UNCHANGED_FILE`) and deep scan suppression for unchanged binaries.
+3. **Release Acceptance Test Suite (`tests/test_release_integration.py`):** Added 13 focused end-to-end integration tests verifying core analysis entry points, structured result contracts, missing intelligence negative-evidence trap protection, candidate indicator anti-poisoning lifecycle, external provider timeout outcome states, local analysis resilience during central backend outages, sensitive path and private IP shielding, grounded AI assistant explanations, safe malformed binary handling without execution, isolated report generation and cleanup, and demo script execution.
+4. **URL Parser Robustness Hardening (`scanners/url_scanner.py`):** Hardened `validate_url` to explicitly reject illegal backslashes / filesystem path separators, validate port integers during initial parsing, and guard `normalize_url` against `ValueError` when processing unusual host:port inputs.
+5. **Configuration and Startup Verification:** Verified environment loading, path resolution, database schema idempotency, and offline resilience when optional services (external TI providers, central REST server) are unavailable.
+6. **Release Readiness Audit:** Completed 6-dimension evaluation (Correctness, Security, Reliability, Reproducibility, Documentation, Hygiene) with zero critical blockers, establishing the ACTIS Milestone Month 1 Release Candidate (`v0.1.0-rc1`).
+
+Expanded the automated test suite from 417 to 430 passing tests (+13 tests in `tests/test_release_integration.py`), maintaining 100% test pass rate with zero failures.
+
+---
 
 ### 2026-10-11 — Day 15: Security Hardening, Adversarial Robustness & Broad Threat Coverage Testing
 

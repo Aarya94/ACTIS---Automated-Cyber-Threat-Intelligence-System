@@ -106,13 +106,13 @@ ACTIS operates under strict defensive boundaries:
 
 ## 📊 Current Implementation vs. Roadmap
 
-### Implemented Baseline Foundation (Days 1–15)
+### Implemented Baseline Foundation (Days 1–16: Milestone 1 Release Candidate)
 - **Configuration Management (`config/`):** Strongly-typed `AppConfig`, environment loader, path resolver, constraint validation (11 passing tests).
 - **Enterprise Logging (`config/config.py`):** Rotating file logs, structured formatters, and automated `SecretMaskingFilter` redacting API keys, bearer tokens, and credentials from console and file logs.
 - **Relational Threat Database & Scan History (`reports/`):** SQLite schema with WAL mode (`threats`, `indicators`, `scans`, `detections`, `scan_items`, `file_scan_states`, `threat_sync_runs`, `threat_feed_status`), indexed queries, JSON/CSV/Markdown report generation.
 - **Phishing Machine Learning Foundation (`models/`, `detection_engine/`):** 19-feature morphological Random Forest classifier with formal metadata contract validation.
 - **Static Windows PE Binary Analysis (`scanners/file_feature_extractor.py`):** Read-only PE header and section parsing (`pefile`), Shannon byte entropy, 64 KB chunked SHA-256 and MD5 hashing, hardened against malformed DOS/PE headers, corrupted sections, and oversized binaries without memory exhaustion.
-- **URL Analysis Hardening (`scanners/url_scanner.py`):** RFC scheme validation, canonical normalization, default port stripping, 19-feature vector extraction, session caching.
+- **URL Analysis Hardening (`scanners/url_scanner.py`):** RFC scheme validation, canonical normalization, default port stripping, backslash path rejection, 19-feature vector extraction, session caching.
 - **Message URL Analysis (`scanners/text_analyzer.py`):** Boundary-aware link extraction, canonical deduplication, social engineering heuristics, ReDoS-safe linear time evaluation, and strict delegation to canonical URL analysis.
 - **Detection Decision & Risk Engine (`detection_engine/`):** Multi-criteria evidence fusion, dynamic weight normalization, deterministic heuristic rules, confidence calculation, circular-import-safe module boundaries, and explainability trees.
 - **Device Scanner (`scanners/device_scanner.py`):** User-authorized directory and drive traversal, junction/reparse-point loop safety, safe file metadata extraction, streaming chunked SHA-256 fingerprinting with race detection, cooperative cancellation, structured `DeviceScanResult`.
@@ -124,12 +124,10 @@ ACTIS operates under strict defensive boundaries:
 - **Central Threat Intelligence Service & Secure Synchronization (Day 13, `backend/`, `threat_intelligence/`):** Hardened FastAPI central intelligence REST API (`/api/v1`), constant-time API key verification (`hmac.compare_digest`), role-based authorization (`read`, `contribute`, `admin`), in-memory sliding-window rate limiting (60–300 RPM default), strict RFC 1918 IP shielding, candidate contribution anti-poisoning policy (forces `CANDIDATE` / `PENDING`), administrative review endpoint (`APPROVE`, `REJECT`), client `CentralACTISFeedAdapter`, and total offline scanning isolation.
 - **Grounded AI Security Assistant & Explainable Threat Analysis (Day 14, `assistant/`, `dashboard/`):** Read-only security assistant providing explainable detection breakdowns, multi-factor scoring provenance (Intel 35%, ML 30%, Rules 20%), candidate indicator anti-poisoning caveats, deterministic target disambiguation, secret masking (`mask_sensitive_strings`), and safe defensive incident response recommendations without arbitrary shell or file modifications. Integrated with the Streamlit dashboard via session conversation history and native Markdown.
 - **Security Hardening & Adversarial Robustness (Day 15, `tests/`):** Comprehensive boundary verification against malformed PE binaries, oversized files (>50MB), malformed/adversarial URLs, regex resource safety, private IP and local directory leakage prevention across all provider lookups, prompt injection rejection, queue saturation burst testing (500–1,000 events), and SQLite multi-threaded transaction concurrency.
-- **Automated Test Infrastructure (`tests/`):** 417 unit, integration, adversarial security, and architecture validation tests passing with 100% success rate (+57 new tests for Day 15).
+- **Final Integration, Demonstration & Release Verification (Day 16, `scripts/`, `tests/`):** Comprehensive end-to-end integration across all 15 core subsystems, reproducible safe offline demonstration workflow (`scripts/demo_actis.py`) covering 7 representative flows (Demos A–G), and 13 release acceptance tests (`tests/test_release_integration.py`).
+- **Automated Test Infrastructure (`tests/`):** 430 unit, integration, adversarial security, and release verification tests passing with 100% success rate (+13 new tests for Day 16).
 
-### Planned Subsystems in Target Architecture (Day 16)
-- **Final Integration & Release (Day 16):** Milestone packaging, reproducible deployment verification, documentation finalization, and demonstration scripts.
-
-*(Note: Prototype files for some future modules exist historically in the repository; they are being systematically hardened and integrated per the post-Day-7 roadmap and are not yet production-ready. ACTIS is a development-stage prototype, not a full commercial antivirus or EDR system.)*
+*(Note: ACTIS is a development-stage cybersecurity platform and release candidate prototype, not a commercial antivirus or EDR product. Resident Windows Service integration is verified through modular architecture and mocks; production enterprise deployment requires deployment environment hardening.)*
 
 ---
 
@@ -150,7 +148,8 @@ ACTIS/
 ├── dashboard/                # Streamlit web command center UI
 ├── assistant/                # Grounded AI security assistant & explainable analysis (Day 14)
 ├── backend/                  # Central FastAPI intelligence sharing service
-├── tests/                    # Automated unit, integration, and validation suites
+├── scripts/                  # Safe system demonstration (`demo_actis.py`) and doc generation
+├── tests/                    # Automated unit, integration, adversarial, and release verification suites
 ├── docs/                     # Architectural source of truth, roadmaps, and generated reports
 │   ├── architecture/         # System design, module contracts, workflows, security rules
 │   ├── roadmap/              # Authoritative daily execution roadmaps
@@ -162,16 +161,24 @@ ACTIS/
 
 ## 🧪 Testing & Verification
 
-ACTIS maintains comprehensive test coverage across all implemented modules. To execute the test suite:
+ACTIS maintains comprehensive test coverage across all implemented modules.
 
+### Run Automated Tests
 ```bash
 pytest tests/ -v
 ```
 
 **Current Verification Status:**
-- **417 tests collected**
-- **417 tests passed (100% success rate)**
+- **430 tests collected**
+- **430 tests passed (100% success rate)**
 - **0 failures / 0 errors / 4 warnings**
+
+### Run Safe Offline System Demonstration
+ACTIS includes a deterministic, safe, 100% offline demonstration script that exercises 7 representative security flows (benign URL, synthetic phishing URL, malformed PE static analysis, threat intel lifecycle, grounded AI assistant, multi-format reporting, incremental scan state) inside an isolated sandbox with zero mutation of user databases or files:
+
+```bash
+python scripts/demo_actis.py
+```
 
 ---
 

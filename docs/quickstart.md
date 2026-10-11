@@ -140,19 +140,45 @@ Navigate to the **AI Security Assistant** tab in the Streamlit dashboard (`http:
 
 ---
 
-## 🧪 Running Automated Tests
+## 🎯 Running the Safe System Demonstration
 
-ACTIS includes an automated unit and integration test suite:
+ACTIS provides a reproducible, 100% offline demonstration script that verifies the complete defensive cybersecurity pipeline across 7 representative flows:
 
 ```powershell
-# Run all tests (360 tests)
-pytest tests/ -v
+python scripts/demo_actis.py
+```
+
+### Demonstration Scenarios Covered:
+- **DEMO A — Benign URL Inspection:** Real normalization, 19 morphological features, ML inference, and safe risk scoring in offline mode.
+- **DEMO B — Synthetic Phishing URL Detection:** Lexical heuristics, credential keyword cues, and Random Forest classifier identification.
+- **DEMO C — Synthetic Malformed Binary Inspection:** Safe static inspection of a corrupt PE binary without code execution, followed by immediate cleanup.
+- **DEMO D — Threat Intelligence Lifecycle:** Differentiating `CONFIRMED`, `CANDIDATE` (anti-poisoning protection), and `UNKNOWN` indicators (negative-evidence trap avoidance).
+- **DEMO E — Grounded AI Security Assistant:** Multi-factor evidence breakdown, absence-of-evidence safety warnings, and prompt injection / secret masking boundaries.
+- **DEMO F — Security Audit Reporting:** Exporting structured compliance reports to JSON, CSV, and Markdown in an isolated directory.
+- **DEMO G — Incremental Scan State Optimization:** Demonstrating change classification (`NEW_FILE` vs `UNCHANGED_FILE`) and redundant scan suppression.
+
+*Guarantees: Zero mutation of production databases, zero user file modification, zero live malware execution, and 100% offline execution.*
+
+---
+
+## 🧪 Running Automated Tests
+
+ACTIS includes an automated test suite with 100% pass rate:
+
+```powershell
+# Run the complete test suite (430 tests)
+pytest tests/ -q
+
+# Run the release candidate integration suite
+pytest tests/test_release_integration.py -v
+
+# Run adversarial security & privacy safeguard suites
+pytest tests/test_adversarial_security.py -v
+pytest tests/test_privacy_safeguards.py -v
 
 # Run specific subsystem tests
 pytest tests/test_security_assistant.py -v
-pytest tests/test_config_loading.py -v
-pytest tests/test_config_validation.py -v
-pytest tests/test_threat_database.py -v
+pytest tests/test_central_ti_service.py -v
 pytest tests/test_url_scanner.py -v
 pytest tests/test_static_pe.py -v
 ```

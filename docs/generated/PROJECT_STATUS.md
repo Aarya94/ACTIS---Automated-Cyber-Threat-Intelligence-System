@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-11 09:01:29 UTC  
+**Generated:** 2026-10-11 09:05:23 UTC  
 **Current Milestone:** `v0.1.0 — Foundation`  
-**Current Git Branch:** `main` (`cdd89d8`)  
+**Current Git Branch:** `main` (`21b9b1d`)  
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `cdd89d8`
-- **Working Tree:** 6 untracked/unstaged changes
+- **HEAD Commit:** `21b9b1d`
+- **Working Tree:** 11 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `21b9b1d` | Aaryan Suman | 2026-10-11 | test(integration): add end-to-end release integration acceptance tests |
 | `cdd89d8` | Aaryan Suman | 2026-10-11 | feat(demo): add reproducible offline demonstration workflow |
 | `cb15428` | Aaryan Suman | 2026-10-11 | fix(scanners): harden URL parser against path separators and invalid ports |
 | `5d86124` | Aaryan Suman | 2026-10-11 | docs(security): document Day 15 hardening baseline and operational boundaries |
@@ -140,7 +141,6 @@
 | `7b5cd71` | Aaryan Suman | 2026-10-10 | docs(changelog): align Day 14 commit history and generated changelog telemetry |
 | `331edd8` | Aaryan Suman | 2026-10-10 | docs(architecture): reconcile architectural documentation and test baselines with Day 14 |
 | `56151d9` | Aaryan Suman | 2026-10-10 | docs: document Day 14 grounded AI security assistant and update roadmap |
-| `332e3cf` | Aaryan Suman | 2026-10-10 | test(assistant): add comprehensive test suite for grounded security assistant and safety boundaries |
 
 ## Known Issues
 

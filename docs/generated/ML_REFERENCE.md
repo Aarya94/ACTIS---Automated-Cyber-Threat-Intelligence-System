@@ -1,6 +1,6 @@
 # ACTIS Machine Learning Reference
 
-**Generated:** 2026-10-11 09:01:29 UTC  
+**Generated:** 2026-10-11 09:05:23 UTC  
 **Source of Truth:** Models Audit & Metadata Contracts (`scripts/generate_docs.py`)  
 
 This reference catalogs all machine learning models, training datasets, feature sets,
