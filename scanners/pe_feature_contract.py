@@ -78,6 +78,13 @@ class PEImportFeature:
     imported_functions: Tuple[str, ...] = field(default_factory=tuple)
     suspicious_apis_found: Tuple[str, ...] = field(default_factory=tuple)
     suspicious_api_count: int = 0
+    imphash: str = ""
+    api_categories_found: Dict[str, Tuple[str, ...]] = field(default_factory=dict)
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Serializes import features to dictionary."""
+        return asdict(self)
+
 
 
 @dataclass

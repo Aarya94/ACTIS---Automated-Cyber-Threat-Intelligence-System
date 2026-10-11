@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-11 10:08:44 UTC
+**Generated:** 2026-10-11 10:45:47 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`0ea1677`)
+**Current Git Branch:** `main` (`fb94e6b`)
 
 ---
 
@@ -118,19 +118,20 @@
 ## Test Status
 
 - **Total Test Files:** `34`
-- **Total Discovered Test Functions:** `447`
+- **Total Discovered Test Functions:** `458`
 - **Coverage Areas:** Configuration validation, SQLite database schema & CRUD, Phishing/Malware model contracts, PE feature extraction, API backend.
 
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `0ea1677`
-- **Working Tree:** 5 untracked/unstaged changes
+- **HEAD Commit:** `fb94e6b`
+- **Working Tree:** 15 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `fb94e6b` | Aaryan Suman | 2026-10-11 | docs(day17): document Windows service management, native notifications, and Day 17 milestone |
 | `0ea1677` | Aaryan Suman | 2026-10-11 | feat(notifications): add native Windows desktop toast notifier with async dispatch and secret redaction |
 | `9d8001f` | Aaryan Suman | 2026-10-11 | feat(service): implement safe Windows SCM installation, status, and removal scripts |
 | `8f62018` | Aaryan Suman | 2026-10-11 | feat(service): enhance Windows service host lifecycle and CLI integration |
@@ -140,7 +141,6 @@
 | `d47becd` | Aaryan Suman | 2026-10-11 | docs(release): document Day 16 integration demonstration and update release baseline |
 | `21b9b1d` | Aaryan Suman | 2026-10-11 | test(integration): add end-to-end release integration acceptance tests |
 | `cdd89d8` | Aaryan Suman | 2026-10-11 | feat(demo): add reproducible offline demonstration workflow |
-| `cb15428` | Aaryan Suman | 2026-10-11 | fix(scanners): harden URL parser against path separators and invalid ports |
 
 ## Known Issues
 

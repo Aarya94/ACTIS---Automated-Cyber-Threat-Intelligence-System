@@ -15,10 +15,12 @@ from detection_engine.malware_dataset_schema import MALWARE_FEATURE_COLUMNS
 from detection_engine.model_manager import model_manager
 from scanners.file_feature_extractor import (
     FileFeatureExtractor,
+    API_CATEGORIES,
     analyze_pe_entropy_distribution,
     calculate_entropy,
     calculate_file_entropy,
     calculate_file_hashes,
+    calculate_imphash,
     calculate_shannon_entropy,
     detect_pe_format,
     extract_pe_header_metadata,
@@ -299,6 +301,40 @@ class TestPEMetadataAndSectionExtraction:
         assert "VirtualAlloc" in imp_res["suspicious_apis_found"]
         assert "FindWindowA" in imp_res["suspicious_apis_found"]
         assert imp_res["suspicious_api_count"] == 2
+        assert "imphash" in imp_res
+        assert len(imp_res["imphash"]) == 32
+        assert "api_categories_found" in imp_res
+        assert "ANTI_DEBUGGING" in imp_res["api_categories_found"]
+        assert "FindWindowA" in imp_res["api_categories_found"]["ANTI_DEBUGGING"]
+        assert "MEMORY_PROTECTION" in imp_res["api_categories_found"]
+        assert "VirtualAlloc" in imp_res["api_categories_found"]["MEMORY_PROTECTION"]
+
+    def test_calculate_imphash_deterministic_and_ordinals(self):
+        """Tests Mandiant imphash calculation algorithm with named and ordinal imports."""
+        mock_pe = MagicMock()
+        entry1 = MagicMock()
+        entry1.dll = b"ADVAPI32.DLL"
+        imp1 = MagicMock()
+        imp1.name = b"OpenProcessToken"
+        imp2 = MagicMock()
+        imp2.name = None
+        imp2.ordinal = 42
+        entry1.imports = [imp1, imp2]
+
+        mock_pe.DIRECTORY_ENTRY_IMPORT = [entry1]
+        imphash_val = calculate_imphash(mock_pe)
+
+        expected_md5 = hashlib.md5(b"advapi32.openprocesstoken,advapi32.ord42").hexdigest().lower()
+        assert imphash_val == expected_md5
+        assert len(imphash_val) == 32
+
+        # Null PE handling
+        assert calculate_imphash(None) == ""
+
+        # PE without imports
+        empty_pe = MagicMock(spec=[])
+        assert calculate_imphash(empty_pe) == ""
+
 
 
 class TestStructuredPEFeatureContract:
@@ -330,6 +366,28 @@ class TestStructuredPEFeatureContract:
         assert "file_metadata" in as_dict
         assert "pe_metadata" in as_dict
         assert "ml_feature_vector" in as_dict
+
+    def test_structured_features_with_imports_contract(self):
+        """Verifies PEImportFeature contract contains imphash and threat categories."""
+        import_contract = PEImportFeature(
+            imported_dll_count=2,
+            imported_function_count=4,
+            imported_dlls=("kernel32.dll", "advapi32.dll"),
+            imported_functions=("VirtualAlloc", "OpenProcessToken"),
+            suspicious_apis_found=("VirtualAlloc", "OpenProcessToken"),
+            suspicious_api_count=2,
+            imphash="d41d8cd98f00b204e9800998ecf8427e",
+            api_categories_found={
+                "MEMORY_PROTECTION": ("VirtualAlloc",),
+                "TOKEN_IMPERSONATION": ("OpenProcessToken",),
+            }
+        )
+        assert import_contract.imphash == "d41d8cd98f00b204e9800998ecf8427e"
+        assert "TOKEN_IMPERSONATION" in import_contract.api_categories_found
+        as_dict = import_contract.to_dict()
+        assert as_dict["imphash"] == "d41d8cd98f00b204e9800998ecf8427e"
+        assert "TOKEN_IMPERSONATION" in as_dict["api_categories_found"]
+
 
 
 class TestMalformedAndEdgeCaseHandling:

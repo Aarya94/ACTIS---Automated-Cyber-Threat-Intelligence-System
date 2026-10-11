@@ -18,7 +18,7 @@ import re
 import hashlib
 from pathlib import Path
 import struct
-from typing import Dict, Any, List, Optional, Sequence, Tuple, Union
+from typing import Dict, Any, List, Optional, Sequence, Tuple, Union, Set
 
 
 # Standard DOS and PE magic signatures
@@ -184,7 +184,7 @@ import pefile
 logger = get_logger("FileFeatureExtractor")
 
 # Known high-risk Windows APIs frequently abused by malware
-SUSPICIOUS_APIS = {
+SUSPICIOUS_APIS: Set[str] = {
     "VirtualAlloc", "VirtualAllocEx", "VirtualProtect", "VirtualProtectEx",
     "WriteProcessMemory", "ReadProcessMemory", "CreateRemoteThread",
     "OpenProcess", "SetWindowsHookExA", "SetWindowsHookExW",
@@ -195,6 +195,117 @@ SUSPICIOUS_APIS = {
     "RegSetValueExW", "CryptEncrypt", "CryptDecrypt", "WSAStartup",
     "connect", "send", "recv"
 }
+
+# Categorized high-risk Windows API threat sequences
+API_CATEGORIES: Dict[str, Set[str]] = {
+    "PROCESS_HOLLOWING": {
+        "VirtualAllocEx", "WriteProcessMemory", "SetThreadContext",
+        "ResumeThread", "NtUnmapViewOfSection", "ZwUnmapViewOfSection",
+        "QueueUserAPC", "CreateRemoteThread", "OpenProcess",
+    },
+    "TOKEN_IMPERSONATION": {
+        "OpenProcessToken", "AdjustTokenPrivileges", "LookupPrivilegeValueA",
+        "LookupPrivilegeValueW", "DuplicateTokenEx", "ImpersonateLoggedOnUser",
+        "ImpersonateSelf",
+    },
+    "DYNAMIC_RESOLUTION": {
+        "LoadLibraryA", "LoadLibraryW", "LoadLibraryExA", "LoadLibraryExW",
+        "GetProcAddress", "LdrLoadDll", "LdrGetProcedureAddress",
+    },
+    "ANTI_DEBUGGING": {
+        "IsDebuggerPresent", "CheckRemoteDebuggerPresent",
+        "NtQueryInformationProcess", "OutputDebugStringA", "OutputDebugStringW",
+        "FindWindowA", "FindWindowW",
+    },
+    "PERSISTENCE_SERVICE": {
+        "CreateServiceA", "CreateServiceW", "OpenSCManagerA", "OpenSCManagerW",
+        "RegCreateKeyExA", "RegCreateKeyExW", "RegSetValueExA", "RegSetValueExW",
+    },
+    "KEYLOGGING_INPUT": {
+        "SetWindowsHookExA", "SetWindowsHookExW", "GetAsyncKeyState", "GetKeyState",
+    },
+    "NETWORK_DOWNLOAD": {
+        "URLDownloadToFileA", "URLDownloadToFileW", "InternetOpenA", "InternetOpenW",
+        "InternetOpenUrlA", "InternetOpenUrlW", "HttpSendRequestA", "HttpSendRequestW",
+        "WSAStartup", "connect", "send", "recv",
+    },
+    "EXECUTION_COMMAND": {
+        "WinExec", "ShellExecuteA", "ShellExecuteW", "CreateProcessA", "CreateProcessW",
+    },
+    "MEMORY_PROTECTION": {
+        "VirtualAlloc", "VirtualProtect", "VirtualProtectEx", "ReadProcessMemory",
+        "MapViewOfFile", "CreateFileMappingA", "CreateFileMappingW",
+    },
+    "CRYPTOGRAPHY": {
+        "CryptEncrypt", "CryptDecrypt", "CryptAcquireContextA", "CryptAcquireContextW",
+    },
+}
+
+# Union categorized APIs into the main suspicious set
+for _cat_apis in API_CATEGORIES.values():
+    SUSPICIOUS_APIS = SUSPICIOUS_APIS.union(_cat_apis)
+
+
+def calculate_imphash(pe: Optional[pefile.PE]) -> str:
+    """
+    Calculates the Mandiant import hash (imphash) for a PE binary.
+    Standardized algorithm:
+    1. Parse imports in sequential order.
+    2. Lowercase DLL name and strip .dll, .sys, or .ocx extension.
+    3. Lowercase imported function name (or 'ordN' if imported by ordinal).
+    4. Format as 'dll.function' and concatenate with commas.
+    5. Compute MD5 digest.
+    """
+    if not pe:
+        return ""
+
+    try:
+        if hasattr(pe, "get_imphash") and callable(pe.get_imphash):
+            val = pe.get_imphash()
+            if isinstance(val, str) and len(val) == 32 and all(c in "0123456789abcdefABCDEF" for c in val):
+                return str(val).lower()
+    except Exception:
+        pass
+
+    # Deterministic fallback calculation
+    if not hasattr(pe, "DIRECTORY_ENTRY_IMPORT"):
+        return ""
+
+    entries: List[str] = []
+    for entry in getattr(pe, "DIRECTORY_ENTRY_IMPORT", []):
+        try:
+            raw_dll = getattr(entry, "dll", b"")
+            if isinstance(raw_dll, bytes):
+                dll_name = raw_dll.decode("utf-8", errors="ignore").strip("\x00").lower()
+            else:
+                dll_name = str(raw_dll).strip("\x00").lower()
+
+            for ext in (".dll", ".sys", ".ocx"):
+                if dll_name.endswith(ext):
+                    dll_name = dll_name[:-len(ext)]
+                    break
+
+            for imp in getattr(entry, "imports", []):
+                func_name = ""
+                raw_func = getattr(imp, "name", None)
+                if raw_func and isinstance(raw_func, bytes):
+                    func_name = raw_func.decode("utf-8", errors="ignore").strip("\x00").lower()
+                elif raw_func:
+                    func_name = str(raw_func).strip("\x00").lower()
+                elif hasattr(imp, "ordinal") and imp.ordinal is not None:
+                    func_name = f"ord{imp.ordinal}"
+
+                if func_name:
+                    entries.append(f"{dll_name}.{func_name}")
+        except Exception:
+            continue
+
+    if not entries:
+        return ""
+
+    joined = ",".join(entries)
+    return hashlib.md5(joined.encode("ascii", errors="ignore")).hexdigest().lower()
+
 
 # Regex for Bitcoin/Cryptocurrency addresses in strings
 BTC_ADDRESS_REGEX = re.compile(rb"\b[13][a-km-zA-HJ-NP-Z1-9]{25,34}\b")
@@ -506,6 +617,15 @@ def extract_pe_import_features(pe: pefile.PE) -> Dict[str, Any]:
             except Exception:
                 continue
 
+    imphash_val = calculate_imphash(pe)
+
+    # Classify imported functions into threat categories
+    api_categories: Dict[str, List[str]] = {}
+    for cat_name, cat_apis in API_CATEGORIES.items():
+        matched = [f for f in imported_functions if f in cat_apis]
+        if matched:
+            api_categories[cat_name] = sorted(list(set(matched)))
+
     return {
         "imported_dll_count": len(imported_dlls),
         "imported_function_count": len(imported_functions),
@@ -513,6 +633,8 @@ def extract_pe_import_features(pe: pefile.PE) -> Dict[str, Any]:
         "imported_functions": imported_functions,
         "suspicious_apis_found": suspicious_apis,
         "suspicious_api_count": len(suspicious_apis),
+        "imphash": imphash_val,
+        "api_categories_found": api_categories,
     }
 
 
@@ -550,6 +672,9 @@ class FileFeatureExtractor:
             "sections": [],
             "imported_dlls": [],
             "suspicious_apis_found": [],
+            "imphash": "",
+            "api_categories_found": {},
+            "entropy_distribution": {},
             "is_signed": False,
             "warnings": []
         }
@@ -647,6 +772,9 @@ class FileFeatureExtractor:
             result["import_metadata"] = imp_features
             result["imported_dlls"] = imp_features["imported_dlls"]
             result["suspicious_apis_found"] = imp_features["suspicious_apis_found"]
+            result["imphash"] = imp_features.get("imphash", "")
+            result["api_categories_found"] = imp_features.get("api_categories_found", {})
+            result["entropy_distribution"] = analyze_pe_entropy_distribution(sec_features, result["entropy"])
             # 1. Machine
             machine = getattr(pe.FILE_HEADER, "Machine", 0)
 
@@ -822,6 +950,8 @@ class FileFeatureExtractor:
         imports_contract = None
         raw_imports = res.get("import_metadata")
         if raw_imports:
+            raw_cats = raw_imports.get("api_categories_found", {})
+            api_categories_tuple = {k: tuple(v) for k, v in raw_cats.items()}
             imports_contract = PEImportFeature(
                 imported_dll_count=raw_imports.get("imported_dll_count", 0),
                 imported_function_count=raw_imports.get("imported_function_count", 0),
@@ -829,6 +959,8 @@ class FileFeatureExtractor:
                 imported_functions=tuple(raw_imports.get("imported_functions", [])),
                 suspicious_apis_found=tuple(raw_imports.get("suspicious_apis_found", [])),
                 suspicious_api_count=raw_imports.get("suspicious_api_count", 0),
+                imphash=raw_imports.get("imphash", ""),
+                api_categories_found=api_categories_tuple,
             )
 
         return PEStaticFeatures(

@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-10-11 10:08:44 UTC
+**Generated:** 2026-10-11 10:45:47 UTC
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)
 
 This document inventories all automated test files, test classes, and test functions
@@ -12,7 +12,7 @@ recorded only after confirmed execution.
 ## Test Suite Summary
 
 - **Total Test Files:** `34`
-- **Total Discovered Test Cases:** `447`
+- **Total Discovered Test Cases:** `458`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -28,7 +28,7 @@ recorded only after confirmed execution.
 | `tests/test_central_ti_service.py` | 30 tests | `PASSING` |
 | `tests/test_config_loading.py` | 11 tests | `PASSING` |
 | `tests/test_config_validation.py` | 11 tests | `PASSING` |
-| `tests/test_detection_engine.py` | 14 tests | `PASSING` |
+| `tests/test_detection_engine.py` | 23 tests | `PASSING` |
 | `tests/test_device_scanner.py` | 10 tests | `PASSING` |
 | `tests/test_doc_generator.py` | 20 tests | `PASSING` |
 | `tests/test_file_protection_burst.py` | 5 tests | `PASSING` |
@@ -45,7 +45,7 @@ recorded only after confirmed execution.
 | `tests/test_risk_engine_day6.py` | 8 tests | `PASSING` |
 | `tests/test_security_assistant.py` | 27 tests | `PASSING` |
 | `tests/test_service_scripts.py` | 6 tests | `PASSING` |
-| `tests/test_static_pe.py` | 21 tests | `PASSING` |
+| `tests/test_static_pe.py` | 23 tests | `PASSING` |
 | `tests/test_text_analyzer.py` | 9 tests | `PASSING` |
 | `tests/test_threat_database.py` | 3 tests | `PASSING` |
 | `tests/test_threat_intel_pipeline.py` | 11 tests | `PASSING` |
@@ -196,7 +196,7 @@ recorded only after confirmed execution.
 - `test_app_name_validation()`
 - `test_api_request_timeout_validation()`
 
-### `tests/test_detection_engine.py` (14 tests)
+### `tests/test_detection_engine.py` (23 tests)
 
 **Class `TestDetectionContractsAndEvidence`:**
 - `test_detection_result_clamping_and_properties()`
@@ -205,6 +205,15 @@ recorded only after confirmed execution.
 **Class `TestRuleEngineContractsAndEvaluation`:**
 - `test_rule_match_to_evidence_signal()`
 - `test_generic_rule_registry_execution()`
+- `test_pe_process_hollowing_rule_unmap()`
+- `test_pe_process_hollowing_rule_sequence()`
+- `test_pe_token_impersonation_rule()`
+- `test_pe_dynamic_api_resolver_rule()`
+- `test_pe_anti_analysis_rule()`
+- `test_pe_persistence_apis_rule()`
+- `test_pe_section_entropy_anomaly_rule()`
+- `test_pe_section_unpacking_stub_rule()`
+- `test_pe_benign_executable_no_severe_rules()`
 
 **Class `TestMLAndThreatIntelContracts`:**
 - `test_ml_prediction_result_conversion()`
@@ -582,7 +591,7 @@ recorded only after confirmed execution.
 - `test_status_script_json_output()`
 - `test_uninstall_script_dry_run_or_uninstalled()`
 
-### `tests/test_static_pe.py` (21 tests)
+### `tests/test_static_pe.py` (23 tests)
 
 **Standalone Test Functions:**
 - `test_pe_static_analysis_notepad()`
@@ -609,9 +618,11 @@ recorded only after confirmed execution.
 **Class `TestPEMetadataAndSectionExtraction`:**
 - `test_synthetic_pe_extraction()`
 - `test_mocked_import_feature_extraction()`
+- `test_calculate_imphash_deterministic_and_ordinals()`
 
 **Class `TestStructuredPEFeatureContract`:**
 - `test_structured_features_extraction()`
+- `test_structured_features_with_imports_contract()`
 
 **Class `TestMalformedAndEdgeCaseHandling`:**
 - `test_nonexistent_file()`
