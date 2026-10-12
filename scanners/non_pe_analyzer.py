@@ -189,6 +189,25 @@ class NonPEAnalyzer:
             if b"bash" in first_line or b"sh" in first_line:
                 return NonPEFileType.SCRIPT_BATCH
 
+        # Content-based heuristic signatures for scripts disguised or without matching extensions
+        sample_lower = header_sample[:512].lower()
+        if b"@echo off" in sample_lower or b"setlocal" in sample_lower:
+            return NonPEFileType.SCRIPT_BATCH
+        if (
+            b"param(" in sample_lower
+            or b"#requires" in sample_lower
+            or b"[cmdletbinding" in sample_lower
+            or b"$psversiontable" in sample_lower
+        ):
+            return NonPEFileType.SCRIPT_POWERSHELL
+        if (
+            b"wscript." in sample_lower
+            or b"cscript." in sample_lower
+            or b"' vbscript" in sample_lower
+            or b"msxml2.xmlhttp" in sample_lower
+        ):
+            return NonPEFileType.SCRIPT_VBSCRIPT
+
         # Distinguish general binary vs text
         if b"\x00" in header_sample:
             return NonPEFileType.GENERIC_BINARY

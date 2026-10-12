@@ -714,6 +714,16 @@ class FileFeatureExtractor:
         # Handle empty files safely
         if file_size == 0:
             result["warnings"].append("Target file is empty (0 bytes).")
+            try:
+                hashes = cls.calculate_hashes(path)
+                result["sha256"] = hashes.get("sha256", "")
+                result["md5"] = hashes.get("md5", "")
+                result["sha1"] = hashes.get("sha1", "")
+            except Exception:
+                pass
+            result["is_pe"] = False
+            result["analysis_method"] = "GENERIC_METADATA_ONLY"
+            result["detected_format"] = "EMPTY_FILE"
             return result
 
         # Calculate cryptographic hashes
@@ -737,6 +747,9 @@ class FileFeatureExtractor:
         # Check for size limitation before deep PE parsing
         if file_size > MAX_FILE_SIZE_BYTES:
             result["warnings"].append(f"File exceeds maximum safe static analysis size ({MAX_FILE_SIZE_BYTES} bytes)")
+            result["is_pe"] = False
+            result["analysis_method"] = "RESOURCE_LIMIT_EXCEEDED"
+            result["detected_format"] = "OVERSIZED_FILE"
             return result
 
         # Pre-check binary format before invoking heavy parser
@@ -785,12 +798,29 @@ class FileFeatureExtractor:
                 result["non_pe_features"] = non_pe_res.to_dict()
                 result["detected_format"] = non_pe_res.detected_format.value
                 result["analysis_method"] = non_pe_res.analysis_method.value
+                if non_pe_res.warnings:
+                    result["warnings"].extend(non_pe_res.warnings)
             except Exception:
                 pass
             return result
         except Exception as e:
             result["is_pe"] = False
             result["warnings"].append(f"PE parser exception: {e.__class__.__name__}")
+            try:
+                from scanners.non_pe_analyzer import NonPEAnalyzer
+                non_pe_res = NonPEAnalyzer.analyze_non_pe_file(
+                    path,
+                    hashes={"sha256": result["sha256"], "md5": result["md5"], "sha1": result["sha1"]},
+                    entropy=result["entropy"],
+                    file_size=file_size
+                )
+                result["non_pe_features"] = non_pe_res.to_dict()
+                result["detected_format"] = non_pe_res.detected_format.value
+                result["analysis_method"] = non_pe_res.analysis_method.value
+                if non_pe_res.warnings:
+                    result["warnings"].extend(non_pe_res.warnings)
+            except Exception:
+                pass
             return result
 
         # Extract PE Characteristics using modular extractors

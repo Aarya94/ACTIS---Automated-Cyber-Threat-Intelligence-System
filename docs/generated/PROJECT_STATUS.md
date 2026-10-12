@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-12 13:49:55 UTC
+**Generated:** 2026-10-12 13:50:21 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`20cd464`)
+**Current Git Branch:** `main` (`af86172`)
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `20cd464`
-- **Working Tree:** 15 untracked/unstaged changes
+- **HEAD Commit:** `af86172`
+- **Working Tree:** 7 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `af86172` | Aaryan Suman | 2026-10-12 | fix(service): harden filesystem event handling and stability checks |
 | `20cd464` | Aaryan Suman | 2026-10-11 | docs(day19): document non-pe analysis and limitations |
 | `54ff907` | Aaryan Suman | 2026-10-11 | test(scanner): cover non-pe fallback and malformed archives |
 | `31e8a12` | Aaryan Suman | 2026-10-11 | feat(detection): add heuristic rules for archives and malicious scripts |
@@ -140,7 +141,6 @@
 | `3a1af8d` | Aaryan Suman | 2026-10-11 | feat(scanner): implement Mandiant imphash calculation and threat family API categorization |
 | `fb94e6b` | Aaryan Suman | 2026-10-11 | docs(day17): document Windows service management, native notifications, and Day 17 milestone |
 | `0ea1677` | Aaryan Suman | 2026-10-11 | feat(notifications): add native Windows desktop toast notifier with async dispatch and secret redaction |
-| `9d8001f` | Aaryan Suman | 2026-10-11 | feat(service): implement safe Windows SCM installation, status, and removal scripts |
 
 ## Known Issues
 
