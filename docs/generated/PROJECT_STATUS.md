@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-12 13:50:57 UTC
+**Generated:** 2026-10-12 14:11:35 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`42552eb`)
+**Current Git Branch:** `main` (`cad7768`)
 
 ---
 
@@ -117,20 +117,21 @@
 
 ## Test Status
 
-- **Total Test Files:** `36`
-- **Total Discovered Test Functions:** `499`
+- **Total Test Files:** `37`
+- **Total Discovered Test Functions:** `517`
 - **Coverage Areas:** Configuration validation, SQLite database schema & CRUD, Phishing/Malware model contracts, PE feature extraction, API backend.
 
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `42552eb`
-- **Working Tree:** 3 untracked/unstaged changes
+- **HEAD Commit:** `cad7768`
+- **Working Tree:** 16 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `cad7768` | Aaryan Suman | 2026-10-12 | docs(day20): document Week 5 integration audit, pipeline hardening, and benchmark |
 | `42552eb` | Aaryan Suman | 2026-10-12 | test(integration): cover file pipeline hardening and mixed-directory benchmark |
 | `add3c91` | Aaryan Suman | 2026-10-12 | fix(scanner): harden PE and non-PE fallback routing and format sniffing |
 | `af86172` | Aaryan Suman | 2026-10-12 | fix(service): harden filesystem event handling and stability checks |
@@ -140,7 +141,6 @@
 | `80d069b` | Aaryan Suman | 2026-10-11 | feat(scanner): add non-pe archive and script static analysis subsystem |
 | `61db8d4` | Aaryan Suman | 2026-10-11 | docs(day18): document enhanced PE import analysis, heuristic rules, and Day 18 milestone |
 | `fa0b8ee` | Aaryan Suman | 2026-10-11 | feat(detection): add enhanced PE heuristic rules for process hollowing, token impersonation, and section anomalies |
-| `3a1af8d` | Aaryan Suman | 2026-10-11 | feat(scanner): implement Mandiant imphash calculation and threat family API categorization |
 
 ## Known Issues
 

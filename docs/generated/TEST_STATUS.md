@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-10-12 13:50:57 UTC
+**Generated:** 2026-10-12 14:11:35 UTC
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)
 
 This document inventories all automated test files, test classes, and test functions
@@ -11,8 +11,8 @@ recorded only after confirmed execution.
 
 ## Test Suite Summary
 
-- **Total Test Files:** `36`
-- **Total Discovered Test Cases:** `499`
+- **Total Test Files:** `37`
+- **Total Discovered Test Cases:** `517`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -49,6 +49,7 @@ recorded only after confirmed execution.
 | `tests/test_service_scripts.py` | 6 tests | `PASSING` |
 | `tests/test_static_pe.py` | 23 tests | `PASSING` |
 | `tests/test_text_analyzer.py` | 9 tests | `PASSING` |
+| `tests/test_threat_caching_deep.py` | 18 tests | `PASSING` |
 | `tests/test_threat_database.py` | 3 tests | `PASSING` |
 | `tests/test_threat_intel_pipeline.py` | 11 tests | `PASSING` |
 | `tests/test_threat_providers.py` | 21 tests | `PASSING` |
@@ -703,6 +704,40 @@ recorded only after confirmed execution.
 - `test_message_scanner_delegates_to_common_url_scanner_path()`
 - `test_empty_none_and_no_url_messages()`
 - `test_structured_message_scan_result_contract()`
+
+### `tests/test_threat_caching_deep.py` (18 tests)
+
+**Class `MockClock`:**
+
+**Class `DummyMockProvider`:**
+
+**Class `TestLRUTTLCache`:**
+- `test_lru_eviction_when_capacity_reached()`
+- `test_ttl_expiration_with_injected_clock()`
+- `test_dict_interface_compatibility()`
+- `test_invalidate_and_clear()`
+
+**Class `TestThreatIntelligenceCache`:**
+- `test_cache_hit_avoids_repeated_lookup()`
+- `test_indicator_type_prevents_key_collisions()`
+- `test_normalization_produces_consistent_keys()`
+- `test_expired_entries_follow_defined_policy()`
+- `test_provider_failures_are_never_cached()`
+- `test_cache_write_failure_isolation()`
+- `test_indicator_invalidation()`
+- `test_cache_capacity_lru_retention()`
+
+**Class `TestCacheConcurrency`:**
+- `test_concurrent_read_write_under_load()`
+
+**Class `TestThreatDetectorScanCache`:**
+- `test_threat_detector_hash_cache_hit_bypasses_deep_analysis()`
+- `test_threat_detector_url_cache_hit()`
+- `test_threat_detector_invalidate_and_clear()`
+
+**Class `TestOfflineOutageResilience`:**
+- `test_outage_does_not_falsely_declare_clean()`
+- `test_database_registration_invalidates_cache()`
 
 ### `tests/test_threat_database.py` (3 tests)
 

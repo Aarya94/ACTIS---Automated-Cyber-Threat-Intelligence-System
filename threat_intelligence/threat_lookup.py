@@ -388,7 +388,17 @@ class ThreatLookup:
             "outcome_state": outcome_state,
         }
 
+    def invalidate_indicator(
+        self,
+        indicator: str,
+        indicator_type: Optional[Union[str, IndicatorType]] = None,
+        provider: Optional[str] = None
+    ) -> int:
+        """Invalidates matching entries in the attached threat intelligence cache."""
+        return self.cache.invalidate(indicator, indicator_type=indicator_type, provider=provider)
+
 
 # Global threat lookup singleton
 threat_lookup = ThreatLookup()
+
 

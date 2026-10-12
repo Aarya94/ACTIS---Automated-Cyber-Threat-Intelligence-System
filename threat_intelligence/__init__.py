@@ -16,6 +16,7 @@ from threat_intelligence.api_clients import (
 from threat_intelligence.threat_cache import (
     threat_cache,
     ThreatIntelligenceCache,
+    LRUTTLCache,
 )
 from threat_intelligence.threat_lookup import (
     ThreatLookup,
@@ -58,6 +59,7 @@ __all__ = [
     "AbuseIPDBClient",
     "threat_cache",
     "ThreatIntelligenceCache",
+    "LRUTTLCache",
     "ThreatLookup",
     "threat_lookup",
     "validate_and_normalize_indicator",

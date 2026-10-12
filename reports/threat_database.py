@@ -337,6 +337,20 @@ def register_indicator(
         conn.commit()
 
     conn.close()
+
+    # Invalidate indicator from active caches
+    try:
+        from threat_intelligence.threat_cache import threat_cache
+        threat_cache.invalidate(val_clean)
+    except Exception:
+        pass
+    try:
+        from detection_engine.threat_detector import threat_detector
+        threat_detector.invalidate_hash(val_clean)
+        threat_detector.invalidate_url(val_clean)
+    except Exception:
+        pass
+
     return ind_id
 
 
@@ -513,6 +527,16 @@ def upsert_feed_records(records: List[Dict[str, Any]]) -> Tuple[int, int, int]:
 
     finally:
         conn.close()
+
+    if inserted > 0 or updated > 0:
+        try:
+            from threat_intelligence.threat_cache import threat_cache
+            for rec in records:
+                val = rec.get("indicator") or rec.get("indicator_value")
+                if val:
+                    threat_cache.invalidate(str(val))
+        except Exception:
+            pass
 
     return inserted, updated, unchanged
 
