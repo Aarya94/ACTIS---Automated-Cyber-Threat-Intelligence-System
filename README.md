@@ -131,7 +131,8 @@ ACTIS operates under strict defensive boundaries:
 - **Week 5 Integration Audit & Pipeline Hardening (Day 20, `service/`, `scanners/`, `tests/`):** Comprehensive integration audit and hardening connecting PE analysis and non-PE fallback routines with resident Windows file protection pipeline and event debouncer. Added 0-byte file write stabilization, directory target rejection, rename previous-path state pruning, content-based script sniffing for disguised extensions, 24-file mixed-directory synthetic benchmark (100% success, 38.57ms avg latency, 6.4 MB peak memory), and 17 regression/edge-case tests.
 - **Threat Caching & High-Performance Lookup Subsystem (Day 21, `threat_intelligence/`, `detection_engine/`, `reports/`, `scripts/`):** Thread-safe bounded in-memory caching (`LRUTTLCache`) with LRU capacity eviction and TTL expiration, hardened `ThreatIntelligenceCache` with indicator invalidation and injectable clock, scan cache integration in `ThreatDetector` with cache invalidation hooks in `register_indicator()` and `upsert_feed_records()`, and comparative benchmark (Cold: 37.17ms/file, 26.9 files/s; Warm: 10.57ms/file, 94.6 files/s, 3.52x speedup; Sustained loop: 106.9 files/s, 88.57% hit ratio).
 - **Explainability Tree & Risk Weight Validation (Day 22, `detection_engine/`):** Bounded hierarchical explainability tree (`ExplainabilityTree`, `ExplainabilityNode`) detailing exact decision rationales, mathematical evidence-to-score calculation traceability (`ScoreTraceability`), sensitive credential/token masking, strict `RiskScoringWeights` validation (NaN, infinity, non-numeric, range constraints), dynamic weight normalization, sub-millisecond tree generation (<5ms for 50 signals), and 23 automated tests.
-- **Automated Test Infrastructure (`tests/`):** 554 unit, integration, adversarial security, service lifecycle, notification, PE analysis, non-PE fallback, pipeline hardening, deep TI caching, and explainability tree tests passing with 100% success rate (+23 new tests for Day 22).
+- **Evidence Fusion Audit & Edge-Case Hardening (Day 23, `detection_engine/`, `tests/`):** Systematic test-backed audit of the full evidence-fusion pipeline. Added deterministic duplicate signal deduplication keyed by `(source, signal_id)` in `DetectionEvidence` preserving highest-contribution signal, strict whitelist mitigation override precedence clamping scores to 0.0 with full before/after traceability, bounded explainability tree node count safety limits (<= 100), and 35 new comprehensive edge-case audit tests.
+- **Automated Test Infrastructure (`tests/`):** 589 unit, integration, adversarial security, service lifecycle, notification, PE analysis, non-PE fallback, pipeline hardening, deep TI caching, explainability tree, and evidence fusion audit tests passing with 100% success rate (+35 new tests for Day 23).
 
 *(Note: ACTIS is a defensive cybersecurity platform and release candidate prototype, not a commercial antivirus or EDR product. Resident Windows Service integration is supported via standard Windows SCM facilities; real SCM registration requires administrative privileges and is fully removable via documented scripts.)*
 
@@ -175,8 +176,8 @@ pytest tests/ -v
 ```
 
 **Current Verification Status:**
-- **554 tests collected**
-- **554 tests passed (100% success rate)**
+- **589 tests collected**
+- **589 tests passed (100% success rate)**
 - **0 failures / 0 errors / 4 warnings**
 
 ### Run Safe Offline System Demonstration

@@ -102,8 +102,22 @@ Month 2 integrates production Windows Service Control Manager (SCM) deployment a
 - **Validation**: 554 automated tests passing with 100% success rate (+23 new unit and integration tests).
 - **Security Boundaries**: Zero dynamic code execution, strict sensitive token redaction, bounded tree depths, and safe handling of unavailable/unsupported models.
 
-### Day 42: Week 6 Review & Test Expansion
-- **Goal**: Verify end-to-end evidence fusion across synthetic edge cases.
+### Day 42: Week 6 Review & Evidence Fusion Edge-Case Audit (`COMPLETED` — Day 23)
+- **Architecture Role**: Audits, hardens, and validates **Pipeline Stage 10 (Evidence Aggregation)**, **Stage 11 (Risk Engine)**, and **Stage 12 (Explainable Detection)** against contradictory, missing, duplicate, boundary, override, and failure edge cases.
+- **Delivered**:
+  1. *Duplicate Signal Deduplication & Audit Provenance (`detection_engine/evidence_model.py`)*: Upgraded `DetectionEvidence` container with automatic deduplication by `(source, signal_id)`. If identical findings are ingested (e.g. repeated rule execution, file watcher replay), the signal with higher weighted contribution is preserved, and dropped duplicates are audited in `discarded_duplicates` without artificial score inflation.
+  2. *Safety Override Precedence & Score Consistency (`detection_engine/decision_engine.py`, `explainability_tree.py`, `explanation_generator.py`)*: Resolved P1 override discrepancy where whitelisted indicators could retain non-zero risk scores. Enforced that verified whitelists/false-positives strictly force authoritative risk score to `0.0`, status `BENIGN`, and level `INFORMATIONAL`, while preserving `pre_override_score` in metadata and tree traceability for full security auditing.
+  3. *Explainability Tree Size & Resource Bounding (`detection_engine/explanation_generator.py`)*: Hardened branch rendering across static, rule, and TI finding loops. Added safety truncation nodes (`static_truncated`, `rule_truncated`, `ti_truncated`) ensuring tree node count strictly respects `MAX_TOTAL_NODES` (<=100) even when analyzing large or noisy evidence payloads.
+  4. *Evidence Fusion Edge-Case Audit Test Suite (`tests/test_evidence_fusion_audit.py`)*: Added 35 automated tests verifying:
+     - *Contradictory evidence*: ML high vs TI absent, ML low vs TI confirmed (CRITICAL floor min 90.0), static structural flags vs zero rules, rules vs ML unavailable, reputation discounts vs static anomalies, whitelist override precedence over confirmed malicious TI.
+     - *Missing/unavailable evidence*: TI provider timeout, rate limiting (429), missing ML model artifacts (omitted without penalty), empty evidence collections (informative baseline uncertainty).
+     - *Duplicate/correlated evidence*: Repeated rule signal deduplication, stronger finding preservation, distinct rules accumulating up to cap.
+     - *Risk scoring boundaries*: 0.0, 100.0, clamped negatives/excesses, weight validation (rejection of NaN/Inf/zero sum), and exact epsilon transitions around canonical thresholds (20, 35, 60, 80).
+     - *Explainability consistency*: Strict equality between tree `final_score` and `decision_result.risk_score`, recursive credential redaction, bounded tree size.
+     - *Offline analysis resilience*: Local PE analysis succeeds and detects threats when external TI is offline.
+- **Files/Components**: `detection_engine/evidence_model.py`, `detection_engine/decision_engine.py`, `detection_engine/explainability_tree.py`, `detection_engine/explanation_generator.py`, `tests/test_evidence_fusion_audit.py`.
+- **Validation**: 589 automated tests passing with 100% success rate (+35 new audit tests, 0 failed, 0 errors, 4 third-party warnings).
+- **Security Boundaries**: Complete non-destructive execution, strict sensitive token masking, zero score inflation on duplicate ingestion, and clear precedence rules for whitelist overrides.
 
 ---
 

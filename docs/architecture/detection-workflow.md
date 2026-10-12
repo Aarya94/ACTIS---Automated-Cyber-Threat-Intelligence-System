@@ -180,24 +180,26 @@ flowchart TD
 - **Inputs:** `ThreatIntelEvidence`, `MLPredictionResult`, `RuleEvaluationResult`, and static structural flags.
 - **Outputs:** `DetectionEvidence` object populated with standardized `EvidenceSignal` list with clamped confidence, severity, and weights.
 - **Dependencies:** `detection_engine/evidence_model.py`, `detection_engine/threat_intel_contract.py`, `detection_engine/ml_prediction_contract.py`.
+- **Deduplication & Provenance:** Enforces automatic deduplication by `(source, signal_id)`. If identical findings are ingested (e.g. repeated rule execution, file watcher replay), the signal with higher weighted contribution is preserved, and dropped duplicates are recorded in `discarded_duplicates` to prevent artificial score inflation.
 - **Error Behavior:** Unavailable signals (`MLPredictionStatus.UNAVAILABLE`, `ThreatIntelVerdict.UNAVAILABLE`) are omitted from positive scoring without penalty or artificial inflation.
-- **Status:** **IMPLEMENTED AND VERIFIED** (Verified in `tests/test_detection_engine.py`, `tests/test_unified_architecture.py`).
+- **Status:** **IMPLEMENTED AND VERIFIED** (Audited and verified in `tests/test_evidence_fusion_audit.py`).
 
 ### Stage 11: Risk Engine
-- **Purpose:** Computes the mathematical composite risk score (0.0 to 100.0) using Multi-Attribute Utility Theory (MAUT), applies dynamic layer weight re-normalization across active sources, rewards mutual corroboration (+15.0), and enforces whitelist overrides.
+- **Purpose:** Computes the mathematical composite risk score (0.0 to 100.0) using Multi-Attribute Utility Theory (MAUT), applies dynamic layer weight re-normalization across active sources, rewards mutual corroboration (+15.0 or 1.25x), and enforces safety overrides.
 - **Inputs:** Target identifier, target type, `known_intel`, `ml_result`, `heuristic_result`, `external_intel`.
-- **Outputs:** Structured risk dictionary (`score`, `risk_level`, `is_threat`, `reasons`, `recommended_action`, `evidence_breakdown`).
-- **Dependencies:** `detection_engine/risk_engine.py`.
+- **Outputs:** Structured risk evaluation (`score`, `risk_level`, `is_threat`, `reasons`, `recommended_action`, `evidence_breakdown`).
+- **Dependencies:** `detection_engine/risk_engine.py`, `detection_engine/decision_engine.py`.
+- **Override Precedence:** Verified whitelists and false positives strictly override confirmed threat intelligence, forcing the authoritative score to `0.0`, status to `BENIGN`, and level to `INFORMATIONAL`. The pre-override score is preserved in metadata and traceability for security auditing.
 - **Error Behavior:** Missing components trigger dynamic weight re-normalization: available active layers rescale proportionally to sum to 1.0.
-- **Status:** **IMPLEMENTED AND VERIFIED** (Refinement for hierarchical explainability tree scheduled in roadmap Days 39–41).
+- **Status:** **IMPLEMENTED AND VERIFIED** (Audited and verified in `tests/test_evidence_fusion_audit.py`).
 
 ### Stage 12: Explainable Detection
 - **Purpose:** Generates comprehensive human-readable and machine-actionable decision justifications: calculates decision confidence (0.0 to 1.0), itemizes contributing rule IDs and ML contributions, builds bounded hierarchical explainability trees with exact score calculation traceability, and supplies grounded defensive mitigation guidance.
 - **Inputs:** Composite score, risk classification, evidence signals, target metadata, score breakdown, layer weights.
 - **Outputs:** `DetectionResult` contract with `confidence`, `primary_reason`, `explanation_json`, `explainability_tree` dictionary, ASCII branch rendering, and defensive recommendations.
 - **Dependencies:** `detection_engine/decision_engine.py`, `detection_engine/explanation_generator.py`, `detection_engine/explainability_tree.py`, `assistant/security_assistant.py`.
-- **Error Behavior:** Never generates fabricated reasons; masks sensitive credentials/tokens; bounds tree depth (<=5) and node counts (<=100) to prevent memory blowout.
-- **Status:** **IMPLEMENTED AND VERIFIED** (Delivered in Day 22; verified in `tests/test_explainability_tree.py`).
+- **Error Behavior:** Never generates fabricated reasons; masks sensitive credentials/tokens; bounds tree depth (<=5) and node counts (<=100) with truncation notification nodes to prevent memory blowout.
+- **Status:** **IMPLEMENTED AND VERIFIED** (Audited and verified in `tests/test_explainability_tree.py`, `tests/test_evidence_fusion_audit.py`).
 
 ### Stage 13: Reports, Dashboard, and Alerts
 - **Purpose:** Multi-channel persistence and egress layer: persists scan sessions and detections to SQLite databases, provides interactive analysis controls in the Streamlit web dashboard, and issues native Windows toast notifications with rate limiting.
@@ -246,7 +248,7 @@ Where:
 
 ## 5. Implementation Status Matrix
 
-The following matrix documents the verified status of all 13 pipeline stages across the repository as of Milestone Day 21:
+The following matrix documents the verified status of all 13 pipeline stages across the repository as of Milestone Day 23:
 
 | # | Pipeline Stage | Primary Component Module(s) | Verified Status | Verification Evidence |
 |---|---|---|---|---|
@@ -259,9 +261,9 @@ The following matrix documents the verified status of all 13 pipeline stages acr
 | 7 | **Threat Intel Service** | `threat_intelligence/threat_lookup.py`, `sync_manager.py` | **IMPLEMENTED AND VERIFIED** | `tests/test_threat_intel_pipeline.py`, `test_central_ti_service.py` |
 | 8 | **TI Cache** | `threat_intelligence/threat_cache.py` (`LRUTTLCache`) | **IMPLEMENTED AND VERIFIED** | `tests/test_threat_caching_deep.py`, `scripts/benchmark_threat_cache.py` |
 | 9 | **TI Providers** | `reports/threat_database.py`, `api_clients.py` | **IMPLEMENTED AND VERIFIED** | `tests/test_threat_providers.py`, `test_threat_database.py` |
-| 10 | **Evidence Aggregation**| `detection_engine/evidence_model.py`, `decision_engine.py`| **IMPLEMENTED AND VERIFIED** | `tests/test_detection_engine.py` (EvidenceSignal contracts) |
-| 11 | **Risk Engine** | `detection_engine/risk_engine.py` | **IMPLEMENTED AND VERIFIED** | `tests/test_risk_engine.py`, `test_risk_engine_day6.py` |
-| 12 | **Explainable Detection**| `explanation_generator.py`, `explainability_tree.py` | **IMPLEMENTED AND VERIFIED** | `tests/test_explainability_tree.py` (Hierarchical trees & score traceability) |
+| 10 | **Evidence Aggregation**| `detection_engine/evidence_model.py`, `decision_engine.py`| **IMPLEMENTED AND VERIFIED** | `tests/test_evidence_fusion_audit.py` (Deduplication & audit trail) |
+| 11 | **Risk Engine** | `detection_engine/risk_engine.py` | **IMPLEMENTED AND VERIFIED** | `tests/test_risk_engine.py`, `test_evidence_fusion_audit.py` (Whitelist precedence) |
+| 12 | **Explainable Detection**| `explanation_generator.py`, `explainability_tree.py` | **IMPLEMENTED AND VERIFIED** | `tests/test_explainability_tree.py`, `test_evidence_fusion_audit.py` (Bounded trees) |
 | 13 | **Reports / Dash / Alerts**| `threat_database.py`, `dashboard/app.py`, `windows_toast.py`| **IMPLEMENTED AND VERIFIED** | `tests/test_windows_notifications.py`, `scripts/demo_actis.py` |
 
 ---

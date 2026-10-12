@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-12 16:06:29 UTC
+**Generated:** 2026-10-12 16:06:42 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`0ba7c55`)
+**Current Git Branch:** `main` (`2fd5e50`)
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `0ba7c55`
-- **Working Tree:** 6 untracked/unstaged changes
+- **HEAD Commit:** `2fd5e50`
+- **Working Tree:** 4 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `2fd5e50` | Aaryan Suman | 2026-10-12 | test(detection): add comprehensive evidence fusion edge-case audit suite |
 | `0ba7c55` | Aaryan Suman | 2026-10-12 | fix(detection): deduplicate evidence signals and enforce whitelist override precedence |
 | `22fdb79` | Aaryan Suman | 2026-10-12 | docs(day22): document explainability tree, score traceability, and roadmap completion |
 | `3dcef34` | Aaryan Suman | 2026-10-12 | test(detection): add comprehensive explainability tree and weight validation suite |
@@ -140,7 +141,6 @@
 | `53e1825` | Aaryan Suman | 2026-10-12 | docs(architecture): document unified detection pipeline |
 | `ac67354` | Aaryan Suman | 2026-10-12 | docs(day21): document threat intelligence caching subsystem and benchmark |
 | `f089b46` | Aaryan Suman | 2026-10-12 | test(ti): add comprehensive deep caching test suite and scan loop benchmark |
-| `386b06e` | Aaryan Suman | 2026-10-12 | feat(detection): integrate bounded LRU scan cache into threat detector |
 
 ## Known Issues
 

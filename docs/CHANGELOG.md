@@ -10,6 +10,34 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 Milestone Scope: Complete core defensive architecture, configuration, logging, database schemas, static PE analysis, URL/message analysis, device scanning, resident Windows service foundation, file watcher pipeline, threat intel integration, scheduled sync, central TI API, grounded AI assistant, security hardening, and release demonstration.
 
+### 2026-10-12 — Day 23: Week 6 Review & Evidence Fusion Edge-Case Audit (Detection Reliability, Risk Consistency & Regression Hardening)
+
+Conducted a systematic, test-backed audit of the complete evidence-fusion and detection-decision pipeline across contradictory, missing, duplicate, boundary, mitigation, override, and offline failure scenarios. Resolved verified defects without architecture rewrites or contract breakage:
+1. **Evidence Deduplication Subsystem (`detection_engine/evidence_model.py`):**
+   - Implemented duplicate signal detection and deduplication keyed by `(source, signal_id)` in both `DetectionEvidence.add_signal()` and `__post_init__()`.
+   - Guaranteed signal idempotence by preserving the signal instance with higher weighted contribution (`confidence * weight`), preventing artificial score inflation from duplicate feed inputs or rule re-evaluations.
+   - Added transparent discarded duplicate tracking (`discarded_duplicates: List[Dict[str, Any]]` and `discarded_duplicates_count` property) for complete auditability.
+2. **Deterministic Whitelist Override Precedence (`detection_engine/decision_engine.py`):**
+   - Enforced strict whitelist mitigation precedence: when `evidence.is_whitelisted` is True, `effective_score` is unconditionally clamped to `0.0`, `status` to `DetectionStatus.BENIGN`, and `level` to `SeverityLevel.INFORMATIONAL`.
+   - Preserved pre-override raw score in `ScoreTraceability` (`pre_override_score`) and analysis metadata (`pre_override_score`) ensuring total mathematical auditability.
+   - Fixed explainability tree synchronization under whitelist overrides: node `calc_override` explicitly documents `WHITELIST_OVERRIDE` with before/after score traceability.
+3. **Bounded Explainability Tree Safety Truncation (`detection_engine/explanation_generator.py`):**
+   - Hardened `ExplanationGenerator` signal iteration loops (static analysis, detection rules, threat intelligence findings) against `MAX_TOTAL_NODES` (100) exhaustion.
+   - Added defensive overflow truncation notices if excessive signals are present, guaranteeing zero unhandled exceptions or memory exhaustion in high-volume edge cases.
+4. **Comprehensive Evidence Fusion Edge-Case Audit Suite (`tests/test_evidence_fusion_audit.py`):**
+   - Added 35 focused automated edge-case and reliability tests covering:
+     - Contradictory evidence handling (high static + clean TI, high ML + low heuristic, high heuristic + benign ML).
+     - Missing and unavailable evidence robustness (offline/unreachable TI providers, zero-signal empty evidence, partial inputs).
+     - Duplicate and correlated signals (duplicate rule IDs, duplicate TI indicators, multi-source same-indicator fusion).
+     - Risk-scoring mathematical boundaries (epsilon boundary checks around 20.0, 35.0, 60.0, 80.0, score clamping [0.0, 100.0]).
+     - Mitigation and safety override precedence (whitelist override vs high raw score, mitigation discounts, multi-mitigation stacking).
+     - Explainability and final-decision consistency (verdict-score alignment, tree traceability reconciliation, secret masking).
+     - Provider failure isolation and offline analysis resilience (transient network drops, simulated HTTP 500/timeout, partial feed corruption).
+     - Cross-module regression behavior across file and URL pipelines.
+   - 589 automated tests passing with 100% success rate (+35 new tests, 0 failed, 0 errors, 4 third-party warnings).
+
+---
+
 ### 2026-10-12 — Day 22: Dynamic Weight Fine-Tuning & Explainability Tree
 
 Implemented a hierarchical explainability tree subsystem, exact evidence-to-score mathematical calculation traceability, validated and configurable risk-scoring weights, and end-to-end pipeline integration without altering existing threat detection contracts:
