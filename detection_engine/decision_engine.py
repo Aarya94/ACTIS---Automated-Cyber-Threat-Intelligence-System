@@ -106,7 +106,21 @@ class DetectionDecisionEngine:
         # 7. Internal Decision Confidence Calculation
         confidence = ConfidenceEngine.calculate_confidence(evidence, breakdown)
 
-        # 8. Human-Readable Explanation Generation
+        # 8. Hierarchical Explainability Tree & Human-Readable Explanations
+        tree = ExplanationGenerator.generate_explainability_tree(
+            target_identifier=target_identifier,
+            input_type=input_type,
+            risk_level=risk_level,
+            status=status,
+            score=score,
+            confidence=confidence,
+            evidence=evidence,
+            breakdown=breakdown,
+            weights=custom_weights,
+            is_whitelisted=is_whitelisted,
+            is_confirmed_threat=is_confirmed,
+            metadata=metadata
+        )
         primary_reason, reasons = ExplanationGenerator.generate_explanation(
             risk_level=risk_level,
             status=status,
@@ -120,6 +134,8 @@ class DetectionDecisionEngine:
         meta["recommended_action"] = action
         meta["score_breakdown"] = breakdown.to_dict()
         meta["evidence_summary"] = evidence.to_dict()
+        meta["explainability_tree"] = tree.to_dict()
+        meta["explainability_ascii"] = tree.render_ascii()
 
         return DetectionResult(
             target_identifier=target_identifier,

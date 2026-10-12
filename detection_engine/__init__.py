@@ -42,6 +42,13 @@ from detection_engine.explanation_generator import (
     ConfidenceEngine,
     ExplanationGenerator,
 )
+from detection_engine.explainability_tree import (
+    ExplainabilityNode,
+    ExplainabilityTree,
+    ScoreTraceability,
+    NodeCategory,
+    NodeStatus,
+)
 from detection_engine.model_manager import (
     ModelManager,
     model_manager,
@@ -80,6 +87,11 @@ __all__ = [
     "RiskClassifier",
     "ConfidenceEngine",
     "ExplanationGenerator",
+    "ExplainabilityNode",
+    "ExplainabilityTree",
+    "ScoreTraceability",
+    "NodeCategory",
+    "NodeStatus",
     "ModelManager",
     "model_manager",
     "DetectionDecisionEngine",

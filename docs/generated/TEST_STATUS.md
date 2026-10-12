@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-10-12 14:25:36 UTC
+**Generated:** 2026-10-12 15:07:15 UTC
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)
 
 This document inventories all automated test files, test classes, and test functions
@@ -11,8 +11,8 @@ recorded only after confirmed execution.
 
 ## Test Suite Summary
 
-- **Total Test Files:** `37`
-- **Total Discovered Test Cases:** `517`
+- **Total Test Files:** `38`
+- **Total Discovered Test Cases:** `540`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -31,6 +31,7 @@ recorded only after confirmed execution.
 | `tests/test_detection_engine.py` | 23 tests | `PASSING` |
 | `tests/test_device_scanner.py` | 10 tests | `PASSING` |
 | `tests/test_doc_generator.py` | 20 tests | `PASSING` |
+| `tests/test_explainability_tree.py` | 23 tests | `PASSING` |
 | `tests/test_file_pipeline_hardening.py` | 17 tests | `PASSING` |
 | `tests/test_file_protection_burst.py` | 5 tests | `PASSING` |
 | `tests/test_file_protection_events.py` | 17 tests | `PASSING` |
@@ -285,6 +286,39 @@ recorded only after confirmed execution.
 
 **Class `TestGeneratorCli`:**
 - `test_cli_check_mode()`
+
+### `tests/test_explainability_tree.py` (23 tests)
+
+**Class `TestExplainabilityTreeStructureAndContracts`:**
+- `test_tree_generation_for_simple_benign_target()`
+- `test_multiple_independent_findings_in_branches()`
+- `test_unavailable_ml_model_representation()`
+- `test_confirmed_threat_intelligence_provenance()`
+- `test_tree_depth_and_node_count_bounds()`
+- `test_sensitive_token_redaction_in_explanations()`
+
+**Class `TestMathematicalTraceability`:**
+- `test_traceability_exact_score_match()`
+- `test_reputation_mitigation_traceability()`
+- `test_ascii_rendering_completeness()`
+
+**Class `TestRiskScoringWeightsValidation`:**
+- `test_valid_default_weights()`
+- `test_rejects_nan_and_infinite_weights()`
+- `test_rejects_negative_weights()`
+- `test_rejects_out_of_range_weights()`
+- `test_rejects_non_numeric_types()`
+- `test_rejects_all_zero_weights()`
+- `test_normalized_method()`
+- `test_from_dict_strict_mode()`
+- `test_from_dict_non_strict_mode()`
+- `test_scoring_with_custom_validated_weights()`
+
+**Class `TestEndToEndPipelineIntegration`:**
+- `test_detector_analyze_url_produces_explainability_tree()`
+- `test_detector_analyze_file_produces_explainability_tree()`
+- `test_repeatable_identical_explanations()`
+- `test_submillisecond_tree_generation_performance()`
 
 ### `tests/test_file_pipeline_hardening.py` (17 tests)
 

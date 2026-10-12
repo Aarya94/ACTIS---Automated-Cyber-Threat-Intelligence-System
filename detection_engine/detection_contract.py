@@ -75,6 +75,11 @@ class DetectionResult:
             or self.risk_level in (RiskLevel.HIGH, RiskLevel.CRITICAL)
         )
 
+    @property
+    def explainability_tree(self) -> Optional[Dict[str, Any]]:
+        """Returns the serialized hierarchical explainability tree if present in analysis_metadata."""
+        return self.analysis_metadata.get("explainability_tree")
+
     def to_dict(self) -> Dict[str, Any]:
         """Serializes the detection result to a clean dictionary representation."""
         return {

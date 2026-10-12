@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-12 14:25:36 UTC
+**Generated:** 2026-10-12 15:07:15 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`53e1825`)
+**Current Git Branch:** `main` (`92e2792`)
 
 ---
 
@@ -117,20 +117,21 @@
 
 ## Test Status
 
-- **Total Test Files:** `37`
-- **Total Discovered Test Functions:** `517`
+- **Total Test Files:** `38`
+- **Total Discovered Test Functions:** `540`
 - **Coverage Areas:** Configuration validation, SQLite database schema & CRUD, Phishing/Malware model contracts, PE feature extraction, API backend.
 
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `53e1825`
-- **Working Tree:** 9 untracked/unstaged changes
+- **HEAD Commit:** `92e2792`
+- **Working Tree:** 18 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `92e2792` | Aaryan Suman | 2026-10-12 | docs(gitbook): align navigation, verification counts, and generated reports |
 | `53e1825` | Aaryan Suman | 2026-10-12 | docs(architecture): document unified detection pipeline |
 | `ac67354` | Aaryan Suman | 2026-10-12 | docs(day21): document threat intelligence caching subsystem and benchmark |
 | `f089b46` | Aaryan Suman | 2026-10-12 | test(ti): add comprehensive deep caching test suite and scan loop benchmark |
@@ -140,7 +141,6 @@
 | `42552eb` | Aaryan Suman | 2026-10-12 | test(integration): cover file pipeline hardening and mixed-directory benchmark |
 | `add3c91` | Aaryan Suman | 2026-10-12 | fix(scanner): harden PE and non-PE fallback routing and format sniffing |
 | `af86172` | Aaryan Suman | 2026-10-12 | fix(service): harden filesystem event handling and stability checks |
-| `20cd464` | Aaryan Suman | 2026-10-11 | docs(day19): document non-pe analysis and limitations |
 
 ## Known Issues
 

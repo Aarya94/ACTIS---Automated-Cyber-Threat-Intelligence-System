@@ -240,6 +240,7 @@ class ThreatDetector:
             "heuristic_result": heuristic_res,
             "threat_intel": intel_result,
             "detection_result": decision_result.to_dict(),
+            "explainability_tree": decision_result.explainability_tree,
             "static_info": static_info,
             "from_cache": False
         }
@@ -401,6 +402,7 @@ class ThreatDetector:
             "heuristic_result": heuristic_res,
             "threat_intel": intel_result,
             "detection_result": decision_result.to_dict(),
+            "explainability_tree": decision_result.explainability_tree,
             "is_valid": True,
             "from_cache": False
         }
