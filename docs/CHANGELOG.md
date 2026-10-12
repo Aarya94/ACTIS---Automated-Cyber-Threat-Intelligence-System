@@ -10,6 +10,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 Milestone Scope: Complete core defensive architecture, configuration, logging, database schemas, static PE analysis, URL/message analysis, device scanning, resident Windows service foundation, file watcher pipeline, threat intel integration, scheduled sync, central TI API, grounded AI assistant, security hardening, and release demonstration.
 
+### 2026-10-12 — Day 21: Threat Detection Engine Deep Integration: Threat Intelligence Caching
+
+Audited and hardened the Threat Intelligence caching layer and integrated high-performance bounded LRU in-memory scan caching with the ACTIS threat detector and local database:
+1. **Thread-Safe Bounded LRU Cache Subsystem (`threat_intelligence/threat_cache.py`):**
+   - Implemented `LRUTTLCache` providing thread-safe (`threading.RLock`) bounded Least-Recently-Used capacity eviction (default 5,000 entries), configurable TTL expiration (default 300s), injectable clock (`clock: Callable[[], float]`), and full dict-interface compatibility (`__getitem__`, `__setitem__`, `__delitem__`, `__contains__`).
+   - Hardened `ThreatIntelligenceCache` with explicit capacity limits (`max_entries`), LRU eviction on saturation, clock injection, safe error boundaries (never crashing detection upon cache failures), and comprehensive telemetry (`hits`, `misses`, `evictions_lru`, `evictions_ttl`, `hit_ratio`).
+   - Reinforced strict exclusion of `UNAVAILABLE` verdicts from caching to ensure transient provider outages are never treated as durable or benign results.
+2. **ThreatDetector Integration & Telemetry (`detection_engine/threat_detector.py`):**
+   - Replaced unbounded raw scan cache dictionaries with `LRUTTLCache` instances for both file hashes and normalized URLs.
+   - Added cache telemetry reporting (`get_cache_stats()`), hash invalidation (`invalidate_hash()`), and URL invalidation (`invalidate_url()`).
+3. **Pipeline Invalidation Hooks (`threat_intelligence/threat_lookup.py`, `reports/threat_database.py`):**
+   - Added `invalidate_indicator` to `ThreatLookup` for programmatic cache eviction.
+   - Connected automatic cache invalidation in `register_indicator()` and `upsert_feed_records()` to guarantee newly identified threats instantly purge stale clean cache entries.
+4. **Benchmark Verification (`scripts/benchmark_threat_cache.py`):**
+   - Cold scan: 37.17 ms/file, 26.9 files/sec; Warm scan: 10.57 ms/file, 94.6 files/sec (3.52x speedup, 100% cache hits); Sustained loop: 106.9 files/sec, 88.57% hit ratio across 100 scans with 2.06 MB peak memory.
+5. **Comprehensive Deep Caching Test Suite (`tests/test_threat_caching_deep.py`):**
+   - Added 18 automated tests covering LRU eviction, TTL expiration with clock injection, indicator type collision prevention, case/whitespace normalization, transient provider failure rejection, safe write error isolation, multi-threaded concurrency, cache invalidation on SQLite registration, and scan cache hit bypassing.
+   - 531 automated tests passing with 100% success rate (+18 new tests, 0 failed, 0 errors, 4 third-party warnings).
+
+---
+
 ### 2026-10-12 — Day 20: Week 5 Integration Audit & End-to-End File Pipeline Hardening
 
 Performed an end-to-end integration audit and hardening of static PE parsing and non-PE fallback analysis with the resident Windows file protection pipeline and filesystem event debouncer. Implemented and verified:

@@ -76,11 +76,15 @@ Month 2 integrates production Windows Service Control Manager (SCM) deployment a
 
 ## Week 6: Detection Engine Deep Integration
 
-### Days 36–38: Threat Caching & High-Performance Lookup
-- **Goal**: Implement high-throughput in-memory hash caching to avoid redundant SQLite queries during recursive directory scans.
-- **Tasks**: Build thread-safe LRU hash cache with TTL expiration.
-- **Files/Components**: `detection_engine/threat_detector.py`.
-- **Validation**: Benchmark scan loop with repeated files.
+### Days 36–38: Threat Caching & High-Performance Lookup (`COMPLETED` — Day 21)
+- **Delivered**:
+  1. *Thread-Safe Bounded In-Memory Hash Cache (`detection_engine/threat_detector.py`)*: Built `LRUTTLCache` providing thread-safe (`threading.RLock`) bounded Least-Recently-Used capacity eviction (default 5,000 entries), configurable TTL expiration (default 300s), clock injection for deterministic testing, and dictionary interface compatibility. Replaced unbounded raw scan cache dictionaries in `ThreatDetector`.
+  2. *Threat Intelligence Cache Hardening (`threat_intelligence/threat_cache.py`)*: Hardened `ThreatIntelligenceCache` with bounded capacity limits (`max_entries`), LRU eviction on saturation, injectable clock function, safe error boundaries, comprehensive telemetry (hits, misses, LRU evictions, TTL evictions, hit ratio), and indicator-level cache invalidation (`invalidate()`).
+  3. *Pipeline Invalidation Integration (`threat_intelligence/threat_lookup.py`, `reports/threat_database.py`)*: Added `invalidate_indicator` to `ThreatLookup` and automated cache invalidation upon indicator registration (`register_indicator`) and feed batch upserts (`upsert_feed_records`), preventing stale benign/clean verdicts when new threats are discovered.
+  4. *Benchmark Validation (`scripts/benchmark_threat_cache.py`)*: Executed cold vs warm repeated scan benchmark across 20 synthetic fixtures (PE, PowerShell, Batch, Logs). Cold pass: 37.17 ms/file, 26.9 files/sec; Warm pass: 10.57 ms/file, 94.6 files/sec (3.52x speedup, 100% cache hits); Sustained loop: 106.9 files/sec, 88.57% hit ratio across 100 scans with 2.06 MB peak memory.
+  5. *Deep Caching & Failure Isolation Test Suite (`tests/test_threat_caching_deep.py`)*: Added 18 automated tests covering LRU eviction, TTL expiration with clock injection, indicator type collision prevention, case/whitespace normalization, transient provider failure rejection, safe write error isolation, multi-threaded concurrency, cache invalidation on SQLite registration, and scan cache hit bypassing.
+- **Files/Components**: `threat_intelligence/threat_cache.py`, `threat_intelligence/threat_lookup.py`, `detection_engine/threat_detector.py`, `reports/threat_database.py`, `scripts/benchmark_threat_cache.py`, `tests/test_threat_caching_deep.py`.
+- **Validation**: 531 automated tests passing with 100% success rate (+18 new unit and integration tests).
 
 ### Days 39–41: Dynamic Weight Fine-Tuning & Explainability Tree
 - **Goal**: Enhance Risk Engine explainability output with structured evidence trees detailing exact rule triggers and ML feature contributions.
