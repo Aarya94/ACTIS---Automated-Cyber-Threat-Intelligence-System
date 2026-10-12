@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-12 15:07:31 UTC
+**Generated:** 2026-10-12 15:07:49 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`7cf9668`)
+**Current Git Branch:** `main` (`66f4371`)
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `7cf9668`
-- **Working Tree:** 6 untracked/unstaged changes
+- **HEAD Commit:** `66f4371`
+- **Working Tree:** 5 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `66f4371` | Aaryan Suman | 2026-10-12 | feat(risk): validate configurable risk scoring weights and boundaries |
 | `7cf9668` | Aaryan Suman | 2026-10-12 | feat(detection): add hierarchical explainability tree and score traceability |
 | `92e2792` | Aaryan Suman | 2026-10-12 | docs(gitbook): align navigation, verification counts, and generated reports |
 | `53e1825` | Aaryan Suman | 2026-10-12 | docs(architecture): document unified detection pipeline |
@@ -140,7 +141,6 @@
 | `89bdec8` | Aaryan Suman | 2026-10-12 | feat(ti): add bounded LRU threat intelligence cache with clock injection |
 | `cad7768` | Aaryan Suman | 2026-10-12 | docs(day20): document Week 5 integration audit, pipeline hardening, and benchmark |
 | `42552eb` | Aaryan Suman | 2026-10-12 | test(integration): cover file pipeline hardening and mixed-directory benchmark |
-| `add3c91` | Aaryan Suman | 2026-10-12 | fix(scanner): harden PE and non-PE fallback routing and format sniffing |
 
 ## Known Issues
 
