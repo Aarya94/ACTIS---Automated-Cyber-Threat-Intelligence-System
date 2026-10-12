@@ -10,7 +10,7 @@
 * [Module Architecture](docs/architecture/module-architecture.md)
 * [Architecture Evolution & Post-Day-7 Breakthrough](docs/architecture/architecture-evolution.md)
 * [Project Structure](docs/architecture/project-structure.md)
-* [Detection Workflow](docs/architecture/detection-workflow.md)
+* [Detection Workflow & Target Pipeline](docs/architecture/detection-workflow.md)
 * [Data Flow & Privacy Boundaries](docs/architecture/data-flow.md)
 * [Scanning Workflow](docs/architecture/scanning-workflow.md)
 * [Threat Intelligence Workflow](docs/architecture/threat-intelligence-workflow.md)

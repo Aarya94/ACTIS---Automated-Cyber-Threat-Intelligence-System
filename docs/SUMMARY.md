@@ -22,6 +22,9 @@
 * [Configuration Guide](configuration.md)
 * [Database & ML Contracts](contracts.md)
 * [Official Branding & Assets](../assets/branding/README.md)
+* [Windows PE Malware Dataset](ml_malware_dataset.md)
+* [Safe Static PE Analysis](static_pe_analysis.md)
+* [Detection Engine & Decision Fusion](detection_engine_workflow.md)
 
 ## 📅 Development Roadmap & Evolution
 * [Roadmap Overview & Post-Day-7 Evolution](roadmap/README.md)
