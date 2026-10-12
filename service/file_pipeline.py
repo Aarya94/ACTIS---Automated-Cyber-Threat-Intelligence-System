@@ -163,7 +163,37 @@ class FileProtectionPipeline(IAnalysisOrchestrationBoundary):
             self._record_result(result)
             return result
 
-        # 3. Query incremental state for change classification
+        # 3. Check if target is a directory mistakenly presented as a file
+        if path_obj.is_dir():
+            with self._lock:
+                self._unsupported_count += 1
+            try:
+                canonical_path = str(path_obj.resolve())
+            except (OSError, RuntimeError):
+                canonical_path = str(path_obj)
+            logger.info(f"Target '{canonical_path}' is a directory; skipping file analysis.")
+            result = EventProcessingResult(
+                event_id=event.event_id,
+                target_path=canonical_path,
+                status=EventProcessingStatus.SKIPPED_UNSUPPORTED,
+                change_type=FileChangeType.UNAVAILABLE_FILE,
+                error_message="Target is a directory, not a regular file.",
+            )
+            self._record_result(result)
+            return result
+
+        # 4. Handle file renames: prune old path from scan state
+        prev_path_val = (event.metadata.get("previous_path") if event.metadata else None) or getattr(event, "previous_path", None)
+        if (event.event_type == SecurityEventType.FILE_RENAMED or prev_path_val) and prev_path_val:
+            try:
+                prev_obj = Path(prev_path_val)
+                prev_canonical = str(prev_obj.resolve()) if prev_obj.exists() else str(prev_obj)
+                self.state_manager.remove_state(prev_canonical)
+                logger.info(f"Pruned previous path '{prev_canonical}' for renamed file '{raw_target}'.")
+            except Exception as prune_err:
+                logger.debug(f"Could not prune previous path '{prev_path_val}': {prune_err}")
+
+        # 5. Query incremental state for change classification
         try:
             canonical_path = str(path_obj.resolve())
         except (OSError, RuntimeError):

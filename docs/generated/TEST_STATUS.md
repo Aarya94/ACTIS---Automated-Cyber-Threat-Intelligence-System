@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-10-11 11:47:18 UTC
+**Generated:** 2026-10-12 13:49:55 UTC
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)
 
 This document inventories all automated test files, test classes, and test functions
@@ -11,8 +11,8 @@ recorded only after confirmed execution.
 
 ## Test Suite Summary
 
-- **Total Test Files:** `35`
-- **Total Discovered Test Cases:** `482`
+- **Total Test Files:** `36`
+- **Total Discovered Test Cases:** `499`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -31,6 +31,7 @@ recorded only after confirmed execution.
 | `tests/test_detection_engine.py` | 23 tests | `PASSING` |
 | `tests/test_device_scanner.py` | 10 tests | `PASSING` |
 | `tests/test_doc_generator.py` | 20 tests | `PASSING` |
+| `tests/test_file_pipeline_hardening.py` | 17 tests | `PASSING` |
 | `tests/test_file_protection_burst.py` | 5 tests | `PASSING` |
 | `tests/test_file_protection_events.py` | 17 tests | `PASSING` |
 | `tests/test_file_protection_integration.py` | 7 tests | `PASSING` |
@@ -283,6 +284,31 @@ recorded only after confirmed execution.
 
 **Class `TestGeneratorCli`:**
 - `test_cli_check_mode()`
+
+### `tests/test_file_pipeline_hardening.py` (17 tests)
+
+**Class `TestFileEventLifecycleAndDebouncing`:**
+- `test_rapid_modifications_coalesced_by_debouncer()`
+- `test_file_stability_check_helper()`
+- `test_duplicate_events_for_same_path_deduplicated_by_state()`
+- `test_pipeline_handles_disappeared_file_cleanly()`
+- `test_pipeline_handles_file_renamed_and_prunes_old_path()`
+- `test_pipeline_handles_file_deletion_and_state_removal()`
+- `test_directory_event_mistakenly_presented_as_file()`
+- `test_temporary_files_filtered_before_pipeline()`
+
+**Class `TestQueueSchedulingAndWorkerSafety`:**
+- `test_bounded_queue_saturation_drops_cleanly()`
+- `test_worker_pool_clean_shutdown_during_pending_work()`
+- `test_analyzer_exception_isolated_in_pipeline()`
+
+**Class `TestEndToEndPERoutingAndEvidenceConsistency`:**
+- `test_routing_valid_pe_uses_pe_parser()`
+- `test_routing_corrupt_pe_header_falls_back_to_non_pe()`
+- `test_routing_script_disguised_as_exe_detected_via_content()`
+- `test_routing_empty_file_has_valid_hashes_and_generic_method()`
+- `test_routing_unsupported_7z_reports_honestly()`
+- `test_pipeline_dispatches_notification_for_malicious_script()`
 
 ### `tests/test_file_protection_burst.py` (5 tests)
 

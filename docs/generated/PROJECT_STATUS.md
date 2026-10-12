@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-11 11:47:18 UTC
+**Generated:** 2026-10-12 13:49:55 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`54ff907`)
+**Current Git Branch:** `main` (`20cd464`)
 
 ---
 
@@ -117,20 +117,21 @@
 
 ## Test Status
 
-- **Total Test Files:** `35`
-- **Total Discovered Test Functions:** `482`
+- **Total Test Files:** `36`
+- **Total Discovered Test Functions:** `499`
 - **Coverage Areas:** Configuration validation, SQLite database schema & CRUD, Phishing/Malware model contracts, PE feature extraction, API backend.
 
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `54ff907`
-- **Working Tree:** 3 untracked/unstaged changes
+- **HEAD Commit:** `20cd464`
+- **Working Tree:** 15 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `20cd464` | Aaryan Suman | 2026-10-11 | docs(day19): document non-pe analysis and limitations |
 | `54ff907` | Aaryan Suman | 2026-10-11 | test(scanner): cover non-pe fallback and malformed archives |
 | `31e8a12` | Aaryan Suman | 2026-10-11 | feat(detection): add heuristic rules for archives and malicious scripts |
 | `80d069b` | Aaryan Suman | 2026-10-11 | feat(scanner): add non-pe archive and script static analysis subsystem |
@@ -140,7 +141,6 @@
 | `fb94e6b` | Aaryan Suman | 2026-10-11 | docs(day17): document Windows service management, native notifications, and Day 17 milestone |
 | `0ea1677` | Aaryan Suman | 2026-10-11 | feat(notifications): add native Windows desktop toast notifier with async dispatch and secret redaction |
 | `9d8001f` | Aaryan Suman | 2026-10-11 | feat(service): implement safe Windows SCM installation, status, and removal scripts |
-| `8f62018` | Aaryan Suman | 2026-10-11 | feat(service): enhance Windows service host lifecycle and CLI integration |
 
 ## Known Issues
 

@@ -52,10 +52,11 @@ def wait_until_file_stable(
                 return False
 
             curr_size = file_path.stat().st_size
-            # If size is positive and hasn't changed across interval, verify readability
-            if curr_size == last_size and curr_size > 0:
+            # If size hasn't changed across interval, verify readability
+            if curr_size == last_size and curr_size >= 0:
                 with open(file_path, "rb") as f:
-                    f.read(min(1024, curr_size))
+                    if curr_size > 0:
+                        f.read(min(1024, curr_size))
                 return True
             last_size = curr_size
         except (PermissionError, OSError):
@@ -63,11 +64,13 @@ def wait_until_file_stable(
 
         time.sleep(check_interval)
 
-    # Final check if file exists and has size > 0
+    # Final check if file exists and is readable
     try:
-        if file_path.exists() and file_path.stat().st_size > 0:
+        if file_path.exists():
             with open(file_path, "rb") as f:
-                f.read(min(1024, file_path.stat().st_size))
+                st_size = file_path.stat().st_size
+                if st_size > 0:
+                    f.read(min(1024, st_size))
             return True
     except (PermissionError, OSError):
         pass
