@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-10-12 15:08:24 UTC
+**Generated:** 2026-10-12 16:06:21 UTC
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)
 
 This document inventories all automated test files, test classes, and test functions
@@ -11,8 +11,8 @@ recorded only after confirmed execution.
 
 ## Test Suite Summary
 
-- **Total Test Files:** `38`
-- **Total Discovered Test Cases:** `540`
+- **Total Test Files:** `39`
+- **Total Discovered Test Cases:** `562`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -31,6 +31,7 @@ recorded only after confirmed execution.
 | `tests/test_detection_engine.py` | 23 tests | `PASSING` |
 | `tests/test_device_scanner.py` | 10 tests | `PASSING` |
 | `tests/test_doc_generator.py` | 20 tests | `PASSING` |
+| `tests/test_evidence_fusion_audit.py` | 22 tests | `PASSING` |
 | `tests/test_explainability_tree.py` | 23 tests | `PASSING` |
 | `tests/test_file_pipeline_hardening.py` | 17 tests | `PASSING` |
 | `tests/test_file_protection_burst.py` | 5 tests | `PASSING` |
@@ -286,6 +287,42 @@ recorded only after confirmed execution.
 
 **Class `TestGeneratorCli`:**
 - `test_cli_check_mode()`
+
+### `tests/test_evidence_fusion_audit.py` (22 tests)
+
+**Class `TestContradictoryEvidence`:**
+- `test_case_a_ml_high_threat_intel_absent()`
+- `test_case_b_ml_low_threat_intel_confirmed_critical()`
+- `test_case_c_static_structural_findings_rules_clean()`
+- `test_case_d_rules_suspicious_ml_unavailable()`
+- `test_case_e_reputation_mitigation_conflicts_with_suspicious_static()`
+- `test_case_f_whitelist_override_precedence_over_confirmed_malicious()`
+
+**Class `TestMissingAndUnavailableEvidence`:**
+- `test_ti_provider_timeout_not_treated_as_clean()`
+- `test_ti_rate_limiting_handled_safely()`
+- `test_ml_model_missing_omitted_without_penalty()`
+- `test_empty_evidence_collection_produces_informative_uncertainty()`
+
+**Class `TestDuplicateAndCorrelatedEvidence`:**
+- `test_duplicate_rule_signals_suppressed_to_prevent_score_inflation()`
+- `test_duplicate_signal_retains_stronger_finding_on_conflict()`
+- `test_distinct_rules_accumulate_legitimately()`
+
+**Class `TestRiskScoringBoundaries`:**
+- `test_numeric_boundaries_clamping()`
+- `test_weights_safety_and_rejections()`
+- `test_classification_threshold_boundaries()`
+- `test_mutual_confirmation_boost_trigger_and_cap()`
+- `test_mitigation_adjustment_clamped_at_zero()`
+
+**Class `TestExplainabilityConsistency`:**
+- `test_tree_score_and_classification_strictly_equal_detection_result()`
+- `test_sensitive_credential_redaction_in_explainability_nodes()`
+- `test_explainability_tree_node_count_strictly_bounded()`
+
+**Class `TestOfflineAndFailureRecovery`:**
+- `test_local_pe_analysis_completes_when_external_ti_offline()`
 
 ### `tests/test_explainability_tree.py` (23 tests)
 

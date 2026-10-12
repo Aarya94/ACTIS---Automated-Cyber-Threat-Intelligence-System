@@ -73,9 +73,43 @@ class DetectionEvidence:
     Provides filtering, severity ranking, and explanation aggregation.
     """
     signals: List[EvidenceSignal] = field(default_factory=list)
+    discarded_duplicates: List[Dict[str, Any]] = field(default_factory=list)
+
+    def __post_init__(self):
+        if self.signals:
+            raw_signals = list(self.signals)
+            self.signals = []
+            for s in raw_signals:
+                self.add_signal(s)
 
     def add_signal(self, signal: EvidenceSignal) -> None:
-        """Appends an evidence signal to the collection."""
+        """
+        Appends an evidence signal to the collection with automatic deduplication.
+        If an exact duplicate signal (same source and signal_id) is added,
+        preserves the signal with the higher weighted contribution and
+        records the dropped duplicate in discarded_duplicates to prevent artificial score inflation.
+        """
+        if not isinstance(signal, EvidenceSignal):
+            return
+
+        for idx, existing in enumerate(self.signals):
+            if existing.source == signal.source and existing.signal_id == signal.signal_id:
+                # Duplicate finding identified
+                if (signal.score_contribution * signal.weight) > (existing.score_contribution * existing.weight):
+                    dropped = existing
+                    self.signals[idx] = signal
+                else:
+                    dropped = signal
+
+                self.discarded_duplicates.append({
+                    "source": dropped.source.value if hasattr(dropped.source, "value") else str(dropped.source),
+                    "signal_id": dropped.signal_id,
+                    "name": dropped.name,
+                    "score_contribution": dropped.score_contribution,
+                    "reason": "Duplicate finding from identical source and identifier suppressed to prevent score inflation."
+                })
+                return
+
         self.signals.append(signal)
 
     def get_signals_by_source(self, source: EvidenceSource) -> List[EvidenceSignal]:
@@ -125,5 +159,7 @@ class DetectionEvidence:
             "max_severity": self.get_max_severity().value,
             "has_critical": self.has_critical_evidence(),
             "signals": [s.to_dict() for s in self.signals],
-            "explanations": self.format_explanations()
+            "explanations": self.format_explanations(),
+            "discarded_duplicates_count": len(self.discarded_duplicates),
+            "discarded_duplicates": list(self.discarded_duplicates)
         }

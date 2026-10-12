@@ -168,9 +168,10 @@ class ScoreTraceability:
     final_score: float
     is_override: bool
     override_reason: Optional[str] = None
+    pre_override_score: Optional[float] = None
 
     def to_dict(self) -> Dict[str, Any]:
-        return {
+        d = {
             "active_layers": list(self.active_layers),
             "configured_weights": {k: round(v, 4) for k, v in self.configured_weights.items()},
             "normalized_weights": {k: round(v, 4) for k, v in self.normalized_weights.items()},
@@ -185,6 +186,9 @@ class ScoreTraceability:
             "is_override": self.is_override,
             "override_reason": self.override_reason
         }
+        if self.pre_override_score is not None:
+            d["pre_override_score"] = round(self.pre_override_score, 2)
+        return d
 
 
 @dataclass

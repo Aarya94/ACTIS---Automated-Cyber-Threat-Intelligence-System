@@ -92,16 +92,24 @@ class DetectionDecisionEngine:
                 evidence.add_signal(sig)
 
         # 5. Risk Scoring Fusion
-        score, breakdown = RiskScoringEngine.score_evidence(evidence, weights=custom_weights)
+        raw_score, breakdown = RiskScoringEngine.score_evidence(evidence, weights=custom_weights)
 
         # 6. Risk Level & Status Classification
         risk_level, status, action = RiskClassifier.classify(
-            score=score,
+            score=raw_score,
             is_confirmed_threat=is_confirmed,
             is_whitelisted=is_whitelisted,
             has_critical_evidence=evidence.has_critical_evidence(),
             thresholds=custom_thresholds
         )
+
+        # Precedence Enforcement: If whitelisted, force authoritative score to 0.0
+        pre_override_score = None
+        if is_whitelisted:
+            pre_override_score = raw_score
+            effective_score = 0.0
+        else:
+            effective_score = raw_score
 
         # 7. Internal Decision Confidence Calculation
         confidence = ConfidenceEngine.calculate_confidence(evidence, breakdown)
@@ -112,25 +120,29 @@ class DetectionDecisionEngine:
             input_type=input_type,
             risk_level=risk_level,
             status=status,
-            score=score,
+            score=effective_score,
             confidence=confidence,
             evidence=evidence,
             breakdown=breakdown,
             weights=custom_weights,
             is_whitelisted=is_whitelisted,
             is_confirmed_threat=is_confirmed,
+            pre_override_score=pre_override_score,
             metadata=metadata
         )
         primary_reason, reasons = ExplanationGenerator.generate_explanation(
             risk_level=risk_level,
             status=status,
-            score=score,
+            score=effective_score,
             evidence=evidence,
             breakdown=breakdown
         )
 
         # Combine analysis metadata
         meta = dict(metadata or {})
+        if pre_override_score is not None:
+            meta["pre_override_score"] = round(pre_override_score, 2)
+            meta["override_applied"] = "WHITELIST_SAFETY_OVERRIDE"
         meta["recommended_action"] = action
         meta["score_breakdown"] = breakdown.to_dict()
         meta["evidence_summary"] = evidence.to_dict()
@@ -142,7 +154,7 @@ class DetectionDecisionEngine:
             input_type=input_type,
             detection_status=status,
             risk_level=risk_level,
-            risk_score=score,
+            risk_score=effective_score,
             confidence=confidence,
             primary_reason=primary_reason,
             reasons=reasons,

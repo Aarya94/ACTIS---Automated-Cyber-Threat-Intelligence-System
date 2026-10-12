@@ -140,6 +140,7 @@ class ExplanationGenerator:
         weights: Optional[RiskScoringWeights] = None,
         is_whitelisted: bool = False,
         is_confirmed_threat: bool = False,
+        pre_override_score: Optional[float] = None,
         metadata: Optional[Dict[str, Any]] = None
     ) -> ExplainabilityTree:
         """
@@ -192,7 +193,13 @@ class ExplanationGenerator:
         is_override = is_whitelisted or is_confirmed_threat
         override_reason = None
         if is_whitelisted:
-            override_reason = "Entity is in trusted whitelist or verified false positive; forces INFORMATIONAL / BENIGN verdict."
+            if pre_override_score is not None and pre_override_score > 0.0:
+                override_reason = (
+                    f"Entity is in trusted whitelist or verified false positive; "
+                    f"safety override replaced pre-override score of {pre_override_score:.1f} with 0.0 (verdict: INFORMATIONAL / BENIGN)."
+                )
+            else:
+                override_reason = "Entity is in trusted whitelist or verified false positive; forces INFORMATIONAL / BENIGN verdict."
         elif is_confirmed_threat:
             override_reason = "Entity confirmed malicious in threat intelligence; guarantees CRITICAL floor (min 90.0)."
 
@@ -209,7 +216,8 @@ class ExplanationGenerator:
             raw_composite=breakdown.raw_composite,
             final_score=score,
             is_override=is_override,
-            override_reason=override_reason
+            override_reason=override_reason,
+            pre_override_score=pre_override_score
         )
 
         # 2. Build Root Node
@@ -274,6 +282,15 @@ class ExplanationGenerator:
             }
         )
         for idx, sig in enumerate(static_signals):
+            if root.count_nodes() + len(static_node.children) >= MAX_TOTAL_NODES - 20:
+                static_node.add_child(ExplainabilityNode(
+                    node_id="static_truncated",
+                    category=NodeCategory.LIMITATION,
+                    title="Static Findings Truncated",
+                    description=f"Additional {len(static_signals) - idx} static findings truncated to remain within safety bounds.",
+                    status=NodeStatus.EVALUATED
+                ))
+                break
             static_node.add_child(ExplainabilityNode(
                 node_id=f"static_sig_{idx}_{sig.signal_id}",
                 category=NodeCategory.FINDING,
@@ -302,6 +319,15 @@ class ExplanationGenerator:
         )
         if rule_signals:
             for idx, r_sig in enumerate(rule_signals):
+                if root.count_nodes() + len(rule_node.children) >= MAX_TOTAL_NODES - 15:
+                    rule_node.add_child(ExplainabilityNode(
+                        node_id="rule_truncated",
+                        category=NodeCategory.LIMITATION,
+                        title="Rule Findings Truncated",
+                        description=f"Additional {len(rule_signals) - idx} rule matches truncated to remain within safety bounds.",
+                        status=NodeStatus.EVALUATED
+                    ))
+                    break
                 rule_node.add_child(ExplainabilityNode(
                     node_id=f"rule_sig_{idx}_{r_sig.signal_id}",
                     category=NodeCategory.FINDING,
@@ -389,6 +415,15 @@ class ExplanationGenerator:
         )
         if ti_signals:
             for idx, ti_sig in enumerate(ti_signals):
+                if root.count_nodes() + len(ti_node.children) >= MAX_TOTAL_NODES - 10:
+                    ti_node.add_child(ExplainabilityNode(
+                        node_id="ti_truncated",
+                        category=NodeCategory.LIMITATION,
+                        title="Threat Intelligence Signals Truncated",
+                        description=f"Additional {len(ti_signals) - idx} threat intel signals truncated to remain within safety bounds.",
+                        status=NodeStatus.EVALUATED
+                    ))
+                    break
                 ti_node.add_child(ExplainabilityNode(
                     node_id=f"ti_sig_{idx}_{ti_sig.signal_id}",
                     category=NodeCategory.FINDING,
@@ -471,12 +506,16 @@ class ExplanationGenerator:
                 score_contribution=round(breakdown.raw_composite - weighted_sum, 2)
             ))
         if is_override:
+            override_meta = {}
+            if pre_override_score is not None:
+                override_meta["pre_override_score"] = round(pre_override_score, 2)
             calc_node.add_child(ExplainabilityNode(
                 node_id="calc_override",
                 category=NodeCategory.FINDING,
                 title="Security Override Applied",
                 description=override_reason or "Safety boundary override modified classification.",
-                status=NodeStatus.OVERRIDDEN
+                status=NodeStatus.OVERRIDDEN,
+                metadata=override_meta
             ))
         root.add_child(calc_node)
 
