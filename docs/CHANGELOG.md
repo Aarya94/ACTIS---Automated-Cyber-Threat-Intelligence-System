@@ -10,6 +10,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 Milestone Scope: Complete core defensive architecture, configuration, logging, database schemas, static PE analysis, URL/message analysis, device scanning, resident Windows service foundation, file watcher pipeline, threat intel integration, scheduled sync, central TI API, grounded AI assistant, security hardening, and release demonstration.
 
+### 2026-10-12 — Day 20: Week 5 Integration Audit & End-to-End File Pipeline Hardening
+
+Performed an end-to-end integration audit and hardening of static PE parsing and non-PE fallback analysis with the resident Windows file protection pipeline and filesystem event debouncer. Implemented and verified:
+1. **Filesystem Event Handling & Stabilization Hardening (`service/file_pipeline.py`, `scanners/file_watcher.py`):**
+   - Hardened `wait_until_file_stable` to allow 0-byte files to stabilize when size remains 0 across intervals and file is openable, eliminating 4-second timeout latency for empty files.
+   - Enhanced `FileProtectionPipeline.process_file_event` with defensive directory validation, returning `SKIPPED_UNSUPPORTED` with clean diagnostic reasons if a directory event is received.
+   - Added automatic incremental scan state pruning for the previous path on `FILE_RENAMED` events to prevent orphaned state records.
+2. **Analysis Fallback & Format Routing Hardening (`scanners/file_feature_extractor.py`, `scanners/non_pe_analyzer.py`):**
+   - Added deterministic empty file handling with standard cryptographic empty-digest hashes and `GENERIC_METADATA_ONLY` method attribution.
+   - Added `OVERSIZED_FILE` categorization with `RESOURCE_LIMIT_EXCEEDED` method for files exceeding `MAX_FILE_SIZE_BYTES`.
+   - Extended PE parser exception fallback to route both `pefile.PEFormatError` and general PE parser exceptions into `NonPEAnalyzer.analyze_non_pe_file()`.
+   - Added content-based heuristic sniffing in `NonPEAnalyzer.detect_format` for Batch, PowerShell, and VBScript scripts lacking typical extensions or disguised with misleading extensions (e.g., `.exe`, `.txt`).
+3. **Deterministic Mixed-Directory Benchmark (`scripts/benchmark_mixed_directory.py`):**
+   - Created a synthetic fixture generator spanning 24 diverse file types (text, benign scripts, heuristic threat scripts, archives, corrupt archives, decompression bombs, PE binaries, corrupt PE headers, empty files, 7z containers, and generic binaries).
+   - Achieved 100% analysis success (24/24 files analyzed) in 0.9259 seconds (38.57ms avg latency, 4.58ms median latency, 6.4 MB peak memory), correctly triggering 5 security alert notifications without code execution.
+4. **Comprehensive Integration & Hardening Test Suite (`tests/test_file_pipeline_hardening.py`):**
+   - Added 17 unit and integration tests covering rapid modification debouncing, write stabilization, duplicate deduplication, file disappearance, rename state pruning, deletion state removal, directory filtering, swap file filtering, queue saturation drops, clean worker pool shutdown, analyzer error isolation, and end-to-end format routing.
+   - Verified 513 automated tests passing with 100% success rate (expanded from 496 baseline, 0 failed, 0 errors, 4 third-party warnings).
+
+---
+
 ### 2026-10-11 — Day 19: Non-PE File Fallback Static Analysis Subsystem
 
 Implemented safe static analysis for non-PE files including bounded streaming cryptographic hashing, safe archive inspection (ZIP, TAR, GZIP, and graceful 7z handling), static script heuristic inspection (PowerShell, Batch, VBScript, Python), and 12 dedicated non-PE detection rules without executing files or extracting contents to disk. Preserved existing Windows PE analysis pathways and zero-privilege offline operation. Implemented and verified:

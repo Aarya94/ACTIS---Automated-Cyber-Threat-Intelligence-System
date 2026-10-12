@@ -62,8 +62,15 @@ Month 2 integrates production Windows Service Control Manager (SCM) deployment a
 - **Validation**: 496 automated tests passing with 100% success rate (+24 new unit and integration tests).
 - **Security Boundaries**: Zero dynamic script execution, zero archive extraction to disk, zero unconstrained memory allocation.
 
-### Day 35: Week 5 Integration Audit
-- **Goal**: Full regression check for static file analysis routines.
+### Day 35: Week 5 Integration Audit & End-to-End File Pipeline Hardening (`COMPLETED` — Day 20)
+- **Delivered**:
+  1. *Filesystem Pipeline & Debounce Hardening (`service/file_pipeline.py`, `scanners/file_watcher.py`)*: Hardened `wait_until_file_stable` to allow 0-byte files to stabilize cleanly without timeout latency. Added directory target rejection in `process_file_event` returning `SKIPPED_UNSUPPORTED` to prevent spurious inaccessibility errors. Added automatic previous-path pruning on `FILE_RENAMED` events.
+  2. *PE & Non-PE Analysis Fallback Hardening (`scanners/file_feature_extractor.py`, `scanners/non_pe_analyzer.py`)*: Added deterministic empty file handling with standard empty-digest hashes and `GENERIC_METADATA_ONLY` attribution. Added `OVERSIZED_FILE` categorization with `RESOURCE_LIMIT_EXCEEDED` method. Extended PE parser exception fallback to route corrupt PE headers and files disguised as `.exe` through `NonPEAnalyzer.analyze_non_pe_file()`. Added content-based heuristic sniffing for Batch, PowerShell, and VBScript scripts lacking typical extensions.
+  3. *Deterministic Mixed-Directory Benchmark (`scripts/benchmark_mixed_directory.py`)*: Executed 24-file synthetic mixed-directory benchmark spanning PE binaries, corrupted PE headers, scripts, benign/bomb/camouflage archives, empty files, and 7z containers. Achieved 100% analysis success (24/24 files), 0.9259s total analysis time (38.57ms avg latency, 4.58ms median latency), 6.4 MB peak memory, and verified 5 security alert triggers through pipeline notifications.
+  4. *Integration & Hardening Test Suite (`tests/test_file_pipeline_hardening.py`)*: Added 17 automated tests covering rapid modification debouncing, write stabilization, duplicate deduplication, file disappearance, rename state pruning, deletion state removal, directory filtering, swap file filtering, queue saturation drops, clean worker pool shutdown, analyzer error isolation, and end-to-end format routing.
+- **Files/Components**: `service/file_pipeline.py`, `scanners/file_watcher.py`, `scanners/file_feature_extractor.py`, `scanners/non_pe_analyzer.py`, `scripts/benchmark_mixed_directory.py`, `tests/test_file_pipeline_hardening.py`.
+- **Validation**: 513 automated tests passing with 100% success rate (+17 new unit and integration tests).
+- **Security Boundaries**: Zero code execution, bounded memory queues, and safe threat notification dispatch.
 
 ---
 
