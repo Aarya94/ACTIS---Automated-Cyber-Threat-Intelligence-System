@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-12 14:11:35 UTC
+**Generated:** 2026-10-12 14:12:00 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`cad7768`)
+**Current Git Branch:** `main` (`89bdec8`)
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `cad7768`
-- **Working Tree:** 16 untracked/unstaged changes
+- **HEAD Commit:** `89bdec8`
+- **Working Tree:** 6 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `89bdec8` | Aaryan Suman | 2026-10-12 | feat(ti): add bounded LRU threat intelligence cache with clock injection |
 | `cad7768` | Aaryan Suman | 2026-10-12 | docs(day20): document Week 5 integration audit, pipeline hardening, and benchmark |
 | `42552eb` | Aaryan Suman | 2026-10-12 | test(integration): cover file pipeline hardening and mixed-directory benchmark |
 | `add3c91` | Aaryan Suman | 2026-10-12 | fix(scanner): harden PE and non-PE fallback routing and format sniffing |
@@ -140,7 +141,6 @@
 | `31e8a12` | Aaryan Suman | 2026-10-11 | feat(detection): add heuristic rules for archives and malicious scripts |
 | `80d069b` | Aaryan Suman | 2026-10-11 | feat(scanner): add non-pe archive and script static analysis subsystem |
 | `61db8d4` | Aaryan Suman | 2026-10-11 | docs(day18): document enhanced PE import analysis, heuristic rules, and Day 18 milestone |
-| `fa0b8ee` | Aaryan Suman | 2026-10-11 | feat(detection): add enhanced PE heuristic rules for process hollowing, token impersonation, and section anomalies |
 
 ## Known Issues
 

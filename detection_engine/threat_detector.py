@@ -6,7 +6,7 @@ machine learning inference, rule-based heuristics, risk scoring, and detection l
 
 from pathlib import Path
 from urllib.parse import urlparse
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Callable
 
 from detection_engine.model_manager import model_manager
 from detection_engine.rule_engine import RuleEngine
@@ -26,15 +26,49 @@ def _get_threat_lookup():
 class ThreatDetector:
     """Central detection pipeline orchestrator."""
 
-    def __init__(self):
-        # In-memory scan caches
-        self._hash_cache: Dict[str, Dict[str, Any]] = {}
-        self._url_cache: Dict[str, Dict[str, Any]] = {}
+    def __init__(
+        self,
+        max_cache_entries: int = 5000,
+        cache_ttl_seconds: float = 300.0,
+        clock: Optional[Callable[[], float]] = None
+    ):
+        # Bounded thread-safe LRU scan caches with TTL
+        from threat_intelligence.threat_cache import LRUTTLCache
+        self._hash_cache = LRUTTLCache(
+            max_size=max_cache_entries,
+            default_ttl_seconds=cache_ttl_seconds,
+            clock=clock
+        )
+        self._url_cache = LRUTTLCache(
+            max_size=max_cache_entries,
+            default_ttl_seconds=cache_ttl_seconds,
+            clock=clock
+        )
 
     def clear_cache(self):
         """Clears both the in-memory file hash and URL scan caches."""
         self._hash_cache.clear()
         self._url_cache.clear()
+
+    def invalidate_hash(self, sha256: str) -> bool:
+        """Invalidates a specific file hash from the in-memory scan cache."""
+        return self._hash_cache.invalidate(sha256)
+
+    def invalidate_url(self, url: str) -> bool:
+        """Invalidates a specific URL from the in-memory scan cache."""
+        from scanners.url_scanner import normalize_url
+        try:
+            norm = normalize_url(url)
+        except Exception:
+            norm = str(url).strip()
+        return self._url_cache.invalidate(norm)
+
+    def get_cache_stats(self) -> Dict[str, Any]:
+        """Returns cache telemetry for both file hash and URL caches."""
+        return {
+            "hash_cache": self._hash_cache.get_stats(),
+            "url_cache": self._url_cache.get_stats()
+        }
 
     def analyze_file(
         self,
@@ -84,10 +118,12 @@ class ThreatDetector:
         sha256 = static_info.get("sha256", "")
         
         # Check in-memory hash cache to avoid redundant expensive processing
-        if sha256 and sha256 in self._hash_cache:
-            cached_result = dict(self._hash_cache[sha256])
-            cached_result["from_cache"] = True
-            return cached_result
+        if sha256:
+            cached_result = self._hash_cache.get(sha256)
+            if cached_result is not None:
+                res = dict(cached_result)
+                res["from_cache"] = True
+                return res
 
         # Step 2: Local & External Threat Intelligence Lookup
         intel_result = _get_threat_lookup().lookup_hash(sha256, query_external=check_external)
@@ -210,7 +246,7 @@ class ThreatDetector:
 
         # Cache result
         if sha256:
-            self._hash_cache[sha256] = final_result
+            self._hash_cache.set(sha256, final_result)
 
         return final_result
 
@@ -269,10 +305,11 @@ class ThreatDetector:
         canonical_url = normalize_url(url)
         domain = extract_domain(canonical_url)
 
-        if canonical_url in self._url_cache:
-            cached_result = dict(self._url_cache[canonical_url])
-            cached_result["from_cache"] = True
-            return cached_result
+        cached_result = self._url_cache.get(canonical_url)
+        if cached_result is not None:
+            res = dict(cached_result)
+            res["from_cache"] = True
+            return res
 
         # Step 3: Local & External Threat Intelligence Lookup
         intel_result = _get_threat_lookup().lookup_url(canonical_url, domain, query_external=check_external)
@@ -369,7 +406,7 @@ class ThreatDetector:
         }
 
         # Cache canonical result in memory
-        self._url_cache[canonical_url] = final_result
+        self._url_cache.set(canonical_url, final_result)
         return final_result
 
 
