@@ -5,8 +5,9 @@ heuristic rule engines, and static PE metadata into a deterministic, explainable
 Implements dynamic weight re-normalization across active evidence layers and mutual confirmation boosts.
 """
 
+import math
 from dataclasses import dataclass, field
-from typing import Dict, Any, List, Optional, Tuple
+from typing import Dict, Any, List, Optional, Tuple, Union
 
 from config.config import (
     RISK_CRITICAL_THRESHOLD,
@@ -40,9 +41,96 @@ class RiskScoringWeights:
     static_pe: float = WEIGHT_EXTERNAL_INTEL
 
     def __post_init__(self):
+        # Type and value safety validations
+        weights = {
+            "threat_intel": self.threat_intel,
+            "ml_probability": self.ml_probability,
+            "heuristic_rules": self.heuristic_rules,
+            "static_pe": self.static_pe,
+        }
+        for name, val in weights.items():
+            if isinstance(val, bool) or not isinstance(val, (int, float)):
+                raise TypeError(f"Weight '{name}' must be a numeric float or integer, got {type(val).__name__}.")
+            if math.isnan(val) or math.isinf(val):
+                raise ValueError(f"Weight '{name}' must be a finite number (got {val}).")
+            if val < 0.0 or val > 1.0:
+                raise ValueError(f"Weight '{name}' must be between 0.0 and 1.0 (got {val}).")
+
         total = self.threat_intel + self.ml_probability + self.heuristic_rules + self.static_pe
         if total <= 0:
             raise ValueError("Total weights must be strictly positive.")
+
+    def to_dict(self) -> Dict[str, float]:
+        """Serializes weights to a clean dictionary."""
+        return {
+            "threat_intel": round(float(self.threat_intel), 4),
+            "ml_probability": round(float(self.ml_probability), 4),
+            "heuristic_rules": round(float(self.heuristic_rules), 4),
+            "static_pe": round(float(self.static_pe), 4),
+        }
+
+    def normalized(self) -> "RiskScoringWeights":
+        """Returns a new RiskScoringWeights instance where the sum of weights equals 1.0."""
+        total = self.threat_intel + self.ml_probability + self.heuristic_rules + self.static_pe
+        return RiskScoringWeights(
+            threat_intel=self.threat_intel / total,
+            ml_probability=self.ml_probability / total,
+            heuristic_rules=self.heuristic_rules / total,
+            static_pe=self.static_pe / total,
+        )
+
+    @classmethod
+    def default(cls) -> "RiskScoringWeights":
+        """Returns the default baseline scoring weights."""
+        return cls(
+            threat_intel=WEIGHT_KNOWN_INTEL,
+            ml_probability=WEIGHT_ML_PROBABILITY,
+            heuristic_rules=WEIGHT_HEURISTIC_RULES,
+            static_pe=WEIGHT_EXTERNAL_INTEL
+        )
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any], strict: bool = True) -> "RiskScoringWeights":
+        """
+        Builds a RiskScoringWeights instance from a dictionary.
+        If strict is True, unexpected keys raise ValueError.
+        """
+        if not isinstance(data, dict):
+            raise TypeError(f"Weights data must be a dictionary, got {type(data).__name__}.")
+
+        valid_keys = {"threat_intel", "ml_probability", "heuristic_rules", "static_pe"}
+        unknown = set(data.keys()) - valid_keys
+        if unknown:
+            if strict:
+                raise ValueError(f"Unknown weight name(s): {', '.join(sorted(unknown))}.")
+            else:
+                logger.warning(f"Ignoring unknown weight keys: {unknown}")
+
+        def _get_val(key: str, default: float) -> float:
+            val = data.get(key, default)
+            return float(val)
+
+        return cls(
+            threat_intel=_get_val("threat_intel", WEIGHT_KNOWN_INTEL),
+            ml_probability=_get_val("ml_probability", WEIGHT_ML_PROBABILITY),
+            heuristic_rules=_get_val("heuristic_rules", WEIGHT_HEURISTIC_RULES),
+            static_pe=_get_val("static_pe", WEIGHT_EXTERNAL_INTEL)
+        )
+
+    @classmethod
+    def from_config(cls, config: Any) -> "RiskScoringWeights":
+        """Loads weights from AppConfig or RiskEngineConfig object."""
+        if hasattr(config, "risk"):
+            risk_cfg = config.risk
+        else:
+            risk_cfg = config
+
+        return cls(
+            threat_intel=float(getattr(risk_cfg, "weight_known_intel", WEIGHT_KNOWN_INTEL)),
+            ml_probability=float(getattr(risk_cfg, "weight_ml_probability", WEIGHT_ML_PROBABILITY)),
+            heuristic_rules=float(getattr(risk_cfg, "weight_heuristic_rules", WEIGHT_HEURISTIC_RULES)),
+            static_pe=float(getattr(risk_cfg, "weight_external_intel", WEIGHT_EXTERNAL_INTEL))
+        )
 
 
 @dataclass(frozen=True)
