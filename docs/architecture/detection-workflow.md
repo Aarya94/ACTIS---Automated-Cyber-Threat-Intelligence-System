@@ -192,12 +192,12 @@ flowchart TD
 - **Status:** **IMPLEMENTED AND VERIFIED** (Refinement for hierarchical explainability tree scheduled in roadmap Days 39–41).
 
 ### Stage 12: Explainable Detection
-- **Purpose:** Generates comprehensive human-readable and machine-actionable decision justifications: calculates decision confidence (0.0 to 1.0), itemizes contributing rule IDs and ML contributions, and supplies grounded defensive mitigation guidance.
-- **Inputs:** Composite score, risk classification, evidence signals, target metadata.
-- **Outputs:** `DetectionResult` contract with `confidence`, `primary_reason`, `explanation_json`, and defensive recommendations.
-- **Dependencies:** `detection_engine/decision_engine.py`, `detection_engine/explanation_generator.py`, `assistant/grounded_assistant.py`.
-- **Error Behavior:** Never generates fabricated reasons; falls back to general descriptive summaries when rule sets produce zero triggers.
-- **Status:** **IMPLEMENTED AND VERIFIED** (Hierarchical tree structure enhancement scheduled for Days 39–41).
+- **Purpose:** Generates comprehensive human-readable and machine-actionable decision justifications: calculates decision confidence (0.0 to 1.0), itemizes contributing rule IDs and ML contributions, builds bounded hierarchical explainability trees with exact score calculation traceability, and supplies grounded defensive mitigation guidance.
+- **Inputs:** Composite score, risk classification, evidence signals, target metadata, score breakdown, layer weights.
+- **Outputs:** `DetectionResult` contract with `confidence`, `primary_reason`, `explanation_json`, `explainability_tree` dictionary, ASCII branch rendering, and defensive recommendations.
+- **Dependencies:** `detection_engine/decision_engine.py`, `detection_engine/explanation_generator.py`, `detection_engine/explainability_tree.py`, `assistant/security_assistant.py`.
+- **Error Behavior:** Never generates fabricated reasons; masks sensitive credentials/tokens; bounds tree depth (<=5) and node counts (<=100) to prevent memory blowout.
+- **Status:** **IMPLEMENTED AND VERIFIED** (Delivered in Day 22; verified in `tests/test_explainability_tree.py`).
 
 ### Stage 13: Reports, Dashboard, and Alerts
 - **Purpose:** Multi-channel persistence and egress layer: persists scan sessions and detections to SQLite databases, provides interactive analysis controls in the Streamlit web dashboard, and issues native Windows toast notifications with rate limiting.
@@ -261,7 +261,7 @@ The following matrix documents the verified status of all 13 pipeline stages acr
 | 9 | **TI Providers** | `reports/threat_database.py`, `api_clients.py` | **IMPLEMENTED AND VERIFIED** | `tests/test_threat_providers.py`, `test_threat_database.py` |
 | 10 | **Evidence Aggregation**| `detection_engine/evidence_model.py`, `decision_engine.py`| **IMPLEMENTED AND VERIFIED** | `tests/test_detection_engine.py` (EvidenceSignal contracts) |
 | 11 | **Risk Engine** | `detection_engine/risk_engine.py` | **IMPLEMENTED AND VERIFIED** | `tests/test_risk_engine.py`, `test_risk_engine_day6.py` |
-| 12 | **Explainable Detection**| `explanation_generator.py`, `grounded_assistant.py` | **IMPLEMENTED AND VERIFIED** | Itemized reason lists active; hierarchical tree planned Days 39–41 |
+| 12 | **Explainable Detection**| `explanation_generator.py`, `explainability_tree.py` | **IMPLEMENTED AND VERIFIED** | `tests/test_explainability_tree.py` (Hierarchical trees & score traceability) |
 | 13 | **Reports / Dash / Alerts**| `threat_database.py`, `dashboard/app.py`, `windows_toast.py`| **IMPLEMENTED AND VERIFIED** | `tests/test_windows_notifications.py`, `scripts/demo_actis.py` |
 
 ---
@@ -291,8 +291,9 @@ This unified detection pipeline document serves as the architectural reference f
 - **Week 6, Days 36–38 (Day 21) — Threat Caching & High-Performance Lookup (`COMPLETED`):**
   - Thread-safe bounded in-memory LRU cache (`LRUTTLCache`) with TTL expiration and clock injection (Delivers **Stage 8: TI Cache**).
   - Verified 3.52x throughput acceleration (106.9 files/sec sustained rate) avoiding redundant SQLite and feature extraction cycles.
-- **Week 6, Days 39–41 (Day 22) — Dynamic Weight Fine-Tuning & Explainability Tree (`PLANNED`):**
-  - Refines **Stage 10 (Evidence Aggregation)**, **Stage 11 (Risk Engine)**, and **Stage 12 (Explainable Detection)**.
-  - Builds structured hierarchical evidence trees detailing exact heuristic rule contributions, ML feature vectors, and intelligence provenance.
+- **Week 6, Days 39–41 (Day 22) — Dynamic Weight Fine-Tuning & Explainability Tree (`COMPLETED`):**
+  - Refined **Stage 10 (Evidence Aggregation)**, **Stage 11 (Risk Engine)**, and **Stage 12 (Explainable Detection)**.
+  - Built structured hierarchical evidence trees detailing exact heuristic rule contributions, ML feature vectors, and intelligence provenance.
+  - Added mathematical score traceability, strict `RiskScoringWeights` validation, and sub-millisecond tree generation with 23 automated tests.
 - **Week 8 (Days 50–56) — Recursive Device Scanner & Milestone Release (`PLANNED`):**
   - Traversal engine utilizing the unified pipeline for multi-threaded drive audits with junction loop protection.

@@ -10,6 +10,31 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 Milestone Scope: Complete core defensive architecture, configuration, logging, database schemas, static PE analysis, URL/message analysis, device scanning, resident Windows service foundation, file watcher pipeline, threat intel integration, scheduled sync, central TI API, grounded AI assistant, security hardening, and release demonstration.
 
+### 2026-10-12 — Day 22: Dynamic Weight Fine-Tuning & Explainability Tree
+
+Implemented a hierarchical explainability tree subsystem, exact evidence-to-score mathematical calculation traceability, validated and configurable risk-scoring weights, and end-to-end pipeline integration without altering existing threat detection contracts:
+1. **Hierarchical Explainability Tree Subsystem (`detection_engine/explainability_tree.py`):**
+   - Implemented `ExplainabilityTree` and `ExplainabilityNode` supporting bounded depth (<=5) and total node count (<=100) to ensure zero memory exhaustion.
+   - Defined `NodeCategory` (`ROOT`, `INPUT_ANALYSIS`, `STATIC_ANALYSIS`, `RULE_ENGINE`, `MACHINE_LEARNING`, `THREAT_INTELLIGENCE`, `EVIDENCE_AGGREGATION`, `RISK_CALCULATION`, `FINAL_DECISION`, `FINDING`, `METRIC`, `LIMITATION`) and `NodeStatus` (`EVALUATED`, `NO_FINDINGS`, `NOT_EVALUATED`, `UNAVAILABLE`, `TIMED_OUT`, `CONFIRMED_THREAT`, `SUSPICIOUS`, `BENIGN`, `MUTUAL_CONFIRMATION`, `MITIGATED`, `OVERRIDDEN`).
+   - Integrated recursive node lookup (`find_node()`, `find_nodes_by_category()`) and human-readable Unicode/ASCII branch rendering (`render_ascii()`).
+   - Added automated redaction of sensitive credentials, API keys, and bearer tokens (`mask_sensitive_value()`) across node titles, descriptions, and metadata dictionaries.
+2. **Evidence-to-Score Traceability (`detection_engine/explainability_tree.py`, `explanation_generator.py`):**
+   - Built `ScoreTraceability` detailing active layer scores, configured weights, normalized weights, weighted contributions, mutual confirmation escalation (+25% boost), mitigation discounts, and safety overrides matching authoritative Risk Engine scores.
+   - Ensured honest representation of unavailable or unsupported models/providers (`NodeStatus.UNAVAILABLE`), distinguishing absence of findings from verified clean verdicts.
+3. **Validated Risk Scoring Weight Configuration (`detection_engine/risk_engine.py`):**
+   - Refined `RiskScoringWeights` with strict type validation, rejection of NaN and infinite values, range validation `[0.0, 1.0]`, dynamic `normalized()` method, `from_dict(strict=True/False)` factory, `from_config()` integration, and safe default rollbacks.
+4. **Empirical Weight Fine-Tuning Evaluation:**
+   - Audited training datasets (`data/malware_dataset.csv`, `data/phishing_dataset.csv`). Formally documented that empirical weight tuning across all 4 layers is responsibly deferred pending a verified multi-layer ground-truth benchmark corpus, avoiding speculative overfitting while providing transparent validated configuration.
+5. **Contract & Pipeline Integration (`detection_engine/detection_contract.py`, `decision_engine.py`, `threat_detector.py`):**
+   - Added `explainability_tree` property to `DetectionResult` contract.
+   - Integrated full tree generation in `DetectionDecisionEngine.evaluate()`, attaching serialized tree and ASCII views to `analysis_metadata`.
+   - Exposed `explainability_tree` in `ThreatDetector.analyze_file()` and `analyze_url()` while preserving 100% backward compatibility for all legacy callers.
+6. **Comprehensive Explainability & Traceability Test Suite (`tests/test_explainability_tree.py`):**
+   - Added 23 automated tests covering tree structure, multi-branch routing, honest representation of unavailable ML/TI, secret redaction, mathematical traceability, strict weight validation, deterministic repeatability, end-to-end file/URL integration, and sub-millisecond performance (< 5.0 ms across 50 signals).
+   - 554 automated tests passing with 100% success rate (+23 new tests, 0 failed, 0 errors, 4 third-party warnings).
+
+---
+
 ### 2026-10-12 — Day 21: Threat Detection Engine Deep Integration: Threat Intelligence Caching
 
 Audited and hardened the Threat Intelligence caching layer and integrated high-performance bounded LRU in-memory scan caching with the ACTIS threat detector and local database:

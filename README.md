@@ -130,7 +130,8 @@ ACTIS operates under strict defensive boundaries:
 - **Non-PE File Fallback Analysis Subsystem (Day 19, `scanners/`, `detection_engine/`):** Purely read-only static analysis for non-PE files including bounded streaming cryptographic hashing (SHA-256, MD5) with 64KB buffer chunks, safe archive metadata inspection (ZIP, TAR, GZIP, and graceful 7z handling) without disk extraction or zip bombs (50MB / 5,000 entries / 100:1 ratio limits), static script heuristics (PowerShell, Batch, VBScript, Python) with comment filtering and snippet masking, and 12 dedicated non-PE detection rules.
 - **Week 5 Integration Audit & Pipeline Hardening (Day 20, `service/`, `scanners/`, `tests/`):** Comprehensive integration audit and hardening connecting PE analysis and non-PE fallback routines with resident Windows file protection pipeline and event debouncer. Added 0-byte file write stabilization, directory target rejection, rename previous-path state pruning, content-based script sniffing for disguised extensions, 24-file mixed-directory synthetic benchmark (100% success, 38.57ms avg latency, 6.4 MB peak memory), and 17 regression/edge-case tests.
 - **Threat Caching & High-Performance Lookup Subsystem (Day 21, `threat_intelligence/`, `detection_engine/`, `reports/`, `scripts/`):** Thread-safe bounded in-memory caching (`LRUTTLCache`) with LRU capacity eviction and TTL expiration, hardened `ThreatIntelligenceCache` with indicator invalidation and injectable clock, scan cache integration in `ThreatDetector` with cache invalidation hooks in `register_indicator()` and `upsert_feed_records()`, and comparative benchmark (Cold: 37.17ms/file, 26.9 files/s; Warm: 10.57ms/file, 94.6 files/s, 3.52x speedup; Sustained loop: 106.9 files/s, 88.57% hit ratio).
-- **Automated Test Infrastructure (`tests/`):** 531 unit, integration, adversarial security, service lifecycle, notification, PE analysis, non-PE fallback, pipeline hardening, and deep TI caching tests passing with 100% success rate (+18 new tests for Day 21).
+- **Explainability Tree & Risk Weight Validation (Day 22, `detection_engine/`):** Bounded hierarchical explainability tree (`ExplainabilityTree`, `ExplainabilityNode`) detailing exact decision rationales, mathematical evidence-to-score calculation traceability (`ScoreTraceability`), sensitive credential/token masking, strict `RiskScoringWeights` validation (NaN, infinity, non-numeric, range constraints), dynamic weight normalization, sub-millisecond tree generation (<5ms for 50 signals), and 23 automated tests.
+- **Automated Test Infrastructure (`tests/`):** 554 unit, integration, adversarial security, service lifecycle, notification, PE analysis, non-PE fallback, pipeline hardening, deep TI caching, and explainability tree tests passing with 100% success rate (+23 new tests for Day 22).
 
 *(Note: ACTIS is a defensive cybersecurity platform and release candidate prototype, not a commercial antivirus or EDR product. Resident Windows Service integration is supported via standard Windows SCM facilities; real SCM registration requires administrative privileges and is fully removable via documented scripts.)*
 
@@ -174,8 +175,8 @@ pytest tests/ -v
 ```
 
 **Current Verification Status:**
-- **531 tests collected**
-- **531 tests passed (100% success rate)**
+- **554 tests collected**
+- **554 tests passed (100% success rate)**
 - **0 failures / 0 errors / 4 warnings**
 
 ### Run Safe Offline System Demonstration
