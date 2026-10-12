@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-12 16:06:21 UTC
+**Generated:** 2026-10-12 16:06:29 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`22fdb79`)
+**Current Git Branch:** `main` (`0ba7c55`)
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `22fdb79`
-- **Working Tree:** 16 untracked/unstaged changes
+- **HEAD Commit:** `0ba7c55`
+- **Working Tree:** 6 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `0ba7c55` | Aaryan Suman | 2026-10-12 | fix(detection): deduplicate evidence signals and enforce whitelist override precedence |
 | `22fdb79` | Aaryan Suman | 2026-10-12 | docs(day22): document explainability tree, score traceability, and roadmap completion |
 | `3dcef34` | Aaryan Suman | 2026-10-12 | test(detection): add comprehensive explainability tree and weight validation suite |
 | `66f4371` | Aaryan Suman | 2026-10-12 | feat(risk): validate configurable risk scoring weights and boundaries |
@@ -140,7 +141,6 @@
 | `ac67354` | Aaryan Suman | 2026-10-12 | docs(day21): document threat intelligence caching subsystem and benchmark |
 | `f089b46` | Aaryan Suman | 2026-10-12 | test(ti): add comprehensive deep caching test suite and scan loop benchmark |
 | `386b06e` | Aaryan Suman | 2026-10-12 | feat(detection): integrate bounded LRU scan cache into threat detector |
-| `89bdec8` | Aaryan Suman | 2026-10-12 | feat(ti): add bounded LRU threat intelligence cache with clock injection |
 
 ## Known Issues
 

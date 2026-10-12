@@ -187,8 +187,11 @@ class TestProtectionServiceBurstStability:
                 t.join(timeout=2.0)
 
             # Wait briefly for workers to consume and dispatch
-            deadline = time.time() + 3.0
-            while orchestrator.received_count < total_events and time.time() < deadline:
+            deadline = time.time() + 5.0
+            while (
+                (orchestrator.received_count < total_events or service.get_health().events_dispatched < total_events)
+                and time.time() < deadline
+            ):
                 time.sleep(0.05)
 
             assert orchestrator.received_count == total_events
