@@ -10,7 +10,7 @@
 * [System Architecture](architecture/system-architecture.md)
 * [Module Architecture](architecture/module-architecture.md)
 * [Project Structure](architecture/project-structure.md)
-* [Detection Workflow](architecture/detection-workflow.md)
+* [Detection Workflow & Target Pipeline](architecture/detection-workflow.md)
 * [Data Flow & Privacy Boundaries](architecture/data-flow.md)
 * [Scanning Workflow](architecture/scanning-workflow.md)
 * [Threat Intelligence Workflow](architecture/threat-intelligence-workflow.md)

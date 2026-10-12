@@ -76,7 +76,10 @@ Month 2 integrates production Windows Service Control Manager (SCM) deployment a
 
 ## Week 6: Detection Engine Deep Integration
 
+> **Target Architecture Reference:** The canonical 13-stage end-to-end detection pipeline is documented in [Detection Workflow & Target Pipeline Architecture](../architecture/detection-workflow.md).
+
 ### Days 36–38: Threat Caching & High-Performance Lookup (`COMPLETED` — Day 21)
+- **Architecture Role**: Fulfills **Pipeline Stage 8: Threat Intelligence Cache (TI Cache)**.
 - **Delivered**:
   1. *Thread-Safe Bounded In-Memory Hash Cache (`detection_engine/threat_detector.py`)*: Built `LRUTTLCache` providing thread-safe (`threading.RLock`) bounded Least-Recently-Used capacity eviction (default 5,000 entries), configurable TTL expiration (default 300s), clock injection for deterministic testing, and dictionary interface compatibility. Replaced unbounded raw scan cache dictionaries in `ThreatDetector`.
   2. *Threat Intelligence Cache Hardening (`threat_intelligence/threat_cache.py`)*: Hardened `ThreatIntelligenceCache` with bounded capacity limits (`max_entries`), LRU eviction on saturation, injectable clock function, safe error boundaries, comprehensive telemetry (hits, misses, LRU evictions, TTL evictions, hit ratio), and indicator-level cache invalidation (`invalidate()`).
@@ -86,9 +89,10 @@ Month 2 integrates production Windows Service Control Manager (SCM) deployment a
 - **Files/Components**: `threat_intelligence/threat_cache.py`, `threat_intelligence/threat_lookup.py`, `detection_engine/threat_detector.py`, `reports/threat_database.py`, `scripts/benchmark_threat_cache.py`, `tests/test_threat_caching_deep.py`.
 - **Validation**: 531 automated tests passing with 100% success rate (+18 new unit and integration tests).
 
-### Days 39–41: Dynamic Weight Fine-Tuning & Explainability Tree
-- **Goal**: Enhance Risk Engine explainability output with structured evidence trees detailing exact rule triggers and ML feature contributions.
-- **Files/Components**: `detection_engine/risk_engine.py`, `tests/test_risk_engine.py`.
+### Days 39–41: Dynamic Weight Fine-Tuning & Explainability Tree (`PLANNED` — Day 22)
+- **Architecture Role**: Enhances **Pipeline Stage 10 (Evidence Aggregation)**, **Stage 11 (Risk Engine)**, and **Stage 12 (Explainable Detection)**.
+- **Goal**: Enhance Risk Engine explainability output with structured hierarchical evidence trees detailing exact rule triggers, ML feature contributions, and intelligence provenance.
+- **Files/Components**: `detection_engine/risk_engine.py`, `detection_engine/explanation_generator.py`, `tests/test_risk_engine.py`.
 
 ### Day 42: Week 6 Review & Test Expansion
 - **Goal**: Verify end-to-end evidence fusion across synthetic edge cases.

@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-12 14:12:29 UTC
+**Generated:** 2026-10-12 14:19:09 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`f089b46`)
+**Current Git Branch:** `main` (`ac67354`)
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `f089b46`
-- **Working Tree:** 3 untracked/unstaged changes
+- **HEAD Commit:** `ac67354`
+- **Working Tree:** 9 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `ac67354` | Aaryan Suman | 2026-10-12 | docs(day21): document threat intelligence caching subsystem and benchmark |
 | `f089b46` | Aaryan Suman | 2026-10-12 | test(ti): add comprehensive deep caching test suite and scan loop benchmark |
 | `386b06e` | Aaryan Suman | 2026-10-12 | feat(detection): integrate bounded LRU scan cache into threat detector |
 | `89bdec8` | Aaryan Suman | 2026-10-12 | feat(ti): add bounded LRU threat intelligence cache with clock injection |
@@ -140,7 +141,6 @@
 | `af86172` | Aaryan Suman | 2026-10-12 | fix(service): harden filesystem event handling and stability checks |
 | `20cd464` | Aaryan Suman | 2026-10-11 | docs(day19): document non-pe analysis and limitations |
 | `54ff907` | Aaryan Suman | 2026-10-11 | test(scanner): cover non-pe fallback and malformed archives |
-| `31e8a12` | Aaryan Suman | 2026-10-11 | feat(detection): add heuristic rules for archives and malicious scripts |
 
 ## Known Issues
 
