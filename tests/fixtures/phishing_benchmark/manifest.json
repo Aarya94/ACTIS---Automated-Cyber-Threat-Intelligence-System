@@ -1,0 +1,1511 @@
+{
+  "dataset_version": "1.0.0",
+  "description": "ACTIS Synthetic Phishing & Message Analysis Verification Benchmark Corpus",
+  "created_date": "2026-10-13",
+  "license": "Defensive Security Research - Synthetic Benchmarking Only",
+  "sample_count": 140,
+  "samples": [
+    {
+      "id": "PHISH_CRED_001",
+      "label": "PHISHING",
+      "scenario": "credential_harvesting",
+      "description": "Urgent password reset prompt due to simulated unauthorized access",
+      "content": "Subject: Urgent: Verify your password immediately\n\nDear customer, your account has detected unauthorized access. Please verify your password within 24 hours at https://auth-verify.example.com/login to restore access.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_URGENCY_PRESSURE",
+        "RULE_MSG_CREDENTIAL_HARVEST"
+      ]
+    },
+    {
+      "id": "PHISH_CRED_002",
+      "label": "PHISHING",
+      "scenario": "credential_harvesting",
+      "description": "HTML message with credential verification link",
+      "content": "From: security@alerts.example.org\nSubject: Action Required: Re-enter password\nContent-Type: text/html\n\n<html><body><p>Your session expired. Please <a href=\"https://secure-login.example.com/auth\">confirm your credentials</a> immediately.</p></body></html>",
+      "is_mime": true,
+      "expected_indicators": [
+        "RULE_MSG_URGENCY_PRESSURE",
+        "RULE_MSG_CREDENTIAL_HARVEST"
+      ]
+    },
+    {
+      "id": "PHISH_CRED_003",
+      "label": "PHISHING",
+      "scenario": "credential_harvesting",
+      "description": "Account locked notification soliciting PIN and password confirmation",
+      "content": "Subject: Account Locked - Identity Confirmation Needed\n\nYour online account is suspended. Enter your password and confirm your identity at https://account-portal.example.com/unlock to proceed.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_URGENCY_PRESSURE",
+        "RULE_MSG_CREDENTIAL_HARVEST"
+      ]
+    },
+    {
+      "id": "PHISH_CRED_004",
+      "label": "PHISHING",
+      "scenario": "credential_harvesting",
+      "description": "Office 365 cloud storage credential prompt",
+      "content": "Subject: Shared Document: Financial Review Q3\n\nA confidential document has been shared with you. Sign in with your login credentials at https://docs-share.example.com/office-auth to view.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_CREDENTIAL_HARVEST"
+      ]
+    },
+    {
+      "id": "PHISH_CRED_005",
+      "label": "PHISHING",
+      "scenario": "credential_harvesting",
+      "description": "Mailbox quota exceeded credential re-authentication lure",
+      "content": "Subject: Mailbox Warning: Quota Limit Exceeded\n\nYour email mailbox has exceeded storage capacity. Update your password and validate account at https://mail-admin.example.com/quota or incoming messages will bounce.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_CREDENTIAL_HARVEST"
+      ]
+    },
+    {
+      "id": "PHISH_CRED_006",
+      "label": "PHISHING",
+      "scenario": "credential_harvesting",
+      "description": "Urgent password expiration deadline notice",
+      "content": "Subject: Password expires soon - Immediate action required\n\nYour corporate domain password expires soon within 2 hours. Update your password now at https://pwd-portal.example.com/reset before access is terminated.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_URGENCY_PRESSURE",
+        "RULE_MSG_CREDENTIAL_HARVEST"
+      ]
+    },
+    {
+      "id": "PHISH_CRED_007",
+      "label": "PHISHING",
+      "scenario": "credential_harvesting",
+      "description": "VPN access renewal requesting login credentials",
+      "content": "Subject: Remote VPN Certificate Renewal\n\nAll remote workers must renew corporate VPN tokens. Enter your pin and login credentials at https://vpn-gateway.example.com/connect to keep connected.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_CREDENTIAL_HARVEST"
+      ]
+    },
+    {
+      "id": "PHISH_CRED_008",
+      "label": "PHISHING",
+      "scenario": "credential_harvesting",
+      "description": "Billing update credential prompt with account suspension threat",
+      "content": "Subject: Billing failure - Account suspended\n\nWe could not process your subscription fee. Update your billing details and confirm your identity at https://billing-update.example.com/portal immediately.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_URGENCY_PRESSURE",
+        "RULE_MSG_CREDENTIAL_HARVEST"
+      ]
+    },
+    {
+      "id": "PHISH_CRED_009",
+      "label": "PHISHING",
+      "scenario": "credential_harvesting",
+      "description": "Urgent mobile device management enrollment with credentials",
+      "content": "Subject: Critical: Device Security Enrollment\n\nAction required: verify your credentials to install company profile: https://enrollment.example.com/auth. Failure to respond within 24 hours will revoke network access.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_URGENCY_PRESSURE",
+        "RULE_MSG_CREDENTIAL_HARVEST"
+      ]
+    },
+    {
+      "id": "PHISH_CRED_010",
+      "label": "PHISHING",
+      "scenario": "credential_harvesting",
+      "description": "Single sign-on re-authentication notice",
+      "content": "Subject: SSO Authentication Sync\n\nYour central sign-on session needs periodic synchronization. Please re-enter password at https://sso-central.example.com/sync to avoid interruption.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_CREDENTIAL_HARVEST"
+      ]
+    },
+    {
+      "id": "PHISH_CRED_011",
+      "label": "PHISHING",
+      "scenario": "credential_harvesting",
+      "description": "Payroll portal migration credential prompt",
+      "content": "Subject: Annual Payroll System Migration\n\nPlease validate account information and verify your credentials at https://payroll-verify.example.com/update before month end.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_CREDENTIAL_HARVEST"
+      ]
+    },
+    {
+      "id": "PHISH_CRED_012",
+      "label": "PHISHING",
+      "scenario": "credential_harvesting",
+      "description": "Urgent security audit confirmation requesting password entry",
+      "content": "Subject: Security Audit: Immediate Verification Required\n\nOur system detected irregular sign-ins. Confirm your identity and enter your password at https://audit-verify.example.com/check within 1 hour.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_URGENCY_PRESSURE",
+        "RULE_MSG_CREDENTIAL_HARVEST"
+      ]
+    },
+    {
+      "id": "PHISH_CRED_013",
+      "label": "PHISHING",
+      "scenario": "credential_harvesting",
+      "description": "Customer portal verification with urgent deadline",
+      "content": "Subject: Urgent Customer Verification Notice\n\nDeadline to respond within 48 hours. Confirm your credentials at https://customer-verify.example.com/secure to prevent account termination.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_URGENCY_PRESSURE",
+        "RULE_MSG_CREDENTIAL_HARVEST"
+      ]
+    },
+    {
+      "id": "PHISH_CRED_014",
+      "label": "PHISHING",
+      "scenario": "credential_harvesting",
+      "description": "Social media business account verification lure",
+      "content": "Subject: Copyright infringement - Final warning\n\nYour page violated intellectual property guidelines. Verify your password at https://appeal-center.example.com/review or your profile will be terminated.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_URGENCY_PRESSURE",
+        "RULE_MSG_CREDENTIAL_HARVEST"
+      ]
+    },
+    {
+      "id": "PHISH_CRED_015",
+      "label": "PHISHING",
+      "scenario": "credential_harvesting",
+      "description": "Cloud database administrator credential prompt",
+      "content": "Subject: Database Admin: Validate Account Access\n\nCloud infrastructure migration requires you to confirm your credentials: https://cloud-db.example.com/verify. Action required today.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_URGENCY_PRESSURE",
+        "RULE_MSG_CREDENTIAL_HARVEST"
+      ]
+    },
+    {
+      "id": "PHISH_CRED_016",
+      "label": "PHISHING",
+      "scenario": "credential_harvesting",
+      "description": "Corporate benefits re-enrollment requesting login",
+      "content": "Subject: Healthcare Benefits Enrollment Period Closing\n\nDeadline approaching immediately. Re-enter password and confirm your identity at https://benefits-hub.example.com/login to submit your selections.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_URGENCY_PRESSURE",
+        "RULE_MSG_CREDENTIAL_HARVEST"
+      ]
+    },
+    {
+      "id": "PHISH_CRED_017",
+      "label": "PHISHING",
+      "scenario": "credential_harvesting",
+      "description": "Email delivery failure notice requesting password verification",
+      "content": "Subject: 5 Undelivered Messages Pending\n\nMultiple inbound messages are held on mail server. Update your password at https://mail-server.example.com/release to release held items.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_CREDENTIAL_HARVEST"
+      ]
+    },
+    {
+      "id": "PHISH_CRED_018",
+      "label": "PHISHING",
+      "scenario": "credential_harvesting",
+      "description": "Remote desktop web client login lure",
+      "content": "Subject: Remote Desktop Gateway Update\n\nGateway upgrades require users to enter your pin and reset your password at https://rdp-portal.example.com/login.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_CREDENTIAL_HARVEST"
+      ]
+    },
+    {
+      "id": "PHISH_IMP_001",
+      "label": "PHISHING",
+      "scenario": "impersonation_social_engineering",
+      "description": "IT support impersonation requesting system credentials",
+      "content": "Subject: IT Support Notice: Mandatory workstation sync\n\nThis is IT support reaching out regarding network anomalies. Please verify your password at https://itsupport-desk.example.com/sync immediately.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_IMPERSONATION",
+        "RULE_MSG_CREDENTIAL_HARVEST"
+      ]
+    },
+    {
+      "id": "PHISH_IMP_002",
+      "label": "PHISHING",
+      "scenario": "impersonation_social_engineering",
+      "description": "System administrator routine server maintenance warning",
+      "content": "Subject: System Administrator: Server Maintenance\n\nThe system administrator has scheduled an update. Confirm your identity at https://sysadmin-portal.example.com/verify to prevent access loss.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_IMPERSONATION",
+        "RULE_MSG_CREDENTIAL_HARVEST"
+      ]
+    },
+    {
+      "id": "PHISH_IMP_003",
+      "label": "PHISHING",
+      "scenario": "impersonation_social_engineering",
+      "description": "Help desk ticket resolution prompt with link",
+      "content": "Subject: Help Desk: Ticket #98124 Resolution Confirmation\n\nOur help desk team resolved your request. Please review the ticket details at https://helpdesk-ticket.example.com/view98124 and re-enter password to confirm.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_IMPERSONATION",
+        "RULE_MSG_CREDENTIAL_HARVEST"
+      ]
+    },
+    {
+      "id": "PHISH_IMP_004",
+      "label": "PHISHING",
+      "scenario": "impersonation_social_engineering",
+      "description": "Human resources department mandatory policy sign-off",
+      "content": "Subject: Human Resources: Urgent Employee Handbook Addendum\n\nThe human resources department requires all staff to sign the revised policy. Action required immediately at https://hr-portal.example.com/sign.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_IMPERSONATION",
+        "RULE_MSG_URGENCY_PRESSURE"
+      ]
+    },
+    {
+      "id": "PHISH_IMP_005",
+      "label": "PHISHING",
+      "scenario": "impersonation_social_engineering",
+      "description": "Payroll department direct deposit confirmation lure",
+      "content": "Subject: Payroll Department: Direct Deposit Error Detected\n\nThe payroll department noticed a routing mismatch for upcoming pay period. Update your billing details at https://payroll-online.example.com/direct-deposit immediately.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_IMPERSONATION",
+        "RULE_MSG_CREDENTIAL_HARVEST",
+        "RULE_MSG_URGENCY_PRESSURE"
+      ]
+    },
+    {
+      "id": "PHISH_IMP_006",
+      "label": "PHISHING",
+      "scenario": "impersonation_social_engineering",
+      "description": "Executive office confidential communication request",
+      "content": "Subject: Executive Office: Confidential Project Inquiry\n\nThis message is from the executive office. I need you to handle an urgent wire transfer request today. Review instructions at https://exec-confidential.example.com/brief.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_IMPERSONATION",
+        "RULE_MSG_FINANCIAL_LURE",
+        "RULE_MSG_URGENCY_PRESSURE"
+      ]
+    },
+    {
+      "id": "PHISH_IMP_007",
+      "label": "PHISHING",
+      "scenario": "impersonation_social_engineering",
+      "description": "Management team annual survey completion with credential harvest",
+      "content": "Subject: Management Team: Performance Feedback Portal\n\nThe management team has initiated the 360 review. Log in with your login credentials at https://mgmt-review.example.com/feedback within 48 hours.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_IMPERSONATION",
+        "RULE_MSG_CREDENTIAL_HARVEST"
+      ]
+    },
+    {
+      "id": "PHISH_IMP_008",
+      "label": "PHISHING",
+      "scenario": "impersonation_social_engineering",
+      "description": "Security team threat advisory with credential verification",
+      "content": "Subject: Security Team: Urgent Malware Exposure Alert\n\nOur security team discovered malware activity linked to your user profile. Verify your credentials at https://security-team.example.com/remediate immediately.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_IMPERSONATION",
+        "RULE_MSG_CREDENTIAL_HARVEST",
+        "RULE_MSG_URGENCY_PRESSURE"
+      ]
+    },
+    {
+      "id": "PHISH_IMP_009",
+      "label": "PHISHING",
+      "scenario": "impersonation_social_engineering",
+      "description": "IT support software license upgrade requiring login",
+      "content": "Subject: IT Support: Enterprise CAD Software Renewal\n\nIT support is renewing enterprise CAD licenses. Please confirm your credentials at https://software-cad.example.com/renew before deadline.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_IMPERSONATION",
+        "RULE_MSG_CREDENTIAL_HARVEST",
+        "RULE_MSG_URGENCY_PRESSURE"
+      ]
+    },
+    {
+      "id": "PHISH_IMP_010",
+      "label": "PHISHING",
+      "scenario": "impersonation_social_engineering",
+      "description": "Help desk voicemail message notification",
+      "content": "Subject: Help Desk: You have a new audio voicemail (0:45)\n\nA voice recording was received from external client. Access help desk voicemail player at https://voicemail-pbx.example.com/play.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_IMPERSONATION"
+      ]
+    },
+    {
+      "id": "PHISH_IMP_011",
+      "label": "PHISHING",
+      "scenario": "impersonation_social_engineering",
+      "description": "Human resources compensation adjustment notice",
+      "content": "Subject: Human Resources: Annual Salary Benchmark Summary\n\nHuman resources has published the revised wage structure. View your personal adjustment at https://hr-compensation.example.com/statement. Action required.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_IMPERSONATION",
+        "RULE_MSG_URGENCY_PRESSURE"
+      ]
+    },
+    {
+      "id": "PHISH_IMP_012",
+      "label": "PHISHING",
+      "scenario": "impersonation_social_engineering",
+      "description": "System administrator domain decommissioning alert",
+      "content": "Subject: System Administrator: Old Domain Cutover\n\nSystem administrator notice: all legacy aliases will expire soon within 12 hours. Update your password at https://legacy-cutover.example.com/verify to migrate.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_IMPERSONATION",
+        "RULE_MSG_CREDENTIAL_HARVEST",
+        "RULE_MSG_URGENCY_PRESSURE"
+      ]
+    },
+    {
+      "id": "PHISH_IMP_013",
+      "label": "PHISHING",
+      "scenario": "impersonation_social_engineering",
+      "description": "Payroll department tax form distribution",
+      "content": "Subject: Payroll Department: W-2 Forms Ready for Download\n\nPayroll department tax documents are available. Enter your pin and login credentials at https://tax-distribution.example.com/forms to download your tax statement.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_IMPERSONATION",
+        "RULE_MSG_CREDENTIAL_HARVEST"
+      ]
+    },
+    {
+      "id": "PHISH_IMP_014",
+      "label": "PHISHING",
+      "scenario": "impersonation_social_engineering",
+      "description": "Executive office sudden vendor invoice payment",
+      "content": "Subject: Executive Office: Priority Vendor Payment Clearance\n\nFrom the executive office: Please process invoice attached for overseas vendor. Wire transfer must be completed immediately today.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_IMPERSONATION",
+        "RULE_MSG_FINANCIAL_LURE",
+        "RULE_MSG_URGENCY_PRESSURE"
+      ]
+    },
+    {
+      "id": "PHISH_IMP_015",
+      "label": "PHISHING",
+      "scenario": "impersonation_social_engineering",
+      "description": "Security team firewall upgrade credential prompt",
+      "content": "Subject: Security Team: Perimeter Firewall Reconfiguration\n\nSecurity team maintenance underway. Re-enter password at https://firewall-auth.example.com/test to verify LDAP connectivity.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_IMPERSONATION",
+        "RULE_MSG_CREDENTIAL_HARVEST"
+      ]
+    },
+    {
+      "id": "PHISH_IMP_016",
+      "label": "PHISHING",
+      "scenario": "impersonation_social_engineering",
+      "description": "Management team mandatory all-hands RSVP with login",
+      "content": "Subject: Management Team: Global Town Hall Briefing\n\nManagement team invites you to the confidential briefing. RSVP by entering your login credentials at https://townhall-rsvp.example.com/login.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_IMPERSONATION",
+        "RULE_MSG_CREDENTIAL_HARVEST"
+      ]
+    },
+    {
+      "id": "PHISH_IMP_017",
+      "label": "PHISHING",
+      "scenario": "impersonation_social_engineering",
+      "description": "Help desk remote assistance session request",
+      "content": "Subject: Help Desk: Screen Sharing Session Request\n\nHelp desk technician is attempting to troubleshoot your Outlook client. Click https://remote-assist.example.com/connect to grant remote desktop control.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_IMPERSONATION"
+      ]
+    },
+    {
+      "id": "PHISH_IMP_018",
+      "label": "PHISHING",
+      "scenario": "impersonation_social_engineering",
+      "description": "IT support multi-factor token deprecation notice",
+      "content": "Subject: IT Support: Hardware Token Sunset Notice\n\nIT support is deprecating physical fobs. Validate account credentials at https://mfa-migrate.example.com/setup before access expires soon.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_IMPERSONATION",
+        "RULE_MSG_CREDENTIAL_HARVEST",
+        "RULE_MSG_URGENCY_PRESSURE"
+      ]
+    },
+    {
+      "id": "PHISH_FIN_001",
+      "label": "PHISHING",
+      "scenario": "financial_manipulation",
+      "description": "Urgent tax refund payout lure",
+      "content": "Subject: IRS Notification: Claim your refund immediately\n\nOur records show a tax refund payout of $1,420 is pending. Claim your refund at https://irs-refund-claim.example.com/portal before the deadline.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_FINANCIAL_LURE",
+        "RULE_MSG_URGENCY_PRESSURE"
+      ]
+    },
+    {
+      "id": "PHISH_FIN_002",
+      "label": "PHISHING",
+      "scenario": "financial_manipulation",
+      "description": "Wire transfer request for overdue invoice",
+      "content": "Subject: Payment Overdue - Invoice Attached\n\nThis is a final warning regarding payment overdue. Please initiate wire transfer to our bank account details at https://pay-portal.example.com/wire immediately.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_FINANCIAL_LURE",
+        "RULE_MSG_URGENCY_PRESSURE"
+      ]
+    },
+    {
+      "id": "PHISH_FIN_003",
+      "label": "PHISHING",
+      "scenario": "financial_manipulation",
+      "description": "Crypto currency deposit payout notice",
+      "content": "Subject: Confirmation: Crypto deposit waiting for clearance\n\nYou received a bitcoin payout worth 0.45 BTC. Pay the processing fee at https://crypto-clear.example.com/claim to release your crypto deposit.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_FINANCIAL_LURE"
+      ]
+    },
+    {
+      "id": "PHISH_FIN_004",
+      "label": "PHISHING",
+      "scenario": "financial_manipulation",
+      "description": "Lottery prize winning notification",
+      "content": "Subject: Congratulations! You have won the Global Prize Draw\n\nYou have won $500,000 in our international lottery. To claim your prize, wire the processing fee to bank account details provided at https://lottery-prize.example.com/payout.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_FINANCIAL_LURE"
+      ]
+    },
+    {
+      "id": "PHISH_FIN_005",
+      "label": "PHISHING",
+      "scenario": "financial_manipulation",
+      "description": "Inheritance fund release solicitation",
+      "content": "Subject: Confidential Estate Notification: Inheritance Distribution\n\nI am contacting you regarding an unclaimed inheritance of $4.2M. Please provide your bank account details at https://estate-trust.example.com/beneficiary to proceed.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_FINANCIAL_LURE"
+      ]
+    },
+    {
+      "id": "PHISH_FIN_006",
+      "label": "PHISHING",
+      "scenario": "financial_manipulation",
+      "description": "Overdue utility disconnection warning",
+      "content": "Subject: Final Warning: Utility Disconnection Scheduled\n\nYour account has a payment overdue of $280. Pay immediately via wire transfer at https://electric-bill.example.com/pay within 24 hours to avoid power cut.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_FINANCIAL_LURE",
+        "RULE_MSG_URGENCY_PRESSURE"
+      ]
+    },
+    {
+      "id": "PHISH_FIN_007",
+      "label": "PHISHING",
+      "scenario": "financial_manipulation",
+      "description": "Gift card reimbursement solicitation",
+      "content": "Subject: Urgent Task: Client Gift Card Purchase\n\nI need you to buy 5 Apple gift cards immediately for client appreciation. Send the gift card redemption codes to https://voucher-submit.example.com/receipt.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_FINANCIAL_LURE",
+        "RULE_MSG_URGENCY_PRESSURE"
+      ]
+    },
+    {
+      "id": "PHISH_FIN_008",
+      "label": "PHISHING",
+      "scenario": "financial_manipulation",
+      "description": "Remittance advice with link",
+      "content": "Subject: Remittance Advice: Payment Ref #891238\n\nPlease find remittance advice for the recent wire transfer. Review payment details at https://remittance-docs.example.com/advice891238.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_FINANCIAL_LURE"
+      ]
+    },
+    {
+      "id": "PHISH_FIN_009",
+      "label": "PHISHING",
+      "scenario": "financial_manipulation",
+      "description": "Unclaimed funds escheatment notice",
+      "content": "Subject: State Treasury: Unclaimed Prize and Property Notice\n\nOur department holds an unclaimed prize of $3,800 under your name. Claim your refund at https://unclaimed-treasury.example.com/claim within 30 days.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_FINANCIAL_LURE"
+      ]
+    },
+    {
+      "id": "PHISH_FIN_010",
+      "label": "PHISHING",
+      "scenario": "financial_manipulation",
+      "description": "Overpayment refund processing",
+      "content": "Subject: Customer Refund Payout - Merchant Overcharge\n\nAn accidental double charge of $899 was billed to your credit card. Claim your refund payout at https://refund-desk.example.com/payout immediately.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_FINANCIAL_LURE",
+        "RULE_MSG_URGENCY_PRESSURE"
+      ]
+    },
+    {
+      "id": "PHISH_FIN_011",
+      "label": "PHISHING",
+      "scenario": "financial_manipulation",
+      "description": "Vendor bank account change notification",
+      "content": "Subject: Important: Updated Bank Account Details for Invoicing\n\nOur treasury banking partner changed. Please route all future wire transfer payments to our new bank account details at https://vendor-remit.example.com/banking.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_FINANCIAL_LURE"
+      ]
+    },
+    {
+      "id": "PHISH_FIN_012",
+      "label": "PHISHING",
+      "scenario": "financial_manipulation",
+      "description": "Cryptocurrency wallet staking reward claim",
+      "content": "Subject: Ethereum 2.0 Staking Reward Payout\n\nYour wallet earned a crypto deposit reward of 1.25 ETH. Claim your refund and reward at https://eth-staking.example.com/rewards.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_FINANCIAL_LURE"
+      ]
+    },
+    {
+      "id": "PHISH_FIN_013",
+      "label": "PHISHING",
+      "scenario": "financial_manipulation",
+      "description": "Mortgage escrow surplus refund lure",
+      "content": "Subject: Escrow Account Analysis: Cash Refund Available\n\nAn annual review generated a surplus refund payout of $2,150. Verify your bank account details at https://escrow-surplus.example.com/refund to receive funds.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_FINANCIAL_LURE"
+      ]
+    },
+    {
+      "id": "PHISH_FIN_014",
+      "label": "PHISHING",
+      "scenario": "financial_manipulation",
+      "description": "Freight customs clearance fee demand",
+      "content": "Subject: Express Freight: Processing Fee Required for Customs Release\n\nYour incoming parcel is held at terminal. Pay processing fee of $45 via wire transfer at https://customs-freight.example.com/clearance within 24 hours.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_FINANCIAL_LURE",
+        "RULE_MSG_URGENCY_PRESSURE"
+      ]
+    },
+    {
+      "id": "PHISH_FIN_015",
+      "label": "PHISHING",
+      "scenario": "financial_manipulation",
+      "description": "Corporate dividend payment disbursement",
+      "content": "Subject: Shareholder Dividend Disbursement Confirmation\n\nQuarterly cash dividend ready. Submit bank account details for wire transfer at https://shareholder-dividend.example.com/payout.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_FINANCIAL_LURE"
+      ]
+    },
+    {
+      "id": "PHISH_URL_001",
+      "label": "PHISHING",
+      "scenario": "deceptive_links_url_obfuscation",
+      "description": "MIME HTML email with blatant display-text domain mismatch",
+      "content": "From: service@paypal.example.org\nTo: user@domain.com\nSubject: Account Verification\nContent-Type: text/html\n\n<html><body><p>Click here to verify: <a href=\"https://evil-harvest-phish.example.com/login\">https://paypal.com/verify</a></p></body></html>",
+      "is_mime": true,
+      "expected_indicators": [
+        "RULE_MSG_DISPLAY_TEXT_MISMATCH"
+      ]
+    },
+    {
+      "id": "PHISH_URL_002",
+      "label": "PHISHING",
+      "scenario": "deceptive_links_url_obfuscation",
+      "description": "Display text bank domain mismatch with credential prompt",
+      "content": "From: security@chase.example.org\nSubject: Security Alert\nContent-Type: text/html\n\n<html><body><p>Suspicious activity detected. Verify your password now: <a href=\"https://attacker-hosted-chase.example.net/auth\">https://chase.com/security</a></p></body></html>",
+      "is_mime": true,
+      "expected_indicators": [
+        "RULE_MSG_DISPLAY_TEXT_MISMATCH",
+        "RULE_MSG_CREDENTIAL_HARVEST"
+      ]
+    },
+    {
+      "id": "PHISH_URL_003",
+      "label": "PHISHING",
+      "scenario": "deceptive_links_url_obfuscation",
+      "description": "Microsoft 365 link mismatch with urgent action",
+      "content": "From: admin@microsoft.example.org\nSubject: Office 365 Session Refresh\nContent-Type: text/html\n\n<html><body><p>Action required: <a href=\"https://login-microsoftonline-phish.example.org/session\">https://login.microsoftonline.com/auth</a></p></body></html>",
+      "is_mime": true,
+      "expected_indicators": [
+        "RULE_MSG_DISPLAY_TEXT_MISMATCH",
+        "RULE_MSG_URGENCY_PRESSURE"
+      ]
+    },
+    {
+      "id": "PHISH_URL_004",
+      "label": "PHISHING",
+      "scenario": "deceptive_links_url_obfuscation",
+      "description": "Google Workspace display mismatch with login prompt",
+      "content": "From: notices@google.example.org\nSubject: Storage Exceeded\nContent-Type: text/html\n\n<html><body><p>Renew quota: <a href=\"https://drive-google-phishing-host.example.com/storage\">https://accounts.google.com/signin</a></p></body></html>",
+      "is_mime": true,
+      "expected_indicators": [
+        "RULE_MSG_DISPLAY_TEXT_MISMATCH"
+      ]
+    },
+    {
+      "id": "PHISH_URL_005",
+      "label": "PHISHING",
+      "scenario": "deceptive_links_url_obfuscation",
+      "description": "Apple ID mismatch with account suspension lure",
+      "content": "From: support@apple.example.org\nSubject: Apple ID Locked\nContent-Type: text/html\n\n<html><body><p>Unlock your account: <a href=\"https://icloud-credential-harvester.example.com/id\">https://appleid.apple.com/account</a></p></body></html>",
+      "is_mime": true,
+      "expected_indicators": [
+        "RULE_MSG_DISPLAY_TEXT_MISMATCH"
+      ]
+    },
+    {
+      "id": "PHISH_URL_006",
+      "label": "PHISHING",
+      "scenario": "deceptive_links_url_obfuscation",
+      "description": "Amazon customer service display text deception",
+      "content": "From: order-update@amazon.example.org\nSubject: Order Cancelled\nContent-Type: text/html\n\n<html><body><p>View order summary: <a href=\"https://amazon-support-phish.example.net/orders\">https://www.amazon.com/orders</a></p></body></html>",
+      "is_mime": true,
+      "expected_indicators": [
+        "RULE_MSG_DISPLAY_TEXT_MISMATCH"
+      ]
+    },
+    {
+      "id": "PHISH_URL_007",
+      "label": "PHISHING",
+      "scenario": "deceptive_links_url_obfuscation",
+      "description": "DocuSign envelope signing display mismatch",
+      "content": "From: docusign@docusign.example.org\nSubject: Please DocuSign: NDA Agreement\nContent-Type: text/html\n\n<html><body><p>Review document: <a href=\"https://docusign-envelope-phish.example.com/sign\">https://na3.docusign.net/Member/Sign</a></p></body></html>",
+      "is_mime": true,
+      "expected_indicators": [
+        "RULE_MSG_DISPLAY_TEXT_MISMATCH"
+      ]
+    },
+    {
+      "id": "PHISH_URL_008",
+      "label": "PHISHING",
+      "scenario": "deceptive_links_url_obfuscation",
+      "description": "FedEx delivery notification display mismatch",
+      "content": "From: tracking@fedex.example.org\nSubject: Delivery Attempt Failed\nContent-Type: text/html\n\n<html><body><p>Reschedule delivery: <a href=\"https://fedex-parcel-redirection.example.com/reschedule\">https://www.fedex.com/tracking</a></p></body></html>",
+      "is_mime": true,
+      "expected_indicators": [
+        "RULE_MSG_DISPLAY_TEXT_MISMATCH"
+      ]
+    },
+    {
+      "id": "PHISH_URL_009",
+      "label": "PHISHING",
+      "scenario": "deceptive_links_url_obfuscation",
+      "description": "URL containing IP address host and credential keywords",
+      "content": "Subject: Urgent security alert\n\nUnauthorized access from external IP. Verify your password at http://192.168.1.100/secure/login immediately.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_URGENCY_PRESSURE",
+        "RULE_MSG_CREDENTIAL_HARVEST"
+      ]
+    },
+    {
+      "id": "PHISH_URL_010",
+      "label": "PHISHING",
+      "scenario": "deceptive_links_url_obfuscation",
+      "description": "URL with percent-encoded userinfo and at-symbol delimiter",
+      "content": "Subject: Account verification link\n\nPlease confirm your credentials at https://legit-service.example.org%40evil-host.example.com/login.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_CREDENTIAL_HARVEST"
+      ]
+    },
+    {
+      "id": "PHISH_URL_011",
+      "label": "PHISHING",
+      "scenario": "deceptive_links_url_obfuscation",
+      "description": "Punycode homograph domain URL with urgent password prompt",
+      "content": "Subject: Urgent: Verify your password\n\nAction required: visit https://xn--pple-43d.example.com/signin within 24 hours.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_URGENCY_PRESSURE",
+        "RULE_MSG_CREDENTIAL_HARVEST"
+      ]
+    },
+    {
+      "id": "PHISH_URL_012",
+      "label": "PHISHING",
+      "scenario": "deceptive_links_url_obfuscation",
+      "description": "Excessive subdomain obfuscation with login path",
+      "content": "Subject: Single sign-on authentication\n\nLog in at https://secure.login.portal.corp.auth.verify.example.com/web/session.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "PHISH_URL_013",
+      "label": "PHISHING",
+      "scenario": "deceptive_links_url_obfuscation",
+      "description": "Multiple display mismatches in single HTML message",
+      "content": "From: multi@alerts.example.org\nSubject: Security Updates\nContent-Type: text/html\n\n<html><body><p><a href=\"https://phish1.example.com\">https://google.com</a> and <a href=\"https://phish2.example.com\">https://github.com</a></p></body></html>",
+      "is_mime": true,
+      "expected_indicators": [
+        "RULE_MSG_DISPLAY_TEXT_MISMATCH"
+      ]
+    },
+    {
+      "id": "PHISH_URL_014",
+      "label": "PHISHING",
+      "scenario": "deceptive_links_url_obfuscation",
+      "description": "Display mismatch targeting Netflix billing",
+      "content": "From: info@netflix.example.org\nSubject: Membership on Hold\nContent-Type: text/html\n\n<html><body><p>Update payment: <a href=\"https://netflix-billing-renew.example.com/payment\">https://www.netflix.com/youraccount</a></p></body></html>",
+      "is_mime": true,
+      "expected_indicators": [
+        "RULE_MSG_DISPLAY_TEXT_MISMATCH"
+      ]
+    },
+    {
+      "id": "PHISH_URL_015",
+      "label": "PHISHING",
+      "scenario": "deceptive_links_url_obfuscation",
+      "description": "LinkedIn connection invitation display mismatch",
+      "content": "From: messaging@linkedin.example.org\nSubject: New Invitation from VP\nContent-Type: text/html\n\n<html><body><p>Accept invite: <a href=\"https://linkedin-invitations-phish.example.net/accept\">https://www.linkedin.com/in/vp</a></p></body></html>",
+      "is_mime": true,
+      "expected_indicators": [
+        "RULE_MSG_DISPLAY_TEXT_MISMATCH"
+      ]
+    },
+    {
+      "id": "PHISH_URL_016",
+      "label": "PHISHING",
+      "scenario": "deceptive_links_url_obfuscation",
+      "description": "Slack workspace invitation display mismatch",
+      "content": "From: slack@slack.example.org\nSubject: Join engineering-team on Slack\nContent-Type: text/html\n\n<html><body><p>Join channel: <a href=\"https://slack-team-phish.example.com/signup\">https://slack.com/workspace</a></p></body></html>",
+      "is_mime": true,
+      "expected_indicators": [
+        "RULE_MSG_DISPLAY_TEXT_MISMATCH"
+      ]
+    },
+    {
+      "id": "PHISH_URL_017",
+      "label": "PHISHING",
+      "scenario": "deceptive_links_url_obfuscation",
+      "description": "Dropbox transfer link display mismatch",
+      "content": "From: transfer@dropbox.example.org\nSubject: Large File Transfer Ready\nContent-Type: text/html\n\n<html><body><p>Download archive: <a href=\"https://dropbox-payload-download.example.com/file\">https://www.dropbox.com/s/archive.zip</a></p></body></html>",
+      "is_mime": true,
+      "expected_indicators": [
+        "RULE_MSG_DISPLAY_TEXT_MISMATCH"
+      ]
+    },
+    {
+      "id": "PHISH_URL_018",
+      "label": "PHISHING",
+      "scenario": "deceptive_links_url_obfuscation",
+      "description": "Intuit QuickBooks invoice display mismatch",
+      "content": "From: quickbooks@quickbooks.example.org\nSubject: Invoice #10291 from Acme Corp\nContent-Type: text/html\n\n<html><body><p>Pay invoice: <a href=\"https://intuit-quickbooks-phish.example.com/invoice\">https://quickbooks.intuit.com/view/10291</a></p></body></html>",
+      "is_mime": true,
+      "expected_indicators": [
+        "RULE_MSG_DISPLAY_TEXT_MISMATCH"
+      ]
+    },
+    {
+      "id": "PHISH_MIX_001",
+      "label": "PHISHING",
+      "scenario": "mixed_phishing_indicators",
+      "description": "Executable attachment with security evasion and urgent urgency cues",
+      "content": "From: billing@vendor.example.org\nSubject: Urgent: Overdue invoice attached\nContent-Type: multipart/mixed; boundary=\"BOUNDARY\"\n\n--BOUNDARY\nContent-Type: text/plain\n\nAction required: please run invoice attachment immediately. If Windows prompts warning, disable your antivirus to proceed.\n--BOUNDARY\nContent-Type: application/octet-stream; name=\"Invoice_Scan.exe\"\nContent-Disposition: attachment; filename=\"Invoice_Scan.exe\"\n\nMZ90FAKEEXE\n--BOUNDARY--",
+      "is_mime": true,
+      "expected_indicators": [
+        "RULE_MSG_SUSPICIOUS_ATTACHMENT",
+        "RULE_MSG_SECURITY_EVASION",
+        "RULE_MSG_URGENCY_PRESSURE"
+      ]
+    },
+    {
+      "id": "PHISH_MIX_002",
+      "label": "PHISHING",
+      "scenario": "mixed_phishing_indicators",
+      "description": "Batch script attachment disguised as security patch",
+      "content": "From: it@corp.example.org\nSubject: IT Support: Urgent Security Patch\nContent-Type: multipart/mixed; boundary=\"BND\"\n\n--BND\nContent-Type: text/plain\n\nIT support requires you to run patch script immediately. Ignore security warnings.\n--BND\nContent-Type: application/x-bat; name=\"patch.bat\"\nContent-Disposition: attachment; filename=\"patch.bat\"\n\necho patch\n--BND--",
+      "is_mime": true,
+      "expected_indicators": [
+        "RULE_MSG_IMPERSONATION",
+        "RULE_MSG_SUSPICIOUS_ATTACHMENT",
+        "RULE_MSG_SECURITY_EVASION"
+      ]
+    },
+    {
+      "id": "PHISH_MIX_003",
+      "label": "PHISHING",
+      "scenario": "mixed_phishing_indicators",
+      "description": "PowerShell script attachment with payroll lure",
+      "content": "From: payroll@corp.example.org\nSubject: Payroll Department: Bonus Calculator\nContent-Type: multipart/mixed; boundary=\"BND\"\n\n--BND\nContent-Type: text/plain\n\nPayroll department bonus breakdown attached.\n--BND\nContent-Type: text/plain; name=\"calc.ps1\"\nContent-Disposition: attachment; filename=\"calc.ps1\"\n\nWrite-Host 'Bonus'\n--BND--",
+      "is_mime": true,
+      "expected_indicators": [
+        "RULE_MSG_IMPERSONATION",
+        "RULE_MSG_SUSPICIOUS_ATTACHMENT"
+      ]
+    },
+    {
+      "id": "PHISH_MIX_004",
+      "label": "PHISHING",
+      "scenario": "mixed_phishing_indicators",
+      "description": "VBScript invoice attachment with wire transfer lure",
+      "content": "From: finance@supplier.example.org\nSubject: Wire Transfer Remittance Advice\nContent-Type: multipart/mixed; boundary=\"BND\"\n\n--BND\nContent-Type: text/plain\n\nReview remittance advice for wire transfer.\n--BND\nContent-Type: text/vbs; name=\"Remittance.vbs\"\nContent-Disposition: attachment; filename=\"Remittance.vbs\"\n\nMsgBox \"test\"\n--BND--",
+      "is_mime": true,
+      "expected_indicators": [
+        "RULE_MSG_FINANCIAL_LURE",
+        "RULE_MSG_SUSPICIOUS_ATTACHMENT"
+      ]
+    },
+    {
+      "id": "PHISH_MIX_005",
+      "label": "PHISHING",
+      "scenario": "mixed_phishing_indicators",
+      "description": "Urgent 2FA code solicitation with security evasion cues",
+      "content": "Subject: Urgent: Verify 2FA code immediately\n\nSecurity team alert: unauthorized access detected. Enter your one-time password and 2fa code at https://2fa-verify.example.com/token. Ignore security warnings to complete login.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_SENSITIVE_INFO_PROMPT",
+        "RULE_MSG_SECURITY_EVASION",
+        "RULE_MSG_URGENCY_PRESSURE",
+        "RULE_MSG_IMPERSONATION"
+      ]
+    },
+    {
+      "id": "PHISH_MIX_006",
+      "label": "PHISHING",
+      "scenario": "mixed_phishing_indicators",
+      "description": "Sensitive OTP solicitation with authority impersonation",
+      "content": "Subject: IT Support: Authentication token needed for migration\n\nIT support help desk needs your otp and authentication token to sync email profile. Reply within 1 hour immediately.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_IMPERSONATION",
+        "RULE_MSG_SENSITIVE_INFO_PROMPT",
+        "RULE_MSG_URGENCY_PRESSURE"
+      ]
+    },
+    {
+      "id": "PHISH_MIX_007",
+      "label": "PHISHING",
+      "scenario": "mixed_phishing_indicators",
+      "description": "Crypto wallet seed phrase theft lure with financial prize",
+      "content": "Subject: Crypto Deposit: Claim your refund and rewards\n\nYou won a bitcoin payout. Provide your seed phrase and recovery code at https://wallet-claim.example.com/seed to disburse funds.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_FINANCIAL_LURE",
+        "RULE_MSG_SENSITIVE_INFO_PROMPT"
+      ]
+    },
+    {
+      "id": "PHISH_MIX_008",
+      "label": "PHISHING",
+      "scenario": "mixed_phishing_indicators",
+      "description": "Display mismatch + Credential harvest + Urgency",
+      "content": "From: alerts@bank.example.org\nSubject: Urgent: Account Suspended Immediately\nContent-Type: text/html\n\n<html><body><p>Account suspended! Verify your password: <a href=\"https://phish-bank.example.com/login\">https://bank.example.org/secure</a></p></body></html>",
+      "is_mime": true,
+      "expected_indicators": [
+        "RULE_MSG_DISPLAY_TEXT_MISMATCH",
+        "RULE_MSG_CREDENTIAL_HARVEST",
+        "RULE_MSG_URGENCY_PRESSURE"
+      ]
+    },
+    {
+      "id": "PHISH_MIX_009",
+      "label": "PHISHING",
+      "scenario": "mixed_phishing_indicators",
+      "description": "Display mismatch + Executable attachment + IT support impersonation",
+      "content": "From: itsupport@corp.example.org\nSubject: IT Support Maintenance Tools\nContent-Type: multipart/mixed; boundary=\"BND\"\n\n--BND\nContent-Type: text/html\n\n<html><body><p>Visit <a href=\"https://malicious.example.com\">https://support.example.org</a></p></body></html>\n--BND\nContent-Type: application/octet-stream; name=\"diag.scr\"\nContent-Disposition: attachment; filename=\"diag.scr\"\n\nFAKESCR\n--BND--",
+      "is_mime": true,
+      "expected_indicators": [
+        "RULE_MSG_IMPERSONATION",
+        "RULE_MSG_DISPLAY_TEXT_MISMATCH",
+        "RULE_MSG_SUSPICIOUS_ATTACHMENT"
+      ]
+    },
+    {
+      "id": "PHISH_MIX_010",
+      "label": "PHISHING",
+      "scenario": "mixed_phishing_indicators",
+      "description": "Security evasion instructions with credential theft",
+      "content": "Subject: Critical: Override protection and reset password\n\nBypass the approval and override protection in your browser. Then enter your password at https://bypass-auth.example.com/reset immediately.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_SECURITY_EVASION",
+        "RULE_MSG_CREDENTIAL_HARVEST",
+        "RULE_MSG_URGENCY_PRESSURE"
+      ]
+    },
+    {
+      "id": "PHISH_MIX_011",
+      "label": "PHISHING",
+      "scenario": "mixed_phishing_indicators",
+      "description": "Help desk + 2FA token + Urgency",
+      "content": "Subject: Help Desk: Immediate action required for MFA sync\n\nHelp desk technicians request your 2fa code to finalize account provisioning within 2 hours.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_IMPERSONATION",
+        "RULE_MSG_SENSITIVE_INFO_PROMPT",
+        "RULE_MSG_URGENCY_PRESSURE"
+      ]
+    },
+    {
+      "id": "PHISH_MIX_012",
+      "label": "PHISHING",
+      "scenario": "mixed_phishing_indicators",
+      "description": "Macro-enabled document attachment with financial lure",
+      "content": "From: billing@supplier.example.org\nSubject: Wire Transfer Invoice Attached\nContent-Type: multipart/mixed; boundary=\"BND\"\n\n--BND\nContent-Type: text/plain\n\nPlease find invoice attached for wire transfer.\n--BND\nContent-Type: application/octet-stream; name=\"Invoice.docm\"\nContent-Disposition: attachment; filename=\"Invoice.docm\"\n\nFAKEMACRO\n--BND--",
+      "is_mime": true,
+      "expected_indicators": [
+        "RULE_MSG_FINANCIAL_LURE",
+        "RULE_MSG_SUSPICIOUS_ATTACHMENT"
+      ]
+    },
+    {
+      "id": "PHISH_MIX_013",
+      "label": "PHISHING",
+      "scenario": "mixed_phishing_indicators",
+      "description": "Security evasion + Sensitive recovery codes prompt",
+      "content": "Subject: Emergency System Recovery\n\nDo not report this message. Submit your recovery codes at https://sys-recovery.example.com/codes to restore administrative privileges.",
+      "is_mime": false,
+      "expected_indicators": [
+        "RULE_MSG_SECURITY_EVASION",
+        "RULE_MSG_SENSITIVE_INFO_PROMPT"
+      ]
+    },
+    {
+      "id": "PHISH_MIX_014",
+      "label": "PHISHING",
+      "scenario": "mixed_phishing_indicators",
+      "description": "Executive impersonation + Wire transfer + Display mismatch",
+      "content": "From: ceo@corp.example.org\nSubject: Executive Office: Wire Transfer Clearance\nContent-Type: text/html\n\n<html><body><p>Executive office urgent directive: wire transfer must be cleared via <a href=\"https://ceo-wire.example.com/auth\">https://corp.example.org/finance</a></p></body></html>",
+      "is_mime": true,
+      "expected_indicators": [
+        "RULE_MSG_IMPERSONATION",
+        "RULE_MSG_FINANCIAL_LURE",
+        "RULE_MSG_DISPLAY_TEXT_MISMATCH"
+      ]
+    },
+    {
+      "id": "PHISH_MIX_015",
+      "label": "PHISHING",
+      "scenario": "mixed_phishing_indicators",
+      "description": "Suspicious ISO image attachment with credential prompt",
+      "content": "From: notice@vendor.example.org\nSubject: Critical Software Update\nContent-Type: multipart/mixed; boundary=\"BND\"\n\n--BND\nContent-Type: text/plain\n\nEnter your password to decrypt the disk image: update.iso.\n--BND\nContent-Type: application/octet-stream; name=\"update.iso\"\nContent-Disposition: attachment; filename=\"update.iso\"\n\nFAKEISO\n--BND--",
+      "is_mime": true,
+      "expected_indicators": [
+        "RULE_MSG_CREDENTIAL_HARVEST",
+        "RULE_MSG_SUSPICIOUS_ATTACHMENT"
+      ]
+    },
+    {
+      "id": "BENIGN_SEC_001",
+      "label": "BENIGN",
+      "scenario": "legitimate_security_account",
+      "description": "Routine password change confirmation notice without links",
+      "content": "Subject: Password Changed Successfully\n\nHello Alice,\n\nYour password was successfully updated today. If you initiated this change, no further action is necessary. If you did not make this change, please contact your security team administrator.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_SEC_002",
+      "label": "BENIGN",
+      "scenario": "legitimate_security_account",
+      "description": "New device login alert with legitimate matching link",
+      "content": "From: no-reply@accounts.example.com\nSubject: New login from Chrome on Windows\nContent-Type: text/html\n\n<html><body><p>A new sign-in was observed on your account. Review your recent security activity at <a href=\"https://accounts.example.com/security\">https://accounts.example.com/security</a>.</p></body></html>",
+      "is_mime": true,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_SEC_003",
+      "label": "BENIGN",
+      "scenario": "legitimate_security_account",
+      "description": "Two-factor authentication enrollment confirmation",
+      "content": "Subject: 2-Step Verification Enabled\n\nHi Bob,\n\nTwo-step verification has been successfully configured on your workspace account. Backup phone: (***) ***-1234. No action required.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_SEC_004",
+      "label": "BENIGN",
+      "scenario": "legitimate_security_account",
+      "description": "Privacy policy routine annual revision notice",
+      "content": "Subject: Notice of Annual Privacy Policy Revisions\n\nDear member,\n\nWe updated our Privacy Policy effective November 1st. You may review the full policy terms at https://example.com/privacy-policy anytime.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_SEC_005",
+      "label": "BENIGN",
+      "scenario": "legitimate_security_account",
+      "description": "Terms of service update notification",
+      "content": "Subject: Updates to Our Terms of Service\n\nWe are sharing periodic updates to our master subscription agreement. Read the detailed terms at https://example.com/terms.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_SEC_006",
+      "label": "BENIGN",
+      "scenario": "legitimate_security_account",
+      "description": "API key generation confirmation",
+      "content": "Subject: New Read-Only API Key Created\n\nA new read-only API key was generated for project 'DataPipeline'. Created by user admin@example.com.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_SEC_007",
+      "label": "BENIGN",
+      "scenario": "legitimate_security_account",
+      "description": "Routine scheduled maintenance advance notification",
+      "content": "Subject: Scheduled Network Maintenance on Saturday Oct 18\n\nOur infrastructure engineers will perform routine maintenance on Saturday between 02:00 UTC and 04:00 UTC. System availability is tracked at https://status.example.com.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_SEC_008",
+      "label": "BENIGN",
+      "scenario": "legitimate_security_account",
+      "description": "Single sign-on certificate rotation notice for IT administrators",
+      "content": "Subject: SAML Signing Certificate Expiring Next Month\n\nNotice for SAML application owners: IdP metadata signing certificate will rotate on Nov 15. Documentation: https://help.example.com/saml-rotation.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_SEC_009",
+      "label": "BENIGN",
+      "scenario": "legitimate_security_account",
+      "description": "Session logout confirmation from public terminal",
+      "content": "Subject: Remote Session Ended\n\nYour web portal session from IP 198.51.100.1 has been logged out due to inactivity.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_SEC_010",
+      "label": "BENIGN",
+      "scenario": "legitimate_security_account",
+      "description": "Device compliance confirmation notice",
+      "content": "Subject: Workstation Compliance Check Completed\n\nYour corporate laptop successfully satisfied the quarterly BitLocker and endpoint patch verification.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_SEC_011",
+      "label": "BENIGN",
+      "scenario": "legitimate_security_account",
+      "description": "Authorized account recovery email address changed",
+      "content": "Subject: Recovery Email Updated\n\nThe recovery email address for your account was changed to backup@example.com.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_SEC_012",
+      "label": "BENIGN",
+      "scenario": "legitimate_security_account",
+      "description": "SSH public key upload receipt",
+      "content": "Subject: New SSH Public Key Added to GitHub\n\nThe following SSH key was added to your profile: SHA256:7b91c... If this was you, you can safely ignore this email.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_SEC_013",
+      "label": "BENIGN",
+      "scenario": "legitimate_security_account",
+      "description": "VPN connection established informational notification",
+      "content": "Subject: VPN Connection Established: Gateway East\n\nYour user session successfully connected to Corporate VPN Gateway East at 08:31 AM EST.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_SEC_014",
+      "label": "BENIGN",
+      "scenario": "legitimate_security_account",
+      "description": "Account profile display name updated confirmation",
+      "content": "Subject: Profile Information Changed\n\nYour profile display name was updated to 'Alex Rivera'. Changes are visible across all team workspaces.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_SEC_015",
+      "label": "BENIGN",
+      "scenario": "legitimate_security_account",
+      "description": "OAuth application authorization notice",
+      "content": "Subject: New Third-Party Application Connected\n\nYou granted 'Zoom Video Integration' permission to view calendar events. Manage permissions at https://example.com/oauth/manage.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_SEC_016",
+      "label": "BENIGN",
+      "scenario": "legitimate_security_account",
+      "description": "Security key registration confirmation",
+      "content": "Subject: Security Key (FIDO2) Registered\n\nA new hardware security key 'YubiKey 5 NFC' was added to your authentication methods.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_SEC_017",
+      "label": "BENIGN",
+      "scenario": "legitimate_security_account",
+      "description": "Trusted IP address added to whitelist",
+      "content": "Subject: Trusted IP Address Added\n\nThe IP address 203.0.113.45 was added to your developer whitelist.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_SEC_018",
+      "label": "BENIGN",
+      "scenario": "legitimate_security_account",
+      "description": "Notification preferences updated confirmation",
+      "content": "Subject: Email Notification Preferences Saved\n\nYour email digest preferences have been updated. You will now receive daily summary digests instead of immediate notifications.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_FIN_001",
+      "label": "BENIGN",
+      "scenario": "benign_financial_business",
+      "description": "Standard monthly SaaS invoice receipt with legitimate PDF attachment",
+      "content": "From: billing@cloudhost.example.com\nSubject: Your Monthly CloudHost Invoice #CH-9021\nContent-Type: multipart/mixed; boundary=\"BND\"\n\n--BND\nContent-Type: text/plain\n\nThank you for your business. Your monthly invoice for $49.00 has been charged to the card ending in 4012.\n--BND\nContent-Type: application/pdf; name=\"Invoice_CH9021.pdf\"\nContent-Disposition: attachment; filename=\"Invoice_CH9021.pdf\"\n\n%PDF-1.4 mock\n--BND--",
+      "is_mime": true,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_FIN_002",
+      "label": "BENIGN",
+      "scenario": "benign_financial_business",
+      "description": "Quarterly financial earnings report notification with clean PDF",
+      "content": "From: ir@enterprise.example.com\nSubject: Q3 Earnings Call Transcript and Report\nContent-Type: multipart/mixed; boundary=\"BND\"\n\n--BND\nContent-Type: text/plain\n\nPlease find attached the Q3 financial presentation and management discussion for all investors.\n--BND\nContent-Type: application/pdf; name=\"Q3_Earnings_Report.pdf\"\nContent-Disposition: attachment; filename=\"Q3_Earnings_Report.pdf\"\n\n%PDF-1.4 mock\n--BND--",
+      "is_mime": true,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_FIN_003",
+      "label": "BENIGN",
+      "scenario": "benign_financial_business",
+      "description": "Weekly engineering sprint planning status email",
+      "content": "Subject: Sprint 42 Planning Notes and Ticket Allocation\n\nHi team, attached are the notes from our Monday retrospective. We committed to 34 story points across the auth, frontend, and backend epics. Review Jira board: https://example.com/jira.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_FIN_004",
+      "label": "BENIGN",
+      "scenario": "benign_financial_business",
+      "description": "Conference room reservation confirmation",
+      "content": "Subject: Room Booking Confirmed: Boardroom B (Thursday 2pm)\n\nYour reservation for Boardroom B on Thursday October 15 from 14:00 to 15:30 has been confirmed. Organizer: Carol Smith.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_FIN_005",
+      "label": "BENIGN",
+      "scenario": "benign_financial_business",
+      "description": "Office catering menu selection for team lunch",
+      "content": "Subject: Friday Team Lunch: Mexican Grill Catering Menu\n\nPlease submit your dietary preferences by Wednesday noon: vegetarian, vegan, and gluten-free options are available.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_FIN_006",
+      "label": "BENIGN",
+      "scenario": "benign_financial_business",
+      "description": "Routine shipping order dispatch notice with legitimate tracking",
+      "content": "From: orders@bookseller.example.com\nSubject: Your order #BK-88219 has shipped!\nContent-Type: text/html\n\n<html><body><p>Great news! Your package is in transit via UPS. Track package: <a href=\"https://tracking.example.com/shipment/88219\">https://tracking.example.com/shipment/88219</a>.</p></body></html>",
+      "is_mime": true,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_FIN_007",
+      "label": "BENIGN",
+      "scenario": "benign_financial_business",
+      "description": "Annual benefits open enrollment information brochure",
+      "content": "Subject: Open Enrollment Begins November 1st\n\nOpen Enrollment is your opportunity to review and change health, dental, and vision coverage for next calendar year. Guide: https://example.com/benefits.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_FIN_008",
+      "label": "BENIGN",
+      "scenario": "benign_financial_business",
+      "description": "Vendor partnership agreement renewal review",
+      "content": "Subject: Annual Vendor Service Level Agreement Renewal Review\n\nAttached is the revised SLA agreement for next fiscal year. Let us schedule a 30-minute sync on Tuesday to discuss terms.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_FIN_009",
+      "label": "BENIGN",
+      "scenario": "benign_financial_business",
+      "description": "Software release notes for ACTIS version 2.4",
+      "content": "Subject: Release Announcement: Version 2.4 Deployed to Staging\n\nStaging environment has been upgraded with URL de-obfuscation and safe MIME parsing capabilities. Test artifacts: https://example.com/releases/v2.4.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_FIN_010",
+      "label": "BENIGN",
+      "scenario": "benign_financial_business",
+      "description": "Company holiday schedule announcement",
+      "content": "Subject: 2027 Corporate Holiday Calendar\n\nPlease find attached the official company holiday schedule for the upcoming calendar year.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_FIN_011",
+      "label": "BENIGN",
+      "scenario": "benign_financial_business",
+      "description": "Customer satisfaction survey invite with non-credential link",
+      "content": "Subject: How was your support experience yesterday?\n\nWe would appreciate 2 minutes of your time to rate your recent interaction with our help desk: https://feedback.example.com/survey/91823.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_FIN_012",
+      "label": "BENIGN",
+      "scenario": "benign_financial_business",
+      "description": "Client kickoff meeting agenda for Project Beacon",
+      "content": "Subject: Project Beacon: Kickoff Meeting Agenda & Attendees\n\nLooking forward to meeting the Beacon team on Monday at 10 AM. Agenda covers architecture overview, milestone timelines, and QA deliverables.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_FIN_013",
+      "label": "BENIGN",
+      "scenario": "benign_financial_business",
+      "description": "Routine employee travel expense report approval receipt",
+      "content": "Subject: Expense Report #EX-4412 Approved\n\nYour expense report for travel to the CyberSec Summit was approved by finance. Total reimbursement: $620.00.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_FIN_014",
+      "label": "BENIGN",
+      "scenario": "benign_financial_business",
+      "description": "Database backup completion notification",
+      "content": "Subject: Daily Automated Database Backup Completed\n\nDaily snapshot backup for cluster db-prod-01 completed successfully in 14 minutes. Size: 42.8 GB.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_FIN_015",
+      "label": "BENIGN",
+      "scenario": "benign_financial_business",
+      "description": "New team member welcome introduction",
+      "content": "Subject: Welcoming Maya Lin to the Infrastructure Team!\n\nPlease join us in welcoming Maya Lin who joins ACTIS today as a Senior Systems Architect.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_FIN_016",
+      "label": "BENIGN",
+      "scenario": "benign_financial_business",
+      "description": "Quarterly office supplies replenishment request",
+      "content": "Subject: Quarterly Office Supplies Order Submitted\n\nThe stationery and hardware peripheral order has been placed with our preferred vendor.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_FIN_017",
+      "label": "BENIGN",
+      "scenario": "benign_financial_business",
+      "description": "Employee anniversary congratulations email",
+      "content": "Subject: Happy 5th Work Anniversary, David!\n\nCongratulations David on five incredible years contributing to our defensive engineering team!",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_FIN_018",
+      "label": "BENIGN",
+      "scenario": "benign_financial_business",
+      "description": "Marketing webinar recording link",
+      "content": "Subject: Webinar Recording: Best Practices in Static Threat Detection\n\nThank you for attending our technical webinar. Access the recording and slides at https://example.com/webinars/threat-detection.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_AWR_001",
+      "label": "BENIGN",
+      "scenario": "security_awareness_education",
+      "description": "Security awareness training bulletin discussing phishing techniques",
+      "content": "Subject: October Cybersecurity Awareness Month: Spotting Phishing Lures\n\nDear team, phishing attacks frequently use fake urgency, credential harvesting lures, and deceptive links to trick users. Always inspect the destination URL and never enter credentials on unfamiliar sites. Visit our awareness portal: https://security-training.example.com.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_AWR_002",
+      "label": "BENIGN",
+      "scenario": "security_awareness_education",
+      "description": "Educational guide on Multi-Factor Authentication hygiene",
+      "content": "Subject: Cyber Hygiene Tip #4: Protecting Your One-Time Passwords\n\nNever share your OTP or SMS verification codes over the phone or email. Attackers impersonate help desk staff to steal authentication tokens. Learn more: https://awareness.example.com/mfa-hygiene.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_AWR_003",
+      "label": "BENIGN",
+      "scenario": "security_awareness_education",
+      "description": "Quarterly simulated phishing campaign results overview",
+      "content": "Subject: Q3 Phishing Simulation Results & Key Takeaways\n\nOur simulated phishing exercise achieved a 94% report rate! Employees successfully flagged suspicious links and spoofed executive requests. Congratulations to all teams.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_AWR_004",
+      "label": "BENIGN",
+      "scenario": "security_awareness_education",
+      "description": "Educational article explaining link display-text mismatches",
+      "content": "Subject: Tech Tip: How Display-Text Mismatches Work in Phishing\n\nIn HTML emails, attackers can write an anchor displaying paypal.com while directing your browser to an attacker server. Hover over links to verify destination domains before clicking.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_AWR_005",
+      "label": "BENIGN",
+      "scenario": "security_awareness_education",
+      "description": "Password manager adoption and best practices webinar invitation",
+      "content": "Subject: Security Lunch & Learn: Mastering Your Enterprise Password Manager\n\nJoin our security engineers this Thursday at noon for a live walkthrough on secure password generation and passkey configuration. Register: https://events.example.com/lunch-and-learn.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_AWR_006",
+      "label": "BENIGN",
+      "scenario": "security_awareness_education",
+      "description": "Advisory regarding public Wi-Fi security precautions",
+      "content": "Subject: Travel Security Checklist: Working Safely on Public Networks\n\nWhen traveling for business, always connect through our corporate VPN before accessing company email or cloud repositories. Read the traveler checklist: https://handbook.example.com/travel.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_AWR_007",
+      "label": "BENIGN",
+      "scenario": "security_awareness_education",
+      "description": "Safe handling of email attachments guidance",
+      "content": "Subject: Security Advisory: Recognizing Malicious Email Attachments\n\nBe vigilant when receiving unsolicited attachments with executable (.exe), script (.bat, .ps1, .vbs), or macro extensions (.docm). Forward suspicious emails to security@example.com.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_AWR_008",
+      "label": "BENIGN",
+      "scenario": "security_awareness_education",
+      "description": "Social engineering red flags educational poster",
+      "content": "Subject: Infographic: Top 5 Social Engineering Tactics\n\nSocial engineers rely on urgency, fear, greed, authority, and curiosity. Check out our downloadable infographic at https://resources.example.com/social-engineering-poster.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_AWR_009",
+      "label": "BENIGN",
+      "scenario": "security_awareness_education",
+      "description": "Clean desk and workstation locking policy reminder",
+      "content": "Subject: Security Best Practice: Lock Your Workstation (Win + L)\n\nWhenever stepping away from your desk, press Windows Key + L to lock your screen. Protect sensitive customer information from unauthorized visual access.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "BENIGN_AWR_010",
+      "label": "BENIGN",
+      "scenario": "security_awareness_education",
+      "description": "Reporting suspicious messages procedure overview",
+      "content": "Subject: How to Use the 'Report Phishing' Button in Outlook\n\nOur one-click PhishAlarm button automatically submits headers and attachments to the Security Operations Center for triage. Quick guide: https://wiki.example.com/phish-reporting.",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "EDGE_ROB_001",
+      "label": "PHISHING",
+      "scenario": "malformed_resource_limits",
+      "description": "Malformed unclosed MIME boundary with credential lure",
+      "content": "Subject: Truncated MIME Test\nContent-Type: multipart/mixed; boundary=\"BOUNDARY_123\"\n\n--BOUNDARY_123\nContent-Type: text/plain\n\nVerify your password at https://auth-fail.example.com/login",
+      "is_mime": true,
+      "expected_indicators": [
+        "RULE_MSG_CREDENTIAL_HARVEST"
+      ]
+    },
+    {
+      "id": "EDGE_ROB_002",
+      "label": "BENIGN",
+      "scenario": "malformed_resource_limits",
+      "description": "Excessive MIME parts exceeding 50-part parser boundary",
+      "content": "Subject: Deep Multipart Structure\nContent-Type: multipart/mixed; boundary=\"BND\"\n\n--BND\nContent-Type: text/plain\n\nPart 0\n--BND\nContent-Type: text/plain\n\nPart 1\n--BND\nContent-Type: text/plain\n\nPart 2\n--BND\nContent-Type: text/plain\n\nPart 3\n--BND\nContent-Type: text/plain\n\nPart 4\n--BND\nContent-Type: text/plain\n\nPart 5\n--BND\nContent-Type: text/plain\n\nPart 6\n--BND\nContent-Type: text/plain\n\nPart 7\n--BND\nContent-Type: text/plain\n\nPart 8\n--BND\nContent-Type: text/plain\n\nPart 9\n--BND\nContent-Type: text/plain\n\nPart 10\n--BND\nContent-Type: text/plain\n\nPart 11\n--BND\nContent-Type: text/plain\n\nPart 12\n--BND\nContent-Type: text/plain\n\nPart 13\n--BND\nContent-Type: text/plain\n\nPart 14\n--BND\nContent-Type: text/plain\n\nPart 15\n--BND\nContent-Type: text/plain\n\nPart 16\n--BND\nContent-Type: text/plain\n\nPart 17\n--BND\nContent-Type: text/plain\n\nPart 18\n--BND\nContent-Type: text/plain\n\nPart 19\n--BND\nContent-Type: text/plain\n\nPart 20\n--BND\nContent-Type: text/plain\n\nPart 21\n--BND\nContent-Type: text/plain\n\nPart 22\n--BND\nContent-Type: text/plain\n\nPart 23\n--BND\nContent-Type: text/plain\n\nPart 24\n--BND\nContent-Type: text/plain\n\nPart 25\n--BND\nContent-Type: text/plain\n\nPart 26\n--BND\nContent-Type: text/plain\n\nPart 27\n--BND\nContent-Type: text/plain\n\nPart 28\n--BND\nContent-Type: text/plain\n\nPart 29\n--BND\nContent-Type: text/plain\n\nPart 30\n--BND\nContent-Type: text/plain\n\nPart 31\n--BND\nContent-Type: text/plain\n\nPart 32\n--BND\nContent-Type: text/plain\n\nPart 33\n--BND\nContent-Type: text/plain\n\nPart 34\n--BND\nContent-Type: text/plain\n\nPart 35\n--BND\nContent-Type: text/plain\n\nPart 36\n--BND\nContent-Type: text/plain\n\nPart 37\n--BND\nContent-Type: text/plain\n\nPart 38\n--BND\nContent-Type: text/plain\n\nPart 39\n--BND\nContent-Type: text/plain\n\nPart 40\n--BND\nContent-Type: text/plain\n\nPart 41\n--BND\nContent-Type: text/plain\n\nPart 42\n--BND\nContent-Type: text/plain\n\nPart 43\n--BND\nContent-Type: text/plain\n\nPart 44\n--BND\nContent-Type: text/plain\n\nPart 45\n--BND\nContent-Type: text/plain\n\nPart 46\n--BND\nContent-Type: text/plain\n\nPart 47\n--BND\nContent-Type: text/plain\n\nPart 48\n--BND\nContent-Type: text/plain\n\nPart 49\n--BND\nContent-Type: text/plain\n\nPart 50\n--BND\nContent-Type: text/plain\n\nPart 51\n--BND\nContent-Type: text/plain\n\nPart 52\n--BND\nContent-Type: text/plain\n\nPart 53\n--BND\nContent-Type: text/plain\n\nPart 54\n--BND\nContent-Type: text/plain\n\nPart 55\n--BND\nContent-Type: text/plain\n\nPart 56\n--BND\nContent-Type: text/plain\n\nPart 57\n--BND\nContent-Type: text/plain\n\nPart 58\n--BND\nContent-Type: text/plain\n\nPart 59\n--BND--",
+      "is_mime": true,
+      "expected_indicators": []
+    },
+    {
+      "id": "EDGE_ROB_003",
+      "label": "PHISHING",
+      "scenario": "malformed_resource_limits",
+      "description": "Excessive URLs exceeding 100 URL boundary with threat links",
+      "content": "Subject: Massive Link Payload\n\nhttps://track0.example.com/login https://track1.example.com/login https://track2.example.com/login https://track3.example.com/login https://track4.example.com/login https://track5.example.com/login https://track6.example.com/login https://track7.example.com/login https://track8.example.com/login https://track9.example.com/login https://track10.example.com/login https://track11.example.com/login https://track12.example.com/login https://track13.example.com/login https://track14.example.com/login https://track15.example.com/login https://track16.example.com/login https://track17.example.com/login https://track18.example.com/login https://track19.example.com/login https://track20.example.com/login https://track21.example.com/login https://track22.example.com/login https://track23.example.com/login https://track24.example.com/login https://track25.example.com/login https://track26.example.com/login https://track27.example.com/login https://track28.example.com/login https://track29.example.com/login https://track30.example.com/login https://track31.example.com/login https://track32.example.com/login https://track33.example.com/login https://track34.example.com/login https://track35.example.com/login https://track36.example.com/login https://track37.example.com/login https://track38.example.com/login https://track39.example.com/login https://track40.example.com/login https://track41.example.com/login https://track42.example.com/login https://track43.example.com/login https://track44.example.com/login https://track45.example.com/login https://track46.example.com/login https://track47.example.com/login https://track48.example.com/login https://track49.example.com/login https://track50.example.com/login https://track51.example.com/login https://track52.example.com/login https://track53.example.com/login https://track54.example.com/login https://track55.example.com/login https://track56.example.com/login https://track57.example.com/login https://track58.example.com/login https://track59.example.com/login https://track60.example.com/login https://track61.example.com/login https://track62.example.com/login https://track63.example.com/login https://track64.example.com/login https://track65.example.com/login https://track66.example.com/login https://track67.example.com/login https://track68.example.com/login https://track69.example.com/login https://track70.example.com/login https://track71.example.com/login https://track72.example.com/login https://track73.example.com/login https://track74.example.com/login https://track75.example.com/login https://track76.example.com/login https://track77.example.com/login https://track78.example.com/login https://track79.example.com/login https://track80.example.com/login https://track81.example.com/login https://track82.example.com/login https://track83.example.com/login https://track84.example.com/login https://track85.example.com/login https://track86.example.com/login https://track87.example.com/login https://track88.example.com/login https://track89.example.com/login https://track90.example.com/login https://track91.example.com/login https://track92.example.com/login https://track93.example.com/login https://track94.example.com/login https://track95.example.com/login https://track96.example.com/login https://track97.example.com/login https://track98.example.com/login https://track99.example.com/login https://track100.example.com/login https://track101.example.com/login https://track102.example.com/login https://track103.example.com/login https://track104.example.com/login https://track105.example.com/login https://track106.example.com/login https://track107.example.com/login https://track108.example.com/login https://track109.example.com/login https://track110.example.com/login https://track111.example.com/login https://track112.example.com/login https://track113.example.com/login https://track114.example.com/login https://track115.example.com/login https://track116.example.com/login https://track117.example.com/login https://track118.example.com/login https://track119.example.com/login",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "EDGE_ROB_004",
+      "label": "BENIGN",
+      "scenario": "malformed_resource_limits",
+      "description": "Repeated identical URL occurring 50 times in plain text",
+      "content": "Subject: Duplicate Links\n\nhttps://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentation",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "EDGE_ROB_005",
+      "label": "BENIGN",
+      "scenario": "malformed_resource_limits",
+      "description": "Empty message string input",
+      "content": "",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "EDGE_ROB_006",
+      "label": "BENIGN",
+      "scenario": "malformed_resource_limits",
+      "description": "Whitespace only message input",
+      "content": "   \n\t\n   ",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "EDGE_ROB_007",
+      "label": "PHISHING",
+      "scenario": "malformed_resource_limits",
+      "description": "Unknown and corrupted character encoding header in phishing message",
+      "content": "Subject: Corrupted Charset Phish\nContent-Type: text/plain; charset=non-existent-charset-xyz\n\nEnter your password immediately at https://bad-encoding.example.com/login",
+      "is_mime": true,
+      "expected_indicators": [
+        "RULE_MSG_CREDENTIAL_HARVEST",
+        "RULE_MSG_URGENCY_PRESSURE"
+      ]
+    },
+    {
+      "id": "EDGE_ROB_008",
+      "label": "BENIGN",
+      "scenario": "malformed_resource_limits",
+      "description": "Extremely long single plain-text line without line breaks",
+      "content": "This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. This is an extraordinarily long text line containing benign words repeating without line breaks. ",
+      "is_mime": false,
+      "expected_indicators": []
+    },
+    {
+      "id": "EDGE_ROB_009",
+      "label": "PHISHING",
+      "scenario": "malformed_resource_limits",
+      "description": "Malformed HTML with broken tags and display mismatch",
+      "content": "From: test@example.org\nContent-Type: text/html\n\n<html><body><p><a href=\"https://attacker.example.com\">https://secure.example.com <p>broken unclosed tags",
+      "is_mime": true,
+      "expected_indicators": [
+        "RULE_MSG_DISPLAY_TEXT_MISMATCH"
+      ]
+    },
+    {
+      "id": "EDGE_ROB_010",
+      "label": "BENIGN",
+      "scenario": "malformed_resource_limits",
+      "description": "Deeply nested multipart message hierarchy",
+      "content": "Content-Type: multipart/mixed; boundary=\"B0\"\n\n--B0\nContent-Type: multipart/alternative; boundary=\"B1\"\n\n--B1\nContent-Type: text/plain\n\nDeeply nested benign text.\n--B1--\n--B0--",
+      "is_mime": true,
+      "expected_indicators": []
+    }
+  ]
+}

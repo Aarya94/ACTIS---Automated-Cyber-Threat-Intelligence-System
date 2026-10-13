@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-10-13 14:22:44 UTC
+**Generated:** 2026-10-13 15:31:15 UTC
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)
 
 This document inventories all automated test files, test classes, and test functions
@@ -11,8 +11,8 @@ recorded only after confirmed execution.
 
 ## Test Suite Summary
 
-- **Total Test Files:** `41`
-- **Total Discovered Test Cases:** `665`
+- **Total Test Files:** `42`
+- **Total Discovered Test Cases:** `688`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -32,7 +32,7 @@ recorded only after confirmed execution.
 | `tests/test_device_scanner.py` | 10 tests | `PASSING` |
 | `tests/test_doc_generator.py` | 20 tests | `PASSING` |
 | `tests/test_evidence_fusion_audit.py` | 22 tests | `PASSING` |
-| `tests/test_explainability_tree.py` | 23 tests | `PASSING` |
+| `tests/test_explainability_tree.py` | 24 tests | `PASSING` |
 | `tests/test_file_pipeline_hardening.py` | 17 tests | `PASSING` |
 | `tests/test_file_protection_burst.py` | 5 tests | `PASSING` |
 | `tests/test_file_protection_events.py` | 17 tests | `PASSING` |
@@ -40,6 +40,7 @@ recorded only after confirmed execution.
 | `tests/test_incremental_state.py` | 8 tests | `PASSING` |
 | `tests/test_malware_dataset.py` | 25 tests | `PASSING` |
 | `tests/test_message_analysis.py` | 45 tests | `PASSING` |
+| `tests/test_message_analysis_benchmark.py` | 22 tests | `PASSING` |
 | `tests/test_non_pe_analysis.py` | 24 tests | `PASSING` |
 | `tests/test_privacy_safeguards.py` | 16 tests | `PASSING` |
 | `tests/test_protection_service_events.py` | 15 tests | `PASSING` |
@@ -326,7 +327,7 @@ recorded only after confirmed execution.
 **Class `TestOfflineAndFailureRecovery`:**
 - `test_local_pe_analysis_completes_when_external_ti_offline()`
 
-### `tests/test_explainability_tree.py` (23 tests)
+### `tests/test_explainability_tree.py` (24 tests)
 
 **Class `TestExplainabilityTreeStructureAndContracts`:**
 - `test_tree_generation_for_simple_benign_target()`
@@ -358,6 +359,7 @@ recorded only after confirmed execution.
 - `test_detector_analyze_file_produces_explainability_tree()`
 - `test_repeatable_identical_explanations()`
 - `test_submillisecond_tree_generation_performance()`
+- `test_partial_message_structure_node_status_limitation()`
 
 ### `tests/test_file_pipeline_hardening.py` (17 tests)
 
@@ -540,6 +542,38 @@ recorded only after confirmed execution.
 - `test_no_network_calls_during_offline_message_analysis()`
 - `test_attachment_content_is_never_executed()`
 - `test_html_javascript_not_executed()`
+
+### `tests/test_message_analysis_benchmark.py` (22 tests)
+
+**Class `TestBenchmarkDatasetAndValidation`:**
+- `test_load_production_benchmark_dataset()`
+- `test_dataset_summary_statistics()`
+- `test_validation_rejects_missing_dataset_version()`
+- `test_validation_rejects_empty_samples()`
+- `test_validation_rejects_duplicate_sample_id()`
+- `test_validation_rejects_invalid_label()`
+- `test_validation_rejects_unsupported_scenario()`
+- `test_validation_rejects_missing_field()`
+- `test_load_nonexistent_file_raises_not_found()`
+
+**Class `TestMetricsCalculationEngine`:**
+- `test_confusion_matrix_perfect_predictions()`
+- `test_confusion_matrix_mixed_predictions()`
+- `test_zero_denominator_precision_handling()`
+- `test_zero_denominator_recall_handling()`
+- `test_coverage_and_abstention_metrics()`
+- `test_performance_metrics_calculations()`
+- `test_empty_durations_returns_clean_defaults()`
+
+**Class `TestBenchmarkRunnerAndMapping`:**
+- `test_verdict_mapping_phishing_cases()`
+- `test_verdict_mapping_benign_cases()`
+- `test_verdict_mapping_abstain_cases()`
+- `test_no_network_calls_during_benchmark_run()`
+- `test_sample_exception_captured_without_crashing_runner()`
+
+**Class `TestReportGeneration`:**
+- `test_generate_json_and_markdown_reports()`
 
 ### `tests/test_non_pe_analysis.py` (24 tests)
 

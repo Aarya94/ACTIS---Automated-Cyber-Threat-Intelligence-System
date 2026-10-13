@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-13 14:22:44 UTC
+**Generated:** 2026-10-13 15:31:15 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`50e5a60`)
+**Current Git Branch:** `main` (`3438abf`)
 
 ---
 
@@ -117,20 +117,21 @@
 
 ## Test Status
 
-- **Total Test Files:** `41`
-- **Total Discovered Test Functions:** `665`
+- **Total Test Files:** `42`
+- **Total Discovered Test Functions:** `688`
 - **Coverage Areas:** Configuration validation, SQLite database schema & CRUD, Phishing/Malware model contracts, PE feature extraction, API backend.
 
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `50e5a60`
-- **Working Tree:** 3 untracked/unstaged changes
+- **HEAD Commit:** `3438abf`
+- **Working Tree:** 20 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `3438abf` | Aaryan Suman | 2026-10-13 | docs(day25): document safe MIME parsing, message heuristics, and 692-test verification |
 | `50e5a60` | Aaryan Suman | 2026-10-13 | test(messages): add deterministic adversarial security test suite for MIME and message analysis |
 | `180f85d` | Aaryan Suman | 2026-10-13 | feat(detection): integrate message rules, threat detector orchestrator, and explainability tree |
 | `1c29b94` | Aaryan Suman | 2026-10-13 | feat(scanners): enhance text analyzer with social engineering heuristics and structured message results |
@@ -140,7 +141,6 @@
 | `31fb828` | Aaryan Suman | 2026-10-13 | feat(url): add bounded URL de-obfuscation and safe redirect analysis |
 | `7790d15` | Aaryan Suman | 2026-10-12 | docs(day23): document evidence fusion audit, test expansion, and roadmap completion |
 | `2fd5e50` | Aaryan Suman | 2026-10-12 | test(detection): add comprehensive evidence fusion edge-case audit suite |
-| `0ba7c55` | Aaryan Suman | 2026-10-12 | fix(detection): deduplicate evidence signals and enforce whitelist override precedence |
 
 ## Known Issues
 
