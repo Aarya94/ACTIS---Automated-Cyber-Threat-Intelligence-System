@@ -330,6 +330,41 @@ class ExplanationGenerator:
                     metadata={"evaluated": False}
                 ))
 
+        # Message & MIME Analysis Traceability in Input Branch (Day 25)
+        msg_meta = meta.get("message_analysis")
+        if msg_meta:
+            is_mime = msg_meta.get("is_mime", False)
+            att_cnt = msg_meta.get("attachments_count", len(msg_meta.get("attachments", [])))
+            url_cnt = msg_meta.get("unique_url_count", len(msg_meta.get("urls_found", [])))
+            mismatches = msg_meta.get("display_mismatches_count", 0)
+            completeness = msg_meta.get("analysis_completeness", "COMPLETE")
+
+            msg_desc = f"Message analysis: {'MIME format' if is_mime else 'Plain text'}, {url_cnt} unique URL(s), {att_cnt} attachment(s)."
+            if mismatches > 0:
+                msg_desc += f" Display-text mismatches: {mismatches}."
+
+            msg_node_status = NodeStatus.SUSPICIOUS if (mismatches > 0 or msg_meta.get("suspicious_attachments_count", 0) > 0) else (
+                NodeStatus.LIMITATION if completeness == "PARTIAL" else NodeStatus.EVALUATED
+            )
+
+            input_node.add_child(ExplainabilityNode(
+                node_id="message_structure",
+                category=NodeCategory.INPUT_ANALYSIS,
+                title="Message Structure & MIME Analysis",
+                description=msg_desc,
+                status=msg_node_status,
+                metadata={
+                    "is_mime": is_mime,
+                    "attachments_count": att_cnt,
+                    "unique_url_count": url_cnt,
+                    "display_mismatches_count": mismatches,
+                    "analysis_completeness": completeness,
+                    "headers": {k: v for k, v in msg_meta.get("mime_headers", {}).items() if k in ("From", "Subject", "Date")},
+                    "defects": msg_meta.get("mime_defects", []),
+                    "warnings": msg_meta.get("warnings", [])
+                }
+            ))
+
         root.add_child(input_node)
 
         # 4. Branch: Static Analysis

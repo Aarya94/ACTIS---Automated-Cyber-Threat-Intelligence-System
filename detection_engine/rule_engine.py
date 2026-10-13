@@ -79,6 +79,7 @@ class RuleTargetType(str, Enum):
     PE_FILE = "PE_FILE"
     HASH = "HASH"
     GENERIC = "GENERIC"
+    MESSAGE = "MESSAGE"
 
 
 @dataclass(frozen=True)
@@ -219,7 +220,18 @@ class GenericRuleRegistry:
 
 
 class RuleEngine:
-    """Evaluates deterministic security heuristics on URLs and file metadata."""
+    """Evaluates deterministic security heuristics on URLs, files, and messages."""
+
+    # Message / Email Heuristic Rules (Day 25)
+    RULE_MSG_URGENCY_PRESSURE = "RULE_MSG_URGENCY_PRESSURE"
+    RULE_MSG_CREDENTIAL_HARVEST = "RULE_MSG_CREDENTIAL_HARVEST"
+    RULE_MSG_FINANCIAL_LURE = "RULE_MSG_FINANCIAL_LURE"
+    RULE_MSG_IMPERSONATION = "RULE_MSG_IMPERSONATION"
+    RULE_MSG_SECURITY_EVASION = "RULE_MSG_SECURITY_EVASION"
+    RULE_MSG_SENSITIVE_INFO_PROMPT = "RULE_MSG_SENSITIVE_INFO_PROMPT"
+    RULE_MSG_DISPLAY_TEXT_MISMATCH = "RULE_MSG_DISPLAY_TEXT_MISMATCH"
+    RULE_MSG_SUSPICIOUS_ATTACHMENT = "RULE_MSG_SUSPICIOUS_ATTACHMENT"
+    RULE_MSG_MIME_DEFECT_ANOMALY = "RULE_MSG_MIME_DEFECT_ANOMALY"
 
     @classmethod
     def evaluate_url(cls, url: Any, analysis_result: Optional[Any] = None) -> Dict[str, Any]:
@@ -468,19 +480,22 @@ class RuleEngine:
                 ))
 
             # H. Suspicious Redirect Behavior (protocol downgrade or excessive hops)
-            if redir and (getattr(redir, "protocol_downgraded", False) or getattr(redir, "hop_count", 0) >= 4):
+            hop_val = getattr(redir, "hop_count", 0) if redir else 0
+            is_excessive_hops = isinstance(hop_val, (int, float)) and hop_val >= 4
+            is_downgraded = bool(getattr(redir, "protocol_downgraded", False)) if redir else False
+            if redir and (is_downgraded or is_excessive_hops):
                 reasons_r = []
-                if redir.protocol_downgraded:
+                if is_downgraded:
                     reasons_r.append("Protocol downgraded from HTTPS to insecure HTTP")
-                if redir.hop_count >= 4:
-                    reasons_r.append(f"Excessive redirect hop count ({redir.hop_count} hops)")
+                if is_excessive_hops:
+                    reasons_r.append(f"Excessive redirect hop count ({hop_val} hops)")
                 matches.append(RuleMatch(
                     rule_id="RULE_URL_SUSPICIOUS_REDIRECT",
                     rule_name="Suspicious Redirect Behavior",
                     severity=RuleSeverity.MEDIUM,
                     score_contribution=25.0,
                     explanation=f"Anomalous redirect chain detected: {'; '.join(reasons_r)}.",
-                    evidence_detail={"hop_count": redir.hop_count, "downgraded": redir.protocol_downgraded}
+                    evidence_detail={"hop_count": hop_val, "downgraded": is_downgraded}
                 ))
 
         total_score = min(100.0, sum(m.score_contribution for m in matches))
@@ -911,3 +926,166 @@ class RuleEngine:
 
     # Alias for universal static file evaluation (supporting both PE and non-PE files)
     evaluate_file = evaluate_pe_file
+
+    @classmethod
+    def evaluate_message(cls, message_data: Any) -> Dict[str, Any]:
+        """
+        Evaluates deterministic heuristic rules against a message or email scan result.
+        Analyzes social engineering pressure, credential lures, financial lures,
+        organizational impersonation, security evasion, display-text mismatches,
+        suspicious attachments, and MIME defect anomalies.
+        """
+        matches: List[RuleMatch] = []
+        if not message_data:
+            structured = RuleEvaluationResult(
+                target_identifier="message",
+                target_type=RuleTargetType.MESSAGE,
+                matches=[],
+                total_score=0.0
+            )
+            return {
+                "score": 0,
+                "heuristic_score": 0.0,
+                "rules_triggered": [],
+                "reasons": [],
+                "structured_result": structured
+            }
+
+        # Accept dict or MessageScanResult
+        if hasattr(message_data, "to_dict"):
+            data = message_data.to_dict()
+        elif isinstance(message_data, dict):
+            data = message_data
+        else:
+            data = {}
+
+        se = data.get("social_engineering", {})
+        if not isinstance(se, dict):
+            se = {}
+
+        # 1. Urgency Pressure
+        if se.get("has_urgency"):
+            hits = se.get("urgency_indicators", [])
+            matches.append(RuleMatch(
+                rule_id=cls.RULE_MSG_URGENCY_PRESSURE,
+                rule_name="Social Engineering Urgency Cues",
+                severity=RuleSeverity.HIGH,
+                score_contribution=25.0,
+                explanation=f"Message employs artificial urgency or deadline pressure ({', '.join(hits[:3])}).",
+                evidence_detail={"urgency_indicators": hits}
+            ))
+
+        # 2. Credential Harvesting Prompt
+        if se.get("has_credential_request"):
+            hits = se.get("credential_indicators", [])
+            matches.append(RuleMatch(
+                rule_id=cls.RULE_MSG_CREDENTIAL_HARVEST,
+                rule_name="Credential Solicitation Pattern",
+                severity=RuleSeverity.HIGH,
+                score_contribution=30.0,
+                explanation=f"Message prompts user to verify or supply credentials ({', '.join(hits[:3])}).",
+                evidence_detail={"credential_indicators": hits}
+            ))
+
+        # 3. Financial Lure
+        if se.get("has_financial_lure"):
+            hits = se.get("financial_indicators", [])
+            matches.append(RuleMatch(
+                rule_id=cls.RULE_MSG_FINANCIAL_LURE,
+                rule_name="Financial Lure Keyword Pattern",
+                severity=RuleSeverity.MEDIUM,
+                score_contribution=20.0,
+                explanation=f"Message contains financial inducement or payout lure ({', '.join(hits[:3])}).",
+                evidence_detail={"financial_indicators": hits}
+            ))
+
+        # 4. Impersonation
+        if se.get("has_impersonation"):
+            hits = se.get("impersonation_indicators", [])
+            matches.append(RuleMatch(
+                rule_id=cls.RULE_MSG_IMPERSONATION,
+                rule_name="Organizational Impersonation Pattern",
+                severity=RuleSeverity.MEDIUM,
+                score_contribution=20.0,
+                explanation=f"Message displays authority or department impersonation language ({', '.join(hits[:3])}).",
+                evidence_detail={"impersonation_indicators": hits}
+            ))
+
+        # 5. Security Control Evasion
+        if se.get("has_security_evasion"):
+            hits = se.get("security_evasion_indicators", [])
+            matches.append(RuleMatch(
+                rule_id=cls.RULE_MSG_SECURITY_EVASION,
+                rule_name="Security Control Evasion Instruction",
+                severity=RuleSeverity.CRITICAL,
+                score_contribution=35.0,
+                explanation=f"Message instructs recipient to bypass security controls or ignore warnings ({', '.join(hits[:3])}).",
+                evidence_detail={"security_evasion_indicators": hits}
+            ))
+
+        # 6. Sensitive Information Prompt (2FA/OTP)
+        if se.get("has_sensitive_info_prompt"):
+            hits = se.get("sensitive_info_indicators", [])
+            matches.append(RuleMatch(
+                rule_id=cls.RULE_MSG_SENSITIVE_INFO_PROMPT,
+                rule_name="Sensitive Authentication Token Request",
+                severity=RuleSeverity.HIGH,
+                score_contribution=25.0,
+                explanation=f"Message solicits one-time passwords or security recovery codes ({', '.join(hits[:3])}).",
+                evidence_detail={"sensitive_info_indicators": hits}
+            ))
+
+        # 7. Display Text Mismatch
+        mismatch_cnt = data.get("display_mismatches_count", 0)
+        if mismatch_cnt > 0:
+            matches.append(RuleMatch(
+                rule_id=cls.RULE_MSG_DISPLAY_TEXT_MISMATCH,
+                rule_name="Link Display Text / Destination Mismatch",
+                severity=RuleSeverity.CRITICAL,
+                score_contribution=35.0,
+                explanation=f"Detected {mismatch_cnt} hyperlink(s) where displayed text portrays a different domain than actual target.",
+                evidence_detail={"display_mismatches_count": mismatch_cnt}
+            ))
+
+        # 8. Suspicious Attachment
+        susp_att_cnt = data.get("suspicious_attachments_count", 0)
+        if susp_att_cnt > 0:
+            att_list = [a.get("filename", "") for a in data.get("attachments", []) if a.get("is_suspicious_extension")]
+            matches.append(RuleMatch(
+                rule_id=cls.RULE_MSG_SUSPICIOUS_ATTACHMENT,
+                rule_name="Dangerous Executable/Script Attachment",
+                severity=RuleSeverity.CRITICAL,
+                score_contribution=35.0,
+                explanation=f"Message contains {susp_att_cnt} attachment(s) with dangerous executable or script extensions ({', '.join(att_list[:3])}).",
+                evidence_detail={"suspicious_attachments": att_list}
+            ))
+
+        # 9. MIME Defect Anomaly
+        defects = data.get("mime_defects", [])
+        if defects:
+            matches.append(RuleMatch(
+                rule_id=cls.RULE_MSG_MIME_DEFECT_ANOMALY,
+                rule_name="MIME Structural Defect Anomaly",
+                severity=RuleSeverity.LOW,
+                score_contribution=10.0,
+                explanation=f"MIME message exhibits structural parsing defects ({', '.join(defects[:3])}).",
+                evidence_detail={"defects": defects}
+            ))
+
+        total_score = min(100.0, sum(m.score_contribution for m in matches))
+        target_name = data.get("mime_headers", {}).get("Subject") or "message_body"
+
+        structured = RuleEvaluationResult(
+            target_identifier=target_name,
+            target_type=RuleTargetType.MESSAGE,
+            matches=matches,
+            total_score=total_score
+        )
+
+        return {
+            "score": int(total_score),
+            "heuristic_score": round(total_score, 2),
+            "rules_triggered": [m.rule_id for m in matches],
+            "reasons": [m.explanation for m in matches],
+            "structured_result": structured
+        }

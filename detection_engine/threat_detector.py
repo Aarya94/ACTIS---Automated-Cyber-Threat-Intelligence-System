@@ -253,15 +253,151 @@ class ThreatDetector:
 
     def analyze_message(
         self,
-        text: str,
-        check_external: bool = False
+        text_or_message: Any = None,
+        check_external: bool = False,
+        scan_id: Optional[int] = None,
+        **kwargs
     ) -> Dict[str, Any]:
         """
-        Executes security analysis on message text, extracting embedded links,
-        evaluating social engineering cues, and delegating each link to URL analysis.
+        Executes security analysis on message text or MIME message, extracting embedded links,
+        evaluating social engineering cues, MIME structure, attachments, display mismatches,
+        and fusing evidence into the ACTIS detection decision engine.
         """
+        if text_or_message is None and "text" in kwargs:
+            text_or_message = kwargs["text"]
+
         from scanners.text_analyzer import TextAnalyzer
-        return TextAnalyzer.analyze_message(text, check_external=check_external)
+        from detection_engine.decision_engine import DetectionDecisionEngine
+        from detection_engine.detection_contract import InputType, RiskLevel
+        from detection_engine.evidence_model import EvidenceSignal, EvidenceSource, EvidenceSeverity
+        from detection_engine.threat_intel_contract import ThreatIntelEvidence, IndicatorType
+
+        # Step 1: Structured Message & MIME Analysis
+        scan_result = TextAnalyzer.analyze_message_structured(
+            text_or_message,
+            check_external=check_external
+        )
+        scan_dict = scan_result.to_dict()
+
+        if not scan_result.is_valid:
+            res = dict(scan_dict)
+            res.update({
+                "target_type": "message",
+                "score": 0.0,
+                "risk_level": "LOW",
+                "is_threat": False,
+                "reasons": scan_result.explanation_summary,
+                "recommended_action": scan_result.recommended_action,
+                "confidence": 0.0,
+                "detection_result": None,
+                "explainability_tree": None,
+                "from_cache": False,
+            })
+            return res
+
+        # Step 2: Heuristic Rule Engine (Message & Social Engineering Rules)
+        heuristic_res = RuleEngine.evaluate_message(scan_result)
+        rule_eval = heuristic_res.get("structured_result")
+
+        # Step 3: Extract Threat Signals from Embedded URLs
+        static_signals = []
+        ti_evidence = None
+        for u_res in scan_result.url_results:
+            u_score = float(u_res.get("score", 0.0) or 0.0)
+            u_threat = bool(u_res.get("is_threat", False))
+            u_canonical = u_res.get("url", "")
+            u_domain = u_res.get("domain", "")
+
+            # Check if URL matched CONFIRMED threat intelligence
+            u_ti = u_res.get("threat_intel", {})
+            local_status = str(u_ti.get("local_intel", {}).get("status", "")).upper()
+            if u_ti.get("is_known_threat") or local_status in ("CONFIRMED", "MALICIOUS"):
+                if ti_evidence is None:
+                    ti_evidence = ThreatIntelEvidence.from_local_intel(
+                        intel=u_ti.get("local_intel"),
+                        indicator=u_canonical,
+                        indicator_type=IndicatorType.URL
+                    )
+
+            if u_threat and u_score >= 60.0:
+                sev = EvidenceSeverity.CRITICAL if u_score >= 80.0 else EvidenceSeverity.HIGH
+                static_signals.append(
+                    EvidenceSignal(
+                        source=EvidenceSource.ANOMALY,
+                        signal_id=f"MSG_URL_RISK_{u_canonical}",
+                        name=f"High-Risk URL in Message: {u_domain}",
+                        description=f"Message contains link '{u_canonical}' with risk score {u_score:.1f}.",
+                        severity=sev,
+                        score_contribution=min(100.0, u_score),
+                        raw_data={"url": u_canonical, "domain": u_domain, "score": u_score}
+                    )
+                )
+
+        # Step 4: Decision Fusion & Explainability Tree
+        subj = scan_result.mime_headers.get("Subject") if scan_result.mime_headers else None
+        target_id = subj or (scan_result.urls_found[0] if scan_result.urls_found else "message_payload")
+
+        decision_result = DetectionDecisionEngine.evaluate(
+            target_identifier=target_id,
+            input_type=InputType.MESSAGE,
+            ti_evidence=ti_evidence,
+            ml_prediction=None,
+            rule_result=rule_eval,
+            static_signals=static_signals,
+            metadata={
+                "message_analysis": scan_dict,
+                "message_structure": scan_dict,
+                "url_results": scan_result.url_results,
+                "total_urls": scan_result.total_url_count,
+                "threat_urls": scan_result.threat_urls_count,
+                "is_mime": scan_result.is_mime,
+                "display_mismatches": scan_result.display_mismatches_count,
+            }
+        )
+
+        is_threat = (
+            decision_result.risk_level in (RiskLevel.HIGH, RiskLevel.CRITICAL)
+            or scan_result.threat_urls_count > 0
+            or scan_result.suspicious_attachments_count > 0
+            or scan_result.is_suspicious_message
+        )
+
+        # Step 5: Optional Record Detection if Threat Identified
+        if is_threat:
+            try:
+                record_detection(
+                    target=target_id,
+                    target_type="message",
+                    final_score=decision_result.risk_score,
+                    risk_level=decision_result.risk_level.value if hasattr(decision_result.risk_level, "value") else str(decision_result.risk_level),
+                    model_name="N/A",
+                    model_score=0.0,
+                    rule_score=heuristic_res.get("heuristic_score", 0.0),
+                    intel_score=decision_result.analysis_metadata.get("score_breakdown", {}).get("threat_intel_score", 0.0),
+                    explanation_list=decision_result.reasons,
+                    scan_id=scan_id,
+                    indicator_id=None
+                )
+            except Exception as e:
+                logger.warning(f"Failed to record message detection log: {e}")
+
+        # Assemble unified response preserving all legacy TextAnalyzer keys
+        final_dict = dict(scan_dict)
+        final_dict.update({
+            "target_type": "message",
+            "score": decision_result.risk_score,
+            "risk_level": decision_result.risk_level.value if hasattr(decision_result.risk_level, "value") else str(decision_result.risk_level),
+            "is_threat": is_threat,
+            "reasons": decision_result.reasons,
+            "recommended_action": decision_result.analysis_metadata.get("recommended_action", scan_result.recommended_action),
+            "confidence": decision_result.confidence,
+            "heuristic_result": heuristic_res,
+            "detection_result": decision_result.to_dict(),
+            "explainability_tree": decision_result.explainability_tree,
+            "from_cache": False
+        })
+        return final_dict
+
 
     def analyze_url(
         self,

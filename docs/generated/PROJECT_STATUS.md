@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-13 14:21:49 UTC
+**Generated:** 2026-10-13 14:22:07 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`f0aa40c`)
+**Current Git Branch:** `main` (`1c29b94`)
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `f0aa40c`
-- **Working Tree:** 8 untracked/unstaged changes
+- **HEAD Commit:** `1c29b94`
+- **Working Tree:** 7 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `1c29b94` | Aaryan Suman | 2026-10-13 | feat(scanners): enhance text analyzer with social engineering heuristics and structured message results |
 | `f0aa40c` | Aaryan Suman | 2026-10-13 | feat(scanners): implement safe MIME parser subsystem and message input contracts |
 | `3dea328` | Aaryan Suman | 2026-10-13 | docs(day24): document URL de-obfuscation, SSRF safeguards, and test expansion |
 | `193262a` | Aaryan Suman | 2026-10-13 | test(url): add comprehensive 58-case URL de-obfuscation and SSRF test suite |
@@ -140,7 +141,6 @@
 | `0ba7c55` | Aaryan Suman | 2026-10-12 | fix(detection): deduplicate evidence signals and enforce whitelist override precedence |
 | `22fdb79` | Aaryan Suman | 2026-10-12 | docs(day22): document explainability tree, score traceability, and roadmap completion |
 | `3dcef34` | Aaryan Suman | 2026-10-12 | test(detection): add comprehensive explainability tree and weight validation suite |
-| `66f4371` | Aaryan Suman | 2026-10-12 | feat(risk): validate configurable risk scoring weights and boundaries |
 
 ## Known Issues
 
