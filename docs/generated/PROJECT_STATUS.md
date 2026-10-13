@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-13 15:32:00 UTC
+**Generated:** 2026-10-13 15:32:25 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`7abcc6f`)
+**Current Git Branch:** `main` (`b78e1e4`)
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `7abcc6f`
-- **Working Tree:** 10 untracked/unstaged changes
+- **HEAD Commit:** `b78e1e4`
+- **Working Tree:** 8 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `b78e1e4` | Aaryan Suman | 2026-10-13 | feat(benchmarks): implement canonical pipeline benchmark runner and verdict mapping |
 | `7abcc6f` | Aaryan Suman | 2026-10-13 | feat(benchmarks): implement confusion matrix and detection evaluation metrics engine |
 | `273520e` | Aaryan Suman | 2026-10-13 | feat(benchmarks): implement synthetic phishing benchmark dataset schema and loader |
 | `3438abf` | Aaryan Suman | 2026-10-13 | docs(day25): document safe MIME parsing, message heuristics, and 692-test verification |
@@ -140,7 +141,6 @@
 | `f0aa40c` | Aaryan Suman | 2026-10-13 | feat(scanners): implement safe MIME parser subsystem and message input contracts |
 | `3dea328` | Aaryan Suman | 2026-10-13 | docs(day24): document URL de-obfuscation, SSRF safeguards, and test expansion |
 | `193262a` | Aaryan Suman | 2026-10-13 | test(url): add comprehensive 58-case URL de-obfuscation and SSRF test suite |
-| `31fb828` | Aaryan Suman | 2026-10-13 | feat(url): add bounded URL de-obfuscation and safe redirect analysis |
 
 ## Known Issues
 

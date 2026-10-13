@@ -592,3 +592,28 @@ class TestEndToEndPipelineIntegration:
         assert tree.total_nodes > 10
         # Tree generation for 50 signals should execute in less than 5 milliseconds
         assert elapsed_ms < 5.0, f"Tree generation took {elapsed_ms:.2f} ms (expected < 5.0 ms)"
+
+    def test_partial_message_structure_node_status_limitation(self):
+        """Verifies messages with PARTIAL analysis completeness correctly produce LIMITATION node status."""
+        assert NodeStatus.LIMITATION == "LIMITATION"
+        res = DetectionDecisionEngine.evaluate(
+            target_identifier="bounded_message",
+            input_type=InputType.MESSAGE,
+            metadata={
+                "message_analysis": {
+                    "is_mime": True,
+                    "analysis_completeness": "PARTIAL",
+                    "attachments_count": 60,
+                    "unique_url_count": 0,
+                    "display_mismatches_count": 0,
+                    "suspicious_attachments_count": 0
+                }
+            }
+        )
+        assert res.explainability_tree is not None
+        root = res.explainability_tree.get("root", res.explainability_tree)
+        input_nodes = [c for c in root.get("children", []) if c.get("node_id") == "input_analysis"]
+        assert len(input_nodes) == 1
+        msg_nodes = [c for c in input_nodes[0].get("children", []) if c.get("node_id") == "message_structure"]
+        assert len(msg_nodes) == 1
+        assert msg_nodes[0]["status"] == "LIMITATION"
