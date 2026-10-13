@@ -132,8 +132,9 @@ ACTIS operates under strict defensive boundaries:
 - **Threat Caching & High-Performance Lookup Subsystem (Day 21, `threat_intelligence/`, `detection_engine/`, `reports/`, `scripts/`):** Thread-safe bounded in-memory caching (`LRUTTLCache`) with LRU capacity eviction and TTL expiration, hardened `ThreatIntelligenceCache` with indicator invalidation and injectable clock, scan cache integration in `ThreatDetector` with cache invalidation hooks in `register_indicator()` and `upsert_feed_records()`, and comparative benchmark (Cold: 37.17ms/file, 26.9 files/s; Warm: 10.57ms/file, 94.6 files/s, 3.52x speedup; Sustained loop: 106.9 files/s, 88.57% hit ratio).
 - **Explainability Tree & Risk Weight Validation (Day 22, `detection_engine/`):** Bounded hierarchical explainability tree (`ExplainabilityTree`, `ExplainabilityNode`) detailing exact decision rationales, mathematical evidence-to-score calculation traceability (`ScoreTraceability`), sensitive credential/token masking, strict `RiskScoringWeights` validation (NaN, infinity, non-numeric, range constraints), dynamic weight normalization, sub-millisecond tree generation (<5ms for 50 signals), and 23 automated tests.
 - **Evidence Fusion Audit & Edge-Case Hardening (Day 23, `detection_engine/`, `tests/`):** Systematic test-backed audit of the full evidence-fusion pipeline. Added deterministic duplicate signal deduplication keyed by `(source, signal_id)` in `DetectionEvidence` preserving highest-contribution signal, strict whitelist mitigation override precedence clamping scores to 0.0 with full before/after traceability, bounded explainability tree node count safety limits (<= 100), and 35 new comprehensive edge-case audit tests.
-- **Advanced URL De-obfuscation & Safe Redirect Analysis (Day 24, `scanners/`, `detection_engine/`, `tests/`):** Standards-aware URL normalization and de-obfuscation with `URLAnalysisResult` contract preserving original and normalized URLs, zero-width character stripping/tracking, IDN/Punycode translation with mixed-script homoglyphs, numeric IP decoders (dword decimal, octal, hex), userinfo deception handling, bounded double percent-encoding and encoded delimiter analysis. Safe bounded redirect inspector (`RedirectInspector`) with strict SSRF defense (`SSRFValidator`) inspecting loopback, private IPv4/IPv6, link-local, cloud metadata, CGNAT, broadcast, and internal domains with full DNS resolution pre-validation. 8 dedicated URL heuristic rules, explainability tree nodes, and 58 new unit/integration tests.
-- **Automated Test Infrastructure (`tests/`):** 647 unit, integration, adversarial security, service lifecycle, notification, PE analysis, non-PE fallback, pipeline hardening, deep TI caching, explainability tree, evidence fusion audit, and URL de-obfuscation/redirect tests passing with 100% success rate (+58 new tests for Day 24).
+- **Advanced URL De-obfuscation & Safe Redirect Analysis (Day 24, `scanners/`, `detection_engine/`, `tests/`):** Standards-aware URL normalization and de-obfuscation with `URLAnalysisResult` contract preserving original and normalized URLs, zero-width character stripping/tracking, IDN/Punycode translation with mixed-script homoglyphs, numeric IP decoders (dword decimal, octal, hex), userinfo deception handling, bounded double percent-encoding and encoded delimiter analysis. Safe bounded redirect inspector (`RedirectInspector`) with strict SSRF defense (`SSRFValidator`) inspecting loopback, private IPv4/IPv6, link-local, cloud metadata, CGNAT, broadcast, and internal domains with full DNS resolution pre-validation. 8 dedicated URL heuristic rules, explainability tree nodes, and 58 unit/integration tests.
+- **Safe MIME Parsing & Message Threat Analysis (Day 25, `scanners/`, `detection_engine/`, `tests/`):** Standards-compliant, bounded MIME message parsing (`SafeMIMEParser`) leveraging standard library `email.parser.BytesParser` with strict resource limits (10MB raw, 64KB headers, 50 parts, 10 nesting levels, 1MB decoded text, 100 URLs, 5s deadline), path traversal sanitization on attachment filenames, and safe fallback for plain text / SMS. Streaming HTML link extraction (`SafeHTMLURLParser`) with zero script execution, link display-text mismatch detection (`is_domain_mismatch`), metadata-only attachment policy (zero attachment execution), 9 deterministic message-level heuristic rules (`RULE_MSG_*`), explainability tree node integration, and 45 new deterministic tests.
+- **Automated Test Infrastructure (`tests/`):** 692 unit, integration, adversarial security, service lifecycle, notification, PE analysis, non-PE fallback, pipeline hardening, deep TI caching, explainability tree, evidence fusion audit, URL de-obfuscation/redirect, and safe MIME/message analysis tests passing with 100% success rate (+45 new tests for Day 25).
 
 *(Note: ACTIS is a defensive cybersecurity platform and release candidate prototype, not a commercial antivirus or EDR product. Resident Windows Service integration is supported via standard Windows SCM facilities; real SCM registration requires administrative privileges and is fully removable via documented scripts.)*
 
@@ -148,8 +149,8 @@ ACTIS/
 ├── data/                     # Local SQLite databases, training datasets
 ├── models/                   # Serialized ML model artifacts (*.pkl) and JSON metadata
 ├── service/                  # Windows Protection Service & file protection pipeline (lifecycle, state, workers, queue, dispatcher, debouncer, windows_host)
-├── scanners/                 # Event/input providers (URL, text, PE static analyzer, device scanner, file watcher)
-├── detection_engine/         # Decision engine, risk engine, heuristic rule engine
+├── scanners/                 # Event/input providers (URL, text, MIME parser, PE static analyzer, device scanner, file watcher)
+├── detection_engine/         # Decision engine, risk engine, heuristic rule engine, explainability tree
 ├── threat_intelligence/      # Local indicator lookup, external API clients, sync manager, feed adapters
 ├── reports/                  # SQLite threat database schemas, query interfaces, reports
 ├── notifications/            # Alert formatting, user dispatch queue, and native Windows desktop toast notifications
@@ -157,7 +158,7 @@ ACTIS/
 ├── assistant/                # Grounded AI security assistant & explainable analysis (Day 14)
 ├── backend/                  # Central FastAPI intelligence sharing service
 ├── scripts/                  # Service management scripts (install, status, uninstall), demo (`demo_actis.py`), doc generator
-├── tests/                    # Automated unit, integration, adversarial, service, and notification suites
+├── tests/                    # Automated unit, integration, adversarial, service, notification, and message suites
 ├── docs/                     # Architectural source of truth, roadmaps, and generated reports
 │   ├── architecture/         # System design, module contracts, workflows, security rules
 │   ├── roadmap/              # Authoritative daily execution roadmaps
@@ -177,8 +178,8 @@ pytest tests/ -v
 ```
 
 **Current Verification Status:**
-- **589 tests collected**
-- **589 tests passed (100% success rate)**
+- **692 tests collected**
+- **692 tests passed (100% success rate)**
 - **0 failures / 0 errors / 4 warnings**
 
 ### Run Safe Offline System Demonstration

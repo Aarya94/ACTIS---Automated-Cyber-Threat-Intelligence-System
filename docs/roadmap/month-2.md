@@ -133,9 +133,18 @@ Month 2 integrates production Windows Service Control Manager (SCM) deployment a
 - **Files/Components**: `scanners/url_scanner.py`, `scanners/redirect_inspector.py`, `detection_engine/rule_engine.py`, `detection_engine/evidence_model.py`, `detection_engine/explanation_generator.py`, `detection_engine/threat_detector.py`, `tests/test_url_deobfuscation_and_redirects.py`.
 - **Baseline**: 647 automated tests passing with 100% success rate (+58 new tests for Day 24). Zero regressions.
 
-### Days 46–48: Social Engineering & Credential Harvesting Heuristics
-- **Goal**: Enhance message text analysis with multi-language urgency triggers and credential harvesting regex.
-- **Files/Components**: `scanners/text_analyzer.py`, `tests/test_text_analyzer.py`.
+### Days 46–48: Social Engineering & Safe MIME Parsing (`COMPLETED` — Day 25)
+- **Architecture Role**: Extends ACTIS message analysis capabilities with safe standard-library MIME parsing, explainable social-engineering indicators, link display-text mismatch detection, metadata-only attachment policy, and unified integration into the ACTIS evidence, detection, risk, and explainability systems.
+- **Delivered**:
+  1. *Safe Bounded MIME Parsing Subsystem (`scanners/mime_parser.py`)*: Standards-compliant traversal using standard library `email.parser.BytesParser(policy=policy.default)` with graceful fallback to `Parser(policy=policy.default)`. Enforces strict configurable resource boundaries (10MB raw message, 64KB headers, 50 parts, 10 nesting levels, 1MB decoded text, 5MB part size, 100 extracted URLs, 5.0s deadline). Path traversal sanitization on attachment filenames (`sanitize_filename`).
+  2. *Safe HTML Extraction & Display-Text Mismatch Detection (`scanners/mime_parser.py`)*: `SafeHTMLURLParser` streaming parser operating with zero JavaScript execution and zero browser rendering. Captures `<a href>` attributes and plain text URLs in non-script/non-style tags. `is_domain_mismatch()` detects deceptive anchor links where visible domain disagrees with actual destination while safely allowing shared registered base domains.
+  3. *Attachment Metadata-Only Policy (`scanners/mime_parser.py`)*: Strict read-only metadata extraction (`filename`, `content_type`, `size_bytes`, `extension`, `is_suspicious_extension`). Zero attachment execution, zero disk execution, zero dynamic loading.
+  4. *Deterministic Heuristic Rules (`detection_engine/rule_engine.py`)*: 9 dedicated rules: `RULE_MSG_URGENCY_PRESSURE`, `RULE_MSG_CREDENTIAL_HARVEST`, `RULE_MSG_FINANCIAL_LURE`, `RULE_MSG_IMPERSONATION`, `RULE_MSG_SECURITY_EVASION`, `RULE_MSG_SENSITIVE_INFO_PROMPT`, `RULE_MSG_DISPLAY_TEXT_MISMATCH`, `RULE_MSG_SUSPICIOUS_ATTACHMENT`, `RULE_MSG_MIME_DEFECT_ANOMALY`.
+  5. *Pipeline & Explainability Integration*: Unified `ThreatDetector.analyze_message()` routing to `DetectionDecisionEngine.evaluate(input_type=InputType.MESSAGE)` with dedicated `message_structure` node in `ExplanationGenerator`. 100% backward compatibility maintained.
+  6. *Automated Test Suite (`tests/test_message_analysis.py`)*: 45 deterministic, offline, adversarial unit and integration tests.
+- **Files/Components**: `scanners/mime_parser.py`, `scanners/text_analyzer.py`, `detection_engine/rule_engine.py`, `detection_engine/threat_detector.py`, `detection_engine/explanation_generator.py`, `detection_engine/detection_contract.py`, `tests/test_message_analysis.py`.
+- **Validation**: 692 automated tests passing with 100% success rate (+45 new tests for Day 25, 0 failures, 0 errors, 4 third-party warnings).
+- **Security Boundaries**: Zero attachment execution, zero network calls during offline message analysis, remote redirect inspection disabled by default (`follow_redirects=False`), zero browser rendering, and strict privacy protections on message logs.
 
 ### Day 49: Week 7 Verification
 - **Goal**: Regression validation across 100+ synthetic phishing URLs and SMS text samples.

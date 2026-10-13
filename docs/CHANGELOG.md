@@ -10,6 +10,48 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 Milestone Scope: Complete core defensive architecture, configuration, logging, database schemas, static PE analysis, URL/message analysis, device scanning, resident Windows service foundation, file watcher pipeline, threat intel integration, scheduled sync, central TI API, grounded AI assistant, security hardening, and release demonstration.
 
+### 2026-10-13 — Day 25: Safe MIME Parsing & Message Threat Analysis (Bounded MIME Traversal, Social Engineering Heuristics, Safe URL Extraction & Explainability Integration)
+
+Implemented standards-compliant, safe MIME parsing, explainable social-engineering indicators, link display-text mismatch detection, metadata-only attachment policy, and unified integration with ACTIS's existing evidence, detection, risk, and explainability systems while strictly preserving security boundaries:
+1. **Safe Bounded MIME Parser Subsystem (`scanners/mime_parser.py`):**
+   - Implemented `SafeMIMEParser` using Python's standard-library `email.parser.BytesParser(policy=policy.default)` with graceful fallback to `Parser(policy=policy.default)` on decoding defects.
+   - Enforced configurable resource boundaries: 10MB raw message (`DEFAULT_MAX_RAW_MESSAGE_SIZE`), 64KB headers (`DEFAULT_MAX_HEADER_LENGTH`), 50 MIME parts (`DEFAULT_MAX_MIME_PARTS`), 10 nesting levels (`DEFAULT_MAX_MIME_DEPTH`), 1MB decoded text (`DEFAULT_MAX_DECODED_TEXT_SIZE`), 5MB individual part (`DEFAULT_MAX_PART_SIZE`), 100 extracted URLs (`DEFAULT_MAX_EXTRACTED_URLS`), and 5.0s analysis deadline.
+   - Structured contract `MIMEAnalysisResult` encapsulating sanitized headers, decoded text/HTML bodies, attachment metadata, extracted URLs with provenance, defect collection, and deterministic resource limit tracking (`limit_reached` and `analysis_completeness`).
+   - Safe fallback for non-MIME plain text / SMS / chat payloads and header-like prefixes.
+   - Sanitized attachment filenames preventing directory traversal, path injection, and control characters (`sanitize_filename`).
+2. **Safe HTML Parsing & Display-Text Mismatch Detection (`scanners/mime_parser.py`):**
+   - Implemented `SafeHTMLURLParser` extending standard-library `html.parser.HTMLParser` in pure streaming mode: zero browser rendering, zero JavaScript execution, zero remote resource loading.
+   - Safely captures `<a href>` attributes, `<... src>` media tags, and raw URLs in non-script/non-style HTML text nodes.
+   - Implemented `is_domain_mismatch()` detecting deceptive anchor links where visible text portrays a legitimate domain (e.g. `paypal.com`) while destination points to an unrelated domain (e.g. `evil-harvest-phish.xyz`), while safely exempting subdomains sharing the same organizational base domain.
+3. **Metadata-Only Attachment Inspection Policy (`scanners/mime_parser.py`):**
+   - Strict read-only metadata extraction: filename, declared content-type, content-disposition, byte size, part index, and dangerous extension classification (`.exe`, `.scr`, `.pif`, `.bat`, `.cmd`, `.vbs`, `.js`, `.ps1`, `.hta`, `.cpl`, etc.).
+   - Zero execution of attachments, zero process spawning, zero dynamic module loading, and zero disk writes.
+4. **Deterministic Message-Level Heuristic Rules (`detection_engine/rule_engine.py`):**
+   - Added 9 dedicated message rules integrated into the Rule Engine (`RuleEngine.evaluate_message()`):
+     - `RULE_MSG_URGENCY_PRESSURE` (HIGH, 25.0): Artificial deadline or account suspension pressure.
+     - `RULE_MSG_CREDENTIAL_HARVEST` (HIGH, 30.0): Prompts requesting credentials, passwords, or account re-entry.
+     - `RULE_MSG_FINANCIAL_LURE` (MEDIUM, 20.0): Tax refunds, inheritance, crypto, gift cards, or overdue payment lures.
+     - `RULE_MSG_IMPERSONATION` (MEDIUM, 20.0): Authority or department impersonation (IT support, HR, payroll, exec).
+     - `RULE_MSG_SECURITY_EVASION` (CRITICAL, 35.0): Instructions to disable antivirus or bypass security controls.
+     - `RULE_MSG_SENSITIVE_INFO_PROMPT` (HIGH, 25.0): Solicitation of one-time passwords, 2FA tokens, or seed phrases.
+     - `RULE_MSG_DISPLAY_TEXT_MISMATCH` (CRITICAL, 35.0): Deceptive link where displayed domain differs from destination.
+     - `RULE_MSG_SUSPICIOUS_ATTACHMENT` (CRITICAL, 35.0): Attachment with dangerous executable/script extensions.
+     - `RULE_MSG_MIME_DEFECT_ANOMALY` (LOW, 10.0): Structural MIME defects or corrupted boundaries.
+5. **Detection Pipeline, Risk & Explainability Tree Integration:**
+   - Updated `ThreatDetector.analyze_message()` to orchestrate structured message scanning, evaluate message heuristic rules, extract threat signals from embedded URLs, and evaluate unified detection through `DetectionDecisionEngine.evaluate(input_type=InputType.MESSAGE)`.
+   - Updated `ExplanationGenerator` adding dedicated `message_structure` explainability node to the input analysis subtree documenting MIME format, URL counts, attachment counts, display mismatches, headers, and defect warnings.
+   - Maintained 100% backward compatibility for all existing `TextAnalyzer.analyze_message()` callers and return keys.
+6. **Comprehensive Automated Test Suite (`tests/test_message_analysis.py`):**
+   - Added 45 deterministic, offline, adversarial unit and integration tests covering:
+     - MIME parsing (plain text, HTML, multipart/alternative, multipart/mixed, malformed boundaries, invalid charsets, traversal filenames, oversized headers/bodies/parts/depth, resource boundaries).
+     - URL extraction (plain text, HTML href, display mismatches, duplicate deduplication, Subject header extraction, relative link exclusion, script tag immunity).
+     - Social engineering heuristic rules (urgency, credential harvesting, financial lures, impersonation, evasion, sensitive info, benign newsletters/invoices).
+     - Privacy & safety boundaries (remote redirect inspection disabled by default, zero network calls during offline analysis, zero attachment execution, zero JS execution).
+     - Full pipeline integration with `ThreatDetector` and `ExplainabilityTree`.
+   - Full test suite baseline expanded to 692 passing tests (+45 new tests, 0 failures, 0 errors, 4 third-party warnings).
+
+---
+
 ### 2026-10-13 — Day 24: Advanced URL De-obfuscation & Safe Redirect Analysis (Obfuscation Detection, SSRF Safeguards & Evidence Integration)
 
 Implemented advanced URL de-obfuscation, standards-aware normalization, safe bounded redirect inspection, and comprehensive SSRF defense-in-depth protections while preserving existing detection architecture, risk scoring, evidence contracts, and explainability tree:
