@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-10-13 13:36:49 UTC
+**Generated:** 2026-10-13 14:21:11 UTC
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)
 
 This document inventories all automated test files, test classes, and test functions
@@ -11,8 +11,8 @@ recorded only after confirmed execution.
 
 ## Test Suite Summary
 
-- **Total Test Files:** `40`
-- **Total Discovered Test Cases:** `620`
+- **Total Test Files:** `41`
+- **Total Discovered Test Cases:** `665`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -39,6 +39,7 @@ recorded only after confirmed execution.
 | `tests/test_file_protection_integration.py` | 7 tests | `PASSING` |
 | `tests/test_incremental_state.py` | 8 tests | `PASSING` |
 | `tests/test_malware_dataset.py` | 25 tests | `PASSING` |
+| `tests/test_message_analysis.py` | 45 tests | `PASSING` |
 | `tests/test_non_pe_analysis.py` | 24 tests | `PASSING` |
 | `tests/test_privacy_safeguards.py` | 16 tests | `PASSING` |
 | `tests/test_protection_service_events.py` | 15 tests | `PASSING` |
@@ -482,6 +483,63 @@ recorded only after confirmed execution.
 - `test_get_class_distribution_raw_labels()`
 - `test_get_class_distribution_normalized_target()`
 - `test_get_class_distribution_empty_dataframe()`
+
+### `tests/test_message_analysis.py` (45 tests)
+
+**Class `TestMIMEParsingSafeAndBounded`:**
+- `test_valid_plain_text_email()`
+- `test_valid_html_email()`
+- `test_multipart_alternative_plain_and_html()`
+- `test_multipart_mixed_with_attachment()`
+- `test_suspicious_attachment_extension()`
+- `test_attachment_filename_sanitization_path_traversal()`
+- `test_missing_attachment_filename()`
+- `test_missing_mime_boundary_does_not_crash()`
+- `test_invalid_charset_fallback()`
+- `test_empty_message_handling()`
+- `test_oversized_message_boundary_limit()`
+- `test_oversized_header_limit()`
+- `test_excessive_mime_parts_limit()`
+- `test_deep_nesting_limit()`
+- `test_excessive_decoded_text_limit()`
+- `test_url_extraction_limit()`
+- `test_plain_text_sms_with_header_like_prefix_handled_safely()`
+
+**Class `TestURLExtractionAndProvenance`:**
+- `test_plain_text_and_html_url_extraction()`
+- `test_display_text_versus_destination_mismatch_positive()`
+- `test_display_text_matching_destination_negative()`
+- `test_display_text_generic_text_not_mismatch()`
+- `test_subdomain_relationship_not_mismatch()`
+- `test_relative_html_links_ignored_safely()`
+- `test_duplicate_url_occurrences_retained_in_provenance()`
+- `test_subject_header_url_extraction()`
+- `test_malformed_html_tags_do_not_crash_parser()`
+
+**Class `TestSocialEngineeringRules`:**
+- `test_urgency_pressure_positive()`
+- `test_urgency_pressure_negative()`
+- `test_credential_harvesting_positive()`
+- `test_credential_harvesting_negative()`
+- `test_financial_lure_positive()`
+- `test_impersonation_positive()`
+- `test_security_control_evasion_positive()`
+- `test_sensitive_info_prompt_positive()`
+- `test_benign_newsletter_discussing_phishing_not_flagged()`
+- `test_benign_invoice_notification()`
+- `test_rule_engine_message_evaluation()`
+
+**Class `TestEvidenceScoringAndPipelineIntegration`:**
+- `test_threat_detector_analyze_message_with_clean_text()`
+- `test_threat_detector_analyze_message_with_phishing_lures_and_mismatch()`
+- `test_duplicate_urls_do_not_inflate_risk_score()`
+- `test_invalid_input_handling()`
+
+**Class `TestPrivacyAndSafetyGuarantees`:**
+- `test_remote_redirect_inspection_disabled_by_default()`
+- `test_no_network_calls_during_offline_message_analysis()`
+- `test_attachment_content_is_never_executed()`
+- `test_html_javascript_not_executed()`
 
 ### `tests/test_non_pe_analysis.py` (24 tests)
 

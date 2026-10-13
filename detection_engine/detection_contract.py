@@ -20,6 +20,7 @@ class InputType(str, Enum):
     HASH = "HASH"
     IOC = "IOC"
     GENERIC = "GENERIC"
+    MESSAGE = "MESSAGE"
 
 
 class DetectionStatus(str, Enum):
