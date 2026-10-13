@@ -259,6 +259,77 @@ class ExplanationGenerator:
                 "domain": meta.get("domain", "")
             }
         )
+
+        # URL De-obfuscation & Redirect Traceability in Input Branch
+        url_analysis_meta = meta.get("url_analysis")
+        if url_analysis_meta:
+            orig_url = url_analysis_meta.get("original_input", "")
+            norm_url = url_analysis_meta.get("normalized_url", "")
+            unicode_host = url_analysis_meta.get("unicode_hostname", "")
+            ascii_host = url_analysis_meta.get("ascii_hostname", "")
+
+            norm_desc = f"Original: '{orig_url}' -> Normalized: '{norm_url}'"
+            if unicode_host and ascii_host and unicode_host != ascii_host:
+                norm_desc += f" (IDN: '{unicode_host}' <-> Punycode: '{ascii_host}')"
+
+            input_node.add_child(ExplainabilityNode(
+                node_id="url_deobfuscation",
+                category=NodeCategory.INPUT_ANALYSIS,
+                title="URL Normalization & De-obfuscation",
+                description=norm_desc,
+                status=NodeStatus.EVALUATED,
+                metadata={
+                    "original_url": orig_url,
+                    "normalized_url": norm_url,
+                    "unicode_hostname": unicode_host,
+                    "ascii_hostname": ascii_host,
+                    "warnings": url_analysis_meta.get("normalization_warnings", []),
+                    "encoding_findings": url_analysis_meta.get("suspicious_encoding_findings", []),
+                    "unicode_findings": url_analysis_meta.get("unicode_or_idn_observations", [])
+                }
+            ))
+
+            hops = url_analysis_meta.get("redirect_hops", [])
+            final_dst = url_analysis_meta.get("final_destination", norm_url)
+            loop_detected = url_analysis_meta.get("redirect_loop_detected", False)
+            limit_exhausted = url_analysis_meta.get("redirect_limit_exhausted", False)
+            net_err = url_analysis_meta.get("network_failure")
+
+            if hops or loop_detected or limit_exhausted or net_err:
+                redir_status = NodeStatus.SUSPICIOUS if loop_detected or (net_err and "SSRF" in str(net_err)) else (
+                    NodeStatus.TIMED_OUT if limit_exhausted else NodeStatus.EVALUATED
+                )
+                redir_desc = f"Traced {len(hops)} redirect hop(s). Final destination: '{final_dst}'."
+                if loop_detected:
+                    redir_desc += " [REDIRECT LOOP DETECTED]"
+                if net_err:
+                    redir_desc += f" [Terminated: {net_err}]"
+
+                input_node.add_child(ExplainabilityNode(
+                    node_id="redirect_inspection",
+                    category=NodeCategory.INPUT_ANALYSIS,
+                    title=f"Safe Redirect Inspection ({len(hops)} hops)",
+                    description=redir_desc,
+                    status=redir_status,
+                    metadata={
+                        "hop_count": len(hops),
+                        "final_destination": final_dst,
+                        "loop_detected": loop_detected,
+                        "limit_exhausted": limit_exhausted,
+                        "network_failure": net_err,
+                        "hops": hops
+                    }
+                ))
+            else:
+                input_node.add_child(ExplainabilityNode(
+                    node_id="redirect_inspection",
+                    category=NodeCategory.INPUT_ANALYSIS,
+                    title="Safe Redirect Inspection",
+                    description="Redirect inspection not evaluated or disabled for this scan.",
+                    status=NodeStatus.NOT_EVALUATED,
+                    metadata={"evaluated": False}
+                ))
+
         root.add_child(input_node)
 
         # 4. Branch: Static Analysis

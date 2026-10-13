@@ -112,6 +112,11 @@ class DetectionEvidence:
 
         self.signals.append(signal)
 
+    @property
+    def discarded_duplicates_count(self) -> int:
+        """Returns the count of suppressed duplicate signals."""
+        return len(self.discarded_duplicates)
+
     def get_signals_by_source(self, source: EvidenceSource) -> List[EvidenceSignal]:
         """Filters signals by provenance source."""
         return [s for s in self.signals if s.source == source]

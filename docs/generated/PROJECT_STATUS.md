@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-12 16:06:42 UTC
+**Generated:** 2026-10-13 13:36:12 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`2fd5e50`)
+**Current Git Branch:** `main` (`7790d15`)
 
 ---
 
@@ -117,20 +117,21 @@
 
 ## Test Status
 
-- **Total Test Files:** `39`
-- **Total Discovered Test Functions:** `562`
+- **Total Test Files:** `40`
+- **Total Discovered Test Functions:** `620`
 - **Coverage Areas:** Configuration validation, SQLite database schema & CRUD, Phishing/Malware model contracts, PE feature extraction, API backend.
 
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `2fd5e50`
-- **Working Tree:** 4 untracked/unstaged changes
+- **HEAD Commit:** `7790d15`
+- **Working Tree:** 18 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `7790d15` | Aaryan Suman | 2026-10-12 | docs(day23): document evidence fusion audit, test expansion, and roadmap completion |
 | `2fd5e50` | Aaryan Suman | 2026-10-12 | test(detection): add comprehensive evidence fusion edge-case audit suite |
 | `0ba7c55` | Aaryan Suman | 2026-10-12 | fix(detection): deduplicate evidence signals and enforce whitelist override precedence |
 | `22fdb79` | Aaryan Suman | 2026-10-12 | docs(day22): document explainability tree, score traceability, and roadmap completion |
@@ -140,7 +141,6 @@
 | `92e2792` | Aaryan Suman | 2026-10-12 | docs(gitbook): align navigation, verification counts, and generated reports |
 | `53e1825` | Aaryan Suman | 2026-10-12 | docs(architecture): document unified detection pipeline |
 | `ac67354` | Aaryan Suman | 2026-10-12 | docs(day21): document threat intelligence caching subsystem and benchmark |
-| `f089b46` | Aaryan Suman | 2026-10-12 | test(ti): add comprehensive deep caching test suite and scan loop benchmark |
 
 ## Known Issues
 

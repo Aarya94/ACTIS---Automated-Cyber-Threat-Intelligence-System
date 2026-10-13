@@ -222,7 +222,7 @@ class RuleEngine:
     """Evaluates deterministic security heuristics on URLs and file metadata."""
 
     @classmethod
-    def evaluate_url(cls, url: Any) -> Dict[str, Any]:
+    def evaluate_url(cls, url: Any, analysis_result: Optional[Any] = None) -> Dict[str, Any]:
         """Runs deterministic heuristic checks on a URL string."""
         matches: List[RuleMatch] = []
 
@@ -246,6 +246,14 @@ class RuleEngine:
             url_to_parse = "http://" + url_str
         else:
             url_to_parse = url_str
+
+        # If analysis_result not passed, compute lightweight de-obfuscation
+        if analysis_result is None:
+            try:
+                from scanners.url_scanner import deobfuscate_and_analyze_url
+                analysis_result = deobfuscate_and_analyze_url(url_str, follow_redirects=False)
+            except Exception:
+                analysis_result = None
 
         try:
             parsed = urlparse(url_to_parse)
@@ -373,6 +381,107 @@ class RuleEngine:
                 explanation=f"URL directs traffic to non-standard service port {parsed.port}.",
                 evidence_detail={"port": parsed.port}
             ))
+
+        # 11. De-obfuscation & Redirect Rules (from URLAnalysisResult)
+        if analysis_result is not None:
+            # A. Mixed-script Homoglyphs & IDN Deception
+            homoglyphs = [obs for obs in getattr(analysis_result, "unicode_or_idn_observations", []) if "homoglyph" in obs.lower()]
+            if homoglyphs:
+                matches.append(RuleMatch(
+                    rule_id="RULE_URL_HOMOGLYPH_IDN",
+                    rule_name="Mixed-Script Homoglyph Deception",
+                    severity=RuleSeverity.HIGH,
+                    score_contribution=30.0,
+                    explanation="Hostname contains deceptive mixed-script homoglyphs (e.g. Cyrillic/Latin character substitution).",
+                    evidence_detail={"findings": homoglyphs}
+                ))
+
+            # B. Invisible Zero-Width Characters
+            zw_obs = [obs for obs in getattr(analysis_result, "unicode_or_idn_observations", []) if "Zero-Width" in obs or "BOM" in obs or "Mark" in obs or "Override" in obs]
+            if zw_obs:
+                matches.append(RuleMatch(
+                    rule_id="RULE_URL_ZERO_WIDTH_CHARS",
+                    rule_name="Invisible Zero-Width Characters",
+                    severity=RuleSeverity.HIGH,
+                    score_contribution=30.0,
+                    explanation="URL contains invisible zero-width or directional control characters used for obfuscation.",
+                    evidence_detail={"observations": zw_obs}
+                ))
+
+            # C. Double Percent Encoding
+            double_enc = [f for f in getattr(analysis_result, "suspicious_encoding_findings", []) if "Double percent" in f]
+            if double_enc:
+                matches.append(RuleMatch(
+                    rule_id="RULE_URL_DOUBLE_ENCODING",
+                    rule_name="Double Percent Encoding",
+                    severity=RuleSeverity.MEDIUM,
+                    score_contribution=25.0,
+                    explanation="URL contains repeated or double percent-encoded character sequences.",
+                    evidence_detail={"findings": double_enc}
+                ))
+
+            # D. Alternative Numeric IP Encoding
+            num_ips = [f for f in getattr(analysis_result, "suspicious_encoding_findings", []) if "Alternative numeric IP" in f]
+            if num_ips:
+                matches.append(RuleMatch(
+                    rule_id="RULE_URL_IP_NUMERIC_OBFUSCATION",
+                    rule_name="Alternative Numeric IP Encoding",
+                    severity=RuleSeverity.HIGH,
+                    score_contribution=35.0,
+                    explanation="Hostname is disguised using an alternative numeric format (dword decimal, octal, or hex IP).",
+                    evidence_detail={"findings": num_ips}
+                ))
+
+            # E. Deceptive Userinfo Authority
+            userinfo = [f for f in getattr(analysis_result, "suspicious_encoding_findings", []) if "Deceptive userinfo" in f]
+            if userinfo:
+                matches.append(RuleMatch(
+                    rule_id="RULE_URL_USERINFO_OBFUSCATION",
+                    rule_name="Deceptive Userinfo Authority",
+                    severity=RuleSeverity.HIGH,
+                    score_contribution=30.0,
+                    explanation="URL authority uses misleading credentials before the actual destination hostname.",
+                    evidence_detail={"findings": userinfo}
+                ))
+
+            # F. SSRF Prohibited Target Attempt
+            redir = getattr(analysis_result, "redirect_result", None)
+            if redir and getattr(redir, "ssrf_blocked", False):
+                matches.append(RuleMatch(
+                    rule_id="RULE_URL_SSRF_PROHIBITED",
+                    rule_name="Prohibited SSRF Destination",
+                    severity=RuleSeverity.CRITICAL,
+                    score_contribution=45.0,
+                    explanation=f"Target or redirect attempted access to prohibited internal or metadata network: {redir.error_reason}",
+                    evidence_detail={"error": redir.error_reason}
+                ))
+
+            # G. Redirect Loop Cycle
+            if getattr(analysis_result, "redirect_loop_detected", False):
+                matches.append(RuleMatch(
+                    rule_id="RULE_URL_REDIRECT_LOOP",
+                    rule_name="Circular Redirect Loop",
+                    severity=RuleSeverity.HIGH,
+                    score_contribution=30.0,
+                    explanation="Redirect inspection identified a circular destination loop.",
+                    evidence_detail={"hops": getattr(analysis_result, "redirect_hops", [])}
+                ))
+
+            # H. Suspicious Redirect Behavior (protocol downgrade or excessive hops)
+            if redir and (getattr(redir, "protocol_downgraded", False) or getattr(redir, "hop_count", 0) >= 4):
+                reasons_r = []
+                if redir.protocol_downgraded:
+                    reasons_r.append("Protocol downgraded from HTTPS to insecure HTTP")
+                if redir.hop_count >= 4:
+                    reasons_r.append(f"Excessive redirect hop count ({redir.hop_count} hops)")
+                matches.append(RuleMatch(
+                    rule_id="RULE_URL_SUSPICIOUS_REDIRECT",
+                    rule_name="Suspicious Redirect Behavior",
+                    severity=RuleSeverity.MEDIUM,
+                    score_contribution=25.0,
+                    explanation=f"Anomalous redirect chain detected: {'; '.join(reasons_r)}.",
+                    evidence_detail={"hop_count": redir.hop_count, "downgraded": redir.protocol_downgraded}
+                ))
 
         total_score = min(100.0, sum(m.score_contribution for m in matches))
         reasons = [m.explanation for m in matches]

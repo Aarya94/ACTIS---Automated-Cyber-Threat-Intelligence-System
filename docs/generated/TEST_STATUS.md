@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-10-12 16:06:42 UTC
+**Generated:** 2026-10-13 13:36:12 UTC
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)
 
 This document inventories all automated test files, test classes, and test functions
@@ -11,8 +11,8 @@ recorded only after confirmed execution.
 
 ## Test Suite Summary
 
-- **Total Test Files:** `39`
-- **Total Discovered Test Cases:** `562`
+- **Total Test Files:** `40`
+- **Total Discovered Test Cases:** `620`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -57,6 +57,7 @@ recorded only after confirmed execution.
 | `tests/test_threat_providers.py` | 21 tests | `PASSING` |
 | `tests/test_threat_sync.py` | 24 tests | `PASSING` |
 | `tests/test_unified_architecture.py` | 12 tests | `PASSING` |
+| `tests/test_url_deobfuscation_and_redirects.py` | 58 tests | `PASSING` |
 | `tests/test_url_scanner.py` | 11 tests | `PASSING` |
 | `tests/test_week1_validation.py` | 4 tests | `PASSING` |
 | `tests/test_windows_notifications.py` | 13 tests | `PASSING` |
@@ -914,6 +915,72 @@ recorded only after confirmed execution.
 - `test_text_analyzer_delegates_urls_to_scanner()`
 - `test_orchestrator_invalid_url_isolation()`
 - `test_orchestrator_nonexistent_file_isolation()`
+
+### `tests/test_url_deobfuscation_and_redirects.py` (58 tests)
+
+**Class `TestURLNormalizationAndObfuscation`:**
+- `test_01_standard_http_url()`
+- `test_02_standard_https_url()`
+- `test_03_mixed_case_scheme_and_hostname()`
+- `test_04_valid_percent_encoding()`
+- `test_05_malformed_percent_encoding()`
+- `test_06_repeated_percent_encoding()`
+- `test_07_encoded_delimiters()`
+- `test_08_unicode_hostname()`
+- `test_09_punycode_hostname()`
+- `test_10_zero_width_characters()`
+- `test_11_unexpected_control_characters()`
+- `test_12_misleading_user_information_component()`
+- `test_13_multiple_at_characters()`
+- `test_14_ipv4_literal()`
+- `test_15_ipv6_literal()`
+- `test_16_unusual_but_valid_port()`
+- `test_17_invalid_port()`
+- `test_18_trailing_dot_hostname()`
+- `test_19_empty_input()`
+- `test_20_malformed_url()`
+- `test_21_repeated_normalization_determinism()`
+- `test_22_normalization_resource_limits()`
+
+**Class `TestSafeRedirectAndSSRF`:**
+- `test_23_one_redirect()`
+- `test_24_multiple_redirects()`
+- `test_25_relative_location()`
+- `test_26_missing_location_header()`
+- `test_27_malformed_location()`
+- `test_28_redirect_loop()`
+- `test_29_maximum_hop_limit()`
+- `test_30_overall_deadline_exhaustion()`
+- `test_31_request_timeout()`
+- `test_32_dns_failure()`
+- `test_33_connection_failure()`
+- `test_34_tls_failure()`
+- `test_35_unsupported_scheme()`
+- `test_36_redirect_to_loopback()`
+- `test_37_redirect_to_private_address()`
+- `test_38_redirect_to_link_local_address()`
+- `test_39_redirect_to_prohibited_ipv6_address()`
+- `test_40_redirect_from_public_hostname_to_private_ip()`
+- `test_41_dns_rebinding_simulation()`
+- `test_42_redirect_destination_hostname_changes()`
+- `test_43_no_unintended_automatic_redirect_following()`
+- `test_44_no_response_body_download_beyond_limit()`
+
+**Class `TestEvidenceIntegrationAndRegression`:**
+- `test_45_url_normalization_findings_enter_evidence_model()`
+- `test_46_redirect_findings_preserve_provenance()`
+- `test_47_existing_phishing_model_findings_remain_available()`
+- `test_48_existing_ti_findings_remain_available()`
+- `test_49_failed_ti_lookup_is_not_treated_as_clean()`
+- `test_50_failed_redirect_inspection_is_not_treated_as_benign_evidence()`
+- `test_51_duplicate_url_signals_do_not_inflate_scores()`
+- `test_52_independent_corroborating_evidence_remains_distinguishable()`
+- `test_53_whitelist_behavior_remains_consistent_with_documented_policy()`
+- `test_54_insufficient_analysis_is_represented_accurately()`
+- `test_55_explainability_score_matches_final_result()`
+- `test_56_existing_url_scanner_callers_remain_compatible()`
+- `test_57_ordinary_benign_urls_not_automatically_flagged()`
+- `test_58_existing_file_and_non_pe_pipelines_remain_functional()`
 
 ### `tests/test_url_scanner.py` (11 tests)
 

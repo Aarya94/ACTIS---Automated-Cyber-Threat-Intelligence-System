@@ -267,15 +267,25 @@ class ThreatDetector:
         self,
         url: Any,
         scan_id: Optional[int] = None,
-        check_external: bool = False
+        check_external: bool = False,
+        follow_redirects: bool = False,
+        http_fetcher: Optional[Callable] = None,
+        dns_resolver: Optional[Callable] = None
     ) -> Dict[str, Any]:
         """
         Executes complete multi-layer security analysis on a URL.
-        Validates input, applies canonical normalization, inspects local TI,
-        evaluates morphological features and heuristics, and fuses decisions
-        via the DetectionDecisionEngine. Operates strictly in READ-ONLY mode.
+        Validates input, applies advanced de-obfuscation and canonical normalization,
+        evaluates morphological features, heuristic rules, machine learning models,
+        local & external threat intelligence, and optional safe redirect hops.
+        Operates strictly in READ-ONLY mode.
         """
-        from scanners.url_scanner import validate_url, normalize_url, extract_domain, extract_url_features
+        from scanners.url_scanner import (
+            validate_url,
+            normalize_url,
+            extract_domain,
+            extract_url_features,
+            deobfuscate_and_analyze_url
+        )
         from detection_engine.decision_engine import DetectionDecisionEngine
         from detection_engine.detection_contract import InputType
         from detection_engine.threat_intel_contract import ThreatIntelEvidence, IndicatorType
@@ -286,6 +296,7 @@ class ThreatDetector:
             return {
                 "target_type": "url",
                 "url": str(url or ""),
+                "original_url": str(url or ""),
                 "domain": "",
                 "score": 0.0,
                 "risk_level": "INFORMATIONAL",
@@ -302,11 +313,19 @@ class ThreatDetector:
                 "from_cache": False
             }
 
-        # Step 2: Canonical Normalization & In-Memory Cache Lookup
-        canonical_url = normalize_url(url)
+        # Step 2: Advanced De-obfuscation & Analysis
+        url_analysis = deobfuscate_and_analyze_url(
+            url,
+            follow_redirects=follow_redirects,
+            http_fetcher=http_fetcher,
+            dns_resolver=dns_resolver
+        )
+        canonical_url = url_analysis.normalized_url
         domain = extract_domain(canonical_url)
 
-        cached_result = self._url_cache.get(canonical_url)
+        # In-Memory Cache Lookup (keyed by canonical URL and follow_redirects flag)
+        cache_key = f"{canonical_url}__redir_{follow_redirects}"
+        cached_result = self._url_cache.get(cache_key)
         if cached_result is not None:
             res = dict(cached_result)
             res["from_cache"] = True
@@ -329,8 +348,8 @@ class ThreatDetector:
         ml_structured = model_manager.predict_phishing_structured(features)
         ml_res = model_manager.predict_phishing(features)
 
-        # Step 6: Heuristic Rule Engine
-        heuristic_res = RuleEngine.evaluate_url(canonical_url)
+        # Step 6: Heuristic Rule Engine (evaluates both URL string and structured URL analysis)
+        heuristic_res = RuleEngine.evaluate_url(canonical_url, analysis_result=url_analysis)
         rule_eval = heuristic_res.get("structured_result")
 
         # Step 7: Multi-Criteria Risk Evaluation & Decision Fusion
@@ -353,7 +372,8 @@ class ThreatDetector:
                 "domain": domain,
                 "raw_url": str(url),
                 "threat_intel": intel_result,
-                "features": features
+                "features": features,
+                "url_analysis": url_analysis.to_dict()
             }
         )
 
@@ -390,6 +410,7 @@ class ThreatDetector:
         final_result = {
             "target_type": "url",
             "url": canonical_url,
+            "original_url": str(url),
             "domain": domain,
             "score": risk_res["score"],
             "risk_level": risk_res["risk_level"],
@@ -403,12 +424,15 @@ class ThreatDetector:
             "threat_intel": intel_result,
             "detection_result": decision_result.to_dict(),
             "explainability_tree": decision_result.explainability_tree,
+            "url_analysis": url_analysis.to_dict(),
+            "redirect_hops": url_analysis.redirect_hops,
+            "final_destination": url_analysis.final_destination,
             "is_valid": True,
             "from_cache": False
         }
 
         # Cache canonical result in memory
-        self._url_cache.set(canonical_url, final_result)
+        self._url_cache.set(cache_key, final_result)
         return final_result
 
 
