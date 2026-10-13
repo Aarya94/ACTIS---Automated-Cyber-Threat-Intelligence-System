@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-13 15:32:25 UTC
+**Generated:** 2026-10-13 15:32:43 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`b78e1e4`)
+**Current Git Branch:** `main` (`24cbd1b`)
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `b78e1e4`
+- **HEAD Commit:** `24cbd1b`
 - **Working Tree:** 8 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `24cbd1b` | Aaryan Suman | 2026-10-13 | fix(explainability): add NodeStatus.LIMITATION for partial message analyses and add benchmark tests |
 | `b78e1e4` | Aaryan Suman | 2026-10-13 | feat(benchmarks): implement canonical pipeline benchmark runner and verdict mapping |
 | `7abcc6f` | Aaryan Suman | 2026-10-13 | feat(benchmarks): implement confusion matrix and detection evaluation metrics engine |
 | `273520e` | Aaryan Suman | 2026-10-13 | feat(benchmarks): implement synthetic phishing benchmark dataset schema and loader |
@@ -140,7 +141,6 @@
 | `1c29b94` | Aaryan Suman | 2026-10-13 | feat(scanners): enhance text analyzer with social engineering heuristics and structured message results |
 | `f0aa40c` | Aaryan Suman | 2026-10-13 | feat(scanners): implement safe MIME parser subsystem and message input contracts |
 | `3dea328` | Aaryan Suman | 2026-10-13 | docs(day24): document URL de-obfuscation, SSRF safeguards, and test expansion |
-| `193262a` | Aaryan Suman | 2026-10-13 | test(url): add comprehensive 58-case URL de-obfuscation and SSRF test suite |
 
 ## Known Issues
 

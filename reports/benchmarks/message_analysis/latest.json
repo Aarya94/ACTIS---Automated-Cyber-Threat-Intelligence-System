@@ -1,0 +1,330 @@
+{
+  "metadata": {
+    "dataset_version": "1.0.0",
+    "dataset_hash": "baa051b9daf69dd49e5a715bf07879d440d97244e7d10723993382f65b1eea85",
+    "git_commit": "3438abfda29b8a49580b4efd9bc3a71b1f90cab7",
+    "python_version": "3.13.15",
+    "timestamp_iso": "2026-10-13T15:26:52.276440+00:00"
+  },
+  "confusion_matrix": {
+    "true_positives": 84,
+    "true_negatives": 32,
+    "false_positives": 19,
+    "false_negatives": 3,
+    "total_evaluated": 138
+  },
+  "classification_metrics": {
+    "precision": 0.8155,
+    "recall": 0.9655,
+    "f1_score": 0.8842,
+    "specificity": 0.6275,
+    "balanced_accuracy": 0.7965,
+    "accuracy": 0.8406,
+    "false_positive_rate": 0.3725,
+    "false_negative_rate": 0.0345
+  },
+  "coverage_metrics": {
+    "total_samples": 140,
+    "valid_binary_predictions": 138,
+    "abstentions": 2,
+    "incomplete_analyses": 2,
+    "invalid_inputs": 0,
+    "exceptions_encountered": 0,
+    "coverage_rate": 0.9857
+  },
+  "per_rule_metrics": {
+    "RULE_MSG_CREDENTIAL_HARVEST": {
+      "rule_id": "RULE_MSG_CREDENTIAL_HARVEST",
+      "firing_count": 39,
+      "phishing_firings": 39,
+      "benign_firings": 0,
+      "precision": 1.0,
+      "recall_contribution": 0.4432,
+      "false_positive_sample_ids": [],
+      "false_negative_sample_ids": []
+    },
+    "RULE_MSG_DISPLAY_TEXT_MISMATCH": {
+      "rule_id": "RULE_MSG_DISPLAY_TEXT_MISMATCH",
+      "firing_count": 17,
+      "phishing_firings": 17,
+      "benign_firings": 0,
+      "precision": 1.0,
+      "recall_contribution": 0.1932,
+      "false_positive_sample_ids": [],
+      "false_negative_sample_ids": [
+        "EDGE_ROB_009"
+      ]
+    },
+    "RULE_MSG_FINANCIAL_LURE": {
+      "rule_id": "RULE_MSG_FINANCIAL_LURE",
+      "firing_count": 22,
+      "phishing_firings": 22,
+      "benign_firings": 0,
+      "precision": 1.0,
+      "recall_contribution": 0.25,
+      "false_positive_sample_ids": [],
+      "false_negative_sample_ids": []
+    },
+    "RULE_MSG_IMPERSONATION": {
+      "rule_id": "RULE_MSG_IMPERSONATION",
+      "firing_count": 28,
+      "phishing_firings": 25,
+      "benign_firings": 3,
+      "precision": 0.8929,
+      "recall_contribution": 0.2841,
+      "false_positive_sample_ids": [
+        "BENIGN_SEC_001",
+        "BENIGN_FIN_011",
+        "BENIGN_AWR_002"
+      ],
+      "false_negative_sample_ids": []
+    },
+    "RULE_MSG_MIME_DEFECT_ANOMALY": {
+      "rule_id": "RULE_MSG_MIME_DEFECT_ANOMALY",
+      "firing_count": 2,
+      "phishing_firings": 1,
+      "benign_firings": 1,
+      "precision": 0.5,
+      "recall_contribution": 0.0114,
+      "false_positive_sample_ids": [
+        "EDGE_ROB_008"
+      ],
+      "false_negative_sample_ids": []
+    },
+    "RULE_MSG_SECURITY_EVASION": {
+      "rule_id": "RULE_MSG_SECURITY_EVASION",
+      "firing_count": 5,
+      "phishing_firings": 5,
+      "benign_firings": 0,
+      "precision": 1.0,
+      "recall_contribution": 0.0568,
+      "false_positive_sample_ids": [],
+      "false_negative_sample_ids": []
+    },
+    "RULE_MSG_SENSITIVE_INFO_PROMPT": {
+      "rule_id": "RULE_MSG_SENSITIVE_INFO_PROMPT",
+      "firing_count": 6,
+      "phishing_firings": 5,
+      "benign_firings": 1,
+      "precision": 0.8333,
+      "recall_contribution": 0.0568,
+      "false_positive_sample_ids": [
+        "BENIGN_AWR_002"
+      ],
+      "false_negative_sample_ids": []
+    },
+    "RULE_MSG_SUSPICIOUS_ATTACHMENT": {
+      "rule_id": "RULE_MSG_SUSPICIOUS_ATTACHMENT",
+      "firing_count": 6,
+      "phishing_firings": 6,
+      "benign_firings": 0,
+      "precision": 1.0,
+      "recall_contribution": 0.0682,
+      "false_positive_sample_ids": [],
+      "false_negative_sample_ids": [
+        "PHISH_MIX_012"
+      ]
+    },
+    "RULE_MSG_URGENCY_PRESSURE": {
+      "rule_id": "RULE_MSG_URGENCY_PRESSURE",
+      "firing_count": 43,
+      "phishing_firings": 41,
+      "benign_firings": 2,
+      "precision": 0.9535,
+      "recall_contribution": 0.4659,
+      "false_positive_sample_ids": [
+        "BENIGN_SEC_003",
+        "BENIGN_SEC_018"
+      ],
+      "false_negative_sample_ids": []
+    }
+  },
+  "scenario_metrics": {
+    "benign_financial_business": {
+      "total_samples": 18,
+      "evaluated": 18,
+      "abstentions": 0,
+      "true_positives": 0,
+      "true_negatives": 12,
+      "false_positives": 6,
+      "false_negatives": 0,
+      "accuracy": 0.6666666666666666,
+      "precision": 0.0,
+      "recall": null,
+      "mean_runtime_ms": 94.34
+    },
+    "credential_harvesting": {
+      "total_samples": 18,
+      "evaluated": 18,
+      "abstentions": 0,
+      "true_positives": 18,
+      "true_negatives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "mean_runtime_ms": 246.4
+    },
+    "deceptive_links_url_obfuscation": {
+      "total_samples": 18,
+      "evaluated": 18,
+      "abstentions": 0,
+      "true_positives": 17,
+      "true_negatives": 0,
+      "false_positives": 0,
+      "false_negatives": 1,
+      "accuracy": 0.9444444444444444,
+      "precision": 1.0,
+      "recall": 0.9444444444444444,
+      "mean_runtime_ms": 250.4
+    },
+    "financial_manipulation": {
+      "total_samples": 15,
+      "evaluated": 15,
+      "abstentions": 0,
+      "true_positives": 15,
+      "true_negatives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "mean_runtime_ms": 257.92
+    },
+    "impersonation_social_engineering": {
+      "total_samples": 18,
+      "evaluated": 18,
+      "abstentions": 0,
+      "true_positives": 18,
+      "true_negatives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "mean_runtime_ms": 248.98
+    },
+    "legitimate_security_account": {
+      "total_samples": 18,
+      "evaluated": 18,
+      "abstentions": 0,
+      "true_positives": 0,
+      "true_negatives": 12,
+      "false_positives": 6,
+      "false_negatives": 0,
+      "accuracy": 0.6666666666666666,
+      "precision": 0.0,
+      "recall": null,
+      "mean_runtime_ms": 78.75
+    },
+    "malformed_resource_limits": {
+      "total_samples": 10,
+      "evaluated": 8,
+      "abstentions": 2,
+      "true_positives": 2,
+      "true_negatives": 4,
+      "false_positives": 1,
+      "false_negatives": 1,
+      "accuracy": 0.75,
+      "precision": 0.6666666666666666,
+      "recall": 0.6666666666666666,
+      "mean_runtime_ms": 2465.5
+    },
+    "mixed_phishing_indicators": {
+      "total_samples": 15,
+      "evaluated": 15,
+      "abstentions": 0,
+      "true_positives": 14,
+      "true_negatives": 0,
+      "false_positives": 0,
+      "false_negatives": 1,
+      "accuracy": 0.9333333333333333,
+      "precision": 1.0,
+      "recall": 0.9333333333333333,
+      "mean_runtime_ms": 112.53
+    },
+    "security_awareness_education": {
+      "total_samples": 10,
+      "evaluated": 10,
+      "abstentions": 0,
+      "true_positives": 0,
+      "true_negatives": 4,
+      "false_positives": 6,
+      "false_negatives": 0,
+      "accuracy": 0.4,
+      "precision": 0.0,
+      "recall": null,
+      "mean_runtime_ms": 146.41
+    }
+  },
+  "url_metrics": {
+    "messages_with_urls": 97,
+    "total_urls_extracted": 246,
+    "unique_canonical_urls": 197,
+    "url_threat_findings": 192,
+    "url_scenarios_total": 18,
+    "url_scenarios_correct": 17,
+    "url_scenarios_missed": 1
+  },
+  "performance_metrics": {
+    "sample_count": 140,
+    "total_runtime_seconds": 48.2154,
+    "mean_seconds": 0.344396,
+    "median_seconds": 0.234399,
+    "p95_seconds": 0.294329,
+    "min_seconds": 0.000613,
+    "max_seconds": 23.814747,
+    "mean_ms": 344.4,
+    "median_ms": 234.4,
+    "p95_ms": 294.33
+  },
+  "robustness_summary": {
+    "total_edge_cases": 10,
+    "uncaught_exceptions": 0,
+    "resource_limits_triggered": 0,
+    "partial_analyses": 2,
+    "invalid_inputs_handled": 0,
+    "structured_results_returned": 10
+  },
+  "failures": {
+    "false_positive_count": 19,
+    "false_positive_ids": [
+      "BENIGN_SEC_002",
+      "BENIGN_SEC_004",
+      "BENIGN_SEC_005",
+      "BENIGN_SEC_007",
+      "BENIGN_SEC_008",
+      "BENIGN_SEC_015",
+      "BENIGN_FIN_003",
+      "BENIGN_FIN_006",
+      "BENIGN_FIN_007",
+      "BENIGN_FIN_009",
+      "BENIGN_FIN_011",
+      "BENIGN_FIN_018",
+      "BENIGN_AWR_001",
+      "BENIGN_AWR_002",
+      "BENIGN_AWR_005",
+      "BENIGN_AWR_006",
+      "BENIGN_AWR_008",
+      "BENIGN_AWR_010",
+      "EDGE_ROB_004"
+    ],
+    "false_negative_count": 3,
+    "false_negative_ids": [
+      "PHISH_URL_010",
+      "PHISH_MIX_012",
+      "EDGE_ROB_009"
+    ],
+    "abstention_count": 2,
+    "abstention_ids": [
+      "EDGE_ROB_002",
+      "EDGE_ROB_003"
+    ]
+  },
+  "limitations_and_provenance": {
+    "synthetic_corpus_disclaimer": "Metrics were measured against an offline synthetic evaluation corpus (v1.0.0). Synthetic performance does NOT represent verified real-world production accuracy.",
+    "network_isolation": "Zero external HTTP, DNS, or socket requests were initiated during evaluation.",
+    "execution_safety": "Attachments and scripts were parsed as metadata only with zero code execution."
+  }
+}
