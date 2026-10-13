@@ -103,13 +103,13 @@ flowchart TD
 
 ## 3. Detailed Component Specifications (13 Pipeline Stages)
 
-### Stage 1: Input Normalization
-- **Purpose:** Sanitizes raw, unvalidated input targets from the filesystem, CLI, API, or message text. Enforces privacy boundaries (RFC 1918 / loopback shielding) and generates consistent canonical representations to prevent bypasses or duplicate evaluations.
+### Stage 1: Input Normalization & URL De-obfuscation
+- **Purpose:** Sanitizes raw, unvalidated input targets from the filesystem, CLI, API, or message text. Enforces privacy boundaries (RFC 1918 / loopback shielding), performs standards-aware URL normalization, de-obfuscation (zero-width characters, IDN homoglyphs, numeric IP representations, userinfo tricks, double percent-encoding), and bounded safe redirect chain analysis with strict SSRF pre-validation.
 - **Inputs:** Raw filesystem path (`Path` or `str`), raw URL string, or raw text message.
-- **Outputs:** Canonical path, normalized URL (lowercase host, default ports stripped, fragments `#` removed), public IP address, or sanitized message body.
-- **Dependencies:** `urllib.parse`, `ipaddress`, `scanners/url_scanner.py`, `threat_intelligence/indicator_validator.py`, `scanners/file_watcher.py`.
-- **Error Behavior:** Malformed inputs return structured validation errors (`is_valid=False`) with specific error messages; private IPs return privacy boundary shielding notices.
-- **Status:** **IMPLEMENTED AND VERIFIED** (Verified across `tests/test_url_scanner.py`, `tests/test_adversarial_security.py`, `tests/test_privacy_safeguards.py`).
+- **Outputs:** Canonical path, `URLAnalysisResult` (preserving both original and normalized URLs, parsed host/scheme/port, encoding findings, Unicode observations, validated redirect hops), public IP address, or sanitized message body.
+- **Dependencies:** `urllib.parse`, `ipaddress`, `scanners/url_scanner.py`, `scanners/redirect_inspector.py`, `threat_intelligence/indicator_validator.py`, `scanners/file_watcher.py`.
+- **Error Behavior:** Malformed inputs return structured validation errors (`is_valid=False`) with specific error messages; private IPs return privacy boundary shielding notices; redirect failures (loops, hop limits, deadlines, timeouts, SSRF blocks) are explicitly recorded without failing open.
+- **Status:** **IMPLEMENTED AND VERIFIED** (Verified across `tests/test_url_scanner.py`, `tests/test_url_deobfuscation_and_redirects.py`, `tests/test_adversarial_security.py`, `tests/test_privacy_safeguards.py`).
 
 ### Stage 2: Analysis Orchestrator
 - **Purpose:** Coordinates multi-stage evaluation across static analysis, rules, ML inference, and threat intelligence. Manages scan session IDs, routes targets to appropriate format handlers, and handles in-memory scan caching.
@@ -128,12 +128,12 @@ flowchart TD
 - **Status:** **IMPLEMENTED AND VERIFIED** (Delivered in Days 18, 19, 20; verified in `tests/test_static_pe.py`, `tests/test_non_pe_analysis.py`).
 
 ### Stage 4: Rule Engine
-- **Purpose:** Evaluates deterministic heuristic rules against extracted static features, script tokens, archive structures, and URL morphology.
-- **Inputs:** Extracted static feature dictionaries or canonical URLs.
+- **Purpose:** Evaluates deterministic heuristic rules against extracted static features, script tokens, archive structures, URL morphology, and URL de-obfuscation/redirect analysis results.
+- **Inputs:** Extracted static feature dictionaries, canonical URLs, or `URLAnalysisResult` structures.
 - **Outputs:** `RuleEvaluationResult` containing list of `RuleMatch` objects (`rule_id`, `severity`, `score_contribution`, `description`, `matched_patterns`).
 - **Dependencies:** `detection_engine/rule_engine.py`.
 - **Error Behavior:** Missing feature fields evaluate rules safely to non-match (`matched=False`); malformed regex catches log debug warnings and return clean evaluations.
-- **Status:** **IMPLEMENTED AND VERIFIED** (Includes 7 PE rules, 12 Non-PE rules, and URL morphological rules; verified in `tests/test_detection_engine.py`).
+- **Status:** **IMPLEMENTED AND VERIFIED** (Includes 7 PE rules, 12 Non-PE rules, and 12 URL rules including 8 de-obfuscation and redirect rules; verified in `tests/test_detection_engine.py`, `tests/test_url_deobfuscation_and_redirects.py`).
 
 ### Stage 5: Machine Learning Models
 - **Purpose:** Computes statistical probability estimates of maliciousness using offline serialized Random Forest classifiers trained on structural characteristics.

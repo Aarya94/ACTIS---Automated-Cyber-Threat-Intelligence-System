@@ -44,7 +44,7 @@ client_secrets.json
 secrets/
 
 # Logs and databases
-logs/*.log
+logs/
 data/*.db
 backend/*.db
 

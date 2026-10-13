@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-13 13:36:28 UTC
+**Generated:** 2026-10-13 13:36:49 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`31fb828`)
+**Current Git Branch:** `main` (`193262a`)
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `31fb828`
-- **Working Tree:** 6 untracked/unstaged changes
+- **HEAD Commit:** `193262a`
+- **Working Tree:** 5 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `193262a` | Aaryan Suman | 2026-10-13 | test(url): add comprehensive 58-case URL de-obfuscation and SSRF test suite |
 | `31fb828` | Aaryan Suman | 2026-10-13 | feat(url): add bounded URL de-obfuscation and safe redirect analysis |
 | `7790d15` | Aaryan Suman | 2026-10-12 | docs(day23): document evidence fusion audit, test expansion, and roadmap completion |
 | `2fd5e50` | Aaryan Suman | 2026-10-12 | test(detection): add comprehensive evidence fusion edge-case audit suite |
@@ -140,7 +141,6 @@
 | `66f4371` | Aaryan Suman | 2026-10-12 | feat(risk): validate configurable risk scoring weights and boundaries |
 | `7cf9668` | Aaryan Suman | 2026-10-12 | feat(detection): add hierarchical explainability tree and score traceability |
 | `92e2792` | Aaryan Suman | 2026-10-12 | docs(gitbook): align navigation, verification counts, and generated reports |
-| `53e1825` | Aaryan Suman | 2026-10-12 | docs(architecture): document unified detection pipeline |
 
 ## Known Issues
 

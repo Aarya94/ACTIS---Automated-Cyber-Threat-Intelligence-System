@@ -123,9 +123,15 @@ Month 2 integrates production Windows Service Control Manager (SCM) deployment a
 
 ## Week 7: URL & Message Scanner Production Integration
 
-### Days 43–45: Advanced URL De-obfuscation & Redirection Handling
-- **Goal**: Expand URL parser to resolve hex-encoded IP addresses, decimal IPs, octal IPs, and open-redirect query parameters.
-- **Files/Components**: `scanners/url_scanner.py`, `tests/test_url_scanner.py`.
+### Days 43–45: Advanced URL De-obfuscation & Redirection Handling (`COMPLETED` — Day 24)
+- **Delivered**:
+  1. *Standards-Aware URL Normalization & De-obfuscation (`scanners/url_scanner.py`)*: Standards-aware parsing with `URLAnalysisResult` contract preserving original and normalized URLs, zero-width character detection/stripping, IDN/Punycode translation with mixed-script homoglyph detection, numeric IP decoders (dword decimal integer, octal, hex) converted to canonical dotted decimal, userinfo deception handling, and bounded double percent-encoding / encoded delimiter analysis. 100% backward compatibility maintained.
+  2. *Strict SSRF Defense & Bounded Redirect Inspection (`scanners/redirect_inspector.py`)*: `SSRFValidator` inspecting loopback, private IPv4/IPv6, link-local, cloud metadata, CGNAT, broadcast, and internal domains with full DNS resolution pre-validation on every hop. `RedirectInspector` with bounded hops (<=5), deadline (<=5.0s), cycle loop detection, relative location joining, non-intrusive HEAD/GET (0-byte body), zero credentials/cookies, zero browser JS or payload execution.
+  3. *Deterministic Heuristic Rules (`detection_engine/rule_engine.py`)*: 8 dedicated rules: `RULE_URL_HOMOGLYPH_IDN`, `RULE_URL_ZERO_WIDTH_CHARS`, `RULE_URL_DOUBLE_ENCODING`, `RULE_URL_IP_NUMERIC_OBFUSCATION`, `RULE_URL_USERINFO_OBFUSCATION`, `RULE_URL_SSRF_PROHIBITED`, `RULE_URL_REDIRECT_LOOP`, `RULE_URL_SUSPICIOUS_REDIRECT`.
+  4. *Evidence & Explainability Integration*: `discarded_duplicates_count` in `DetectionEvidence`, URL de-obfuscation and redirect inspection nodes in `ExplanationGenerator`, and redirect parameter in `ThreatDetector.analyze_url()`.
+  5. *Test Suite*: 58 automated unit/integration tests in `tests/test_url_deobfuscation_and_redirects.py`.
+- **Files/Components**: `scanners/url_scanner.py`, `scanners/redirect_inspector.py`, `detection_engine/rule_engine.py`, `detection_engine/evidence_model.py`, `detection_engine/explanation_generator.py`, `detection_engine/threat_detector.py`, `tests/test_url_deobfuscation_and_redirects.py`.
+- **Baseline**: 647 automated tests passing with 100% success rate (+58 new tests for Day 24). Zero regressions.
 
 ### Days 46–48: Social Engineering & Credential Harvesting Heuristics
 - **Goal**: Enhance message text analysis with multi-language urgency triggers and credential harvesting regex.

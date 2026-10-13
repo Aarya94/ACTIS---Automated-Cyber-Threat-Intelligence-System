@@ -10,6 +10,42 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 Milestone Scope: Complete core defensive architecture, configuration, logging, database schemas, static PE analysis, URL/message analysis, device scanning, resident Windows service foundation, file watcher pipeline, threat intel integration, scheduled sync, central TI API, grounded AI assistant, security hardening, and release demonstration.
 
+### 2026-10-13 — Day 24: Advanced URL De-obfuscation & Safe Redirect Analysis (Obfuscation Detection, SSRF Safeguards & Evidence Integration)
+
+Implemented advanced URL de-obfuscation, standards-aware normalization, safe bounded redirect inspection, and comprehensive SSRF defense-in-depth protections while preserving existing detection architecture, risk scoring, evidence contracts, and explainability tree:
+1. **Standards-Aware URL Normalization & De-obfuscation (`scanners/url_scanner.py`):**
+   - Implemented `URLAnalysisResult` contract and `deobfuscate_and_analyze_url()` function preserving both original input and normalized URL representations.
+   - Handled zero-width and invisible character stripping and tracking (`\u200b`, `\u200c`, `\u200d`, `\ufeff`, `\u202a`–`\u202e`, `\u2060`, `\u00a0`).
+   - Bidirectional IDN and Punycode translation (`xn--...` <-> Unicode) with mixed-script homoglyph detection (e.g. Cyrillic characters mixed into Latin domains).
+   - Alternative numeric IPv4 representation normalization (dword decimal integers, octal representations, hex-encoded IPs) converting to canonical dotted decimal.
+   - Userinfo deception parsing (handling misleading usernames and multiple `@` characters) and trailing dot normalization.
+   - Double percent-encoding (`%25xx`) and encoded delimiter analysis (`%2e`, `%2f`, `%40`, `%3a`, `%5c`) with bounded decoding passes preventing infinite recursion.
+   - Maintained 100% backward compatibility for existing callers: `normalize_url()`, `extract_domain()`, `extract_url_features()`, and `validate_url()`.
+2. **Safe Bounded Redirect Analysis & Strict SSRF Defense (`scanners/redirect_inspector.py`):**
+   - Implemented `SSRFValidator` validating hostnames and all resolved IP addresses before any outbound connection attempt.
+   - Rejects loopback (`127.0.0.0/8`, `::1`), private IPv4/IPv6 (RFC 1918 `10/8`, `172.16/12`, `192.168/16`, RFC 4193 `fc00::/7`), link-local (RFC 3927 `169.254/16`, RFC 4291 `fe80::/10`), cloud metadata endpoints (`169.254.169.254`, `100.100.100.200`, `fd00:ec2::254`, `metadata.google.internal`), CGNAT (`100.64.0.0/10`), broadcast, and internal domain patterns (`.local`, `.internal`, `.lan`, `.corp`, `.home`).
+   - Implemented `RedirectInspector` enforcing bounded redirect chains (max 5 hops default), overall analysis deadline (5.0s default), per-request timeout (2.0s), cycle loop detection, and standards-aware relative location joining.
+   - Uses non-intrusive HEAD/GET requests with 0-byte body reads; sends zero user credentials, cookies, or authorization tokens; zero JavaScript or payload execution.
+3. **Deterministic URL Heuristic Rules (`detection_engine/rule_engine.py`):**
+   - Added 8 dedicated heuristic rules integrated into the existing Rule Engine:
+     - `RULE_URL_HOMOGLYPH_IDN` (HIGH, 30.0): Mixed-script homoglyphs or suspicious IDN homograph patterns.
+     - `RULE_URL_ZERO_WIDTH_CHARS` (HIGH, 30.0): Hidden zero-width or formatting characters within the URL.
+     - `RULE_URL_DOUBLE_ENCODING` (HIGH, 25.0): Double percent-encoding (`%25xx`) or encoded path separators.
+     - `RULE_URL_IP_NUMERIC_OBFUSCATION` (HIGH, 30.0): Dword integer, octal, or hexadecimal IP address obfuscation.
+     - `RULE_URL_USERINFO_OBFUSCATION` (MEDIUM, 20.0): Misleading userinfo component or multiple `@` characters.
+     - `RULE_URL_SSRF_PROHIBITED` (CRITICAL, 45.0): Destination attempted to redirect to prohibited internal, loopback, or cloud metadata target.
+     - `RULE_URL_REDIRECT_LOOP` (MEDIUM, 15.0): Circular redirect loop detected during hop inspection.
+     - `RULE_URL_SUSPICIOUS_REDIRECT` (MEDIUM, 15.0): Excessive hops (>=4) or cross-domain redirection to suspicious TLDs.
+4. **Detection Pipeline, Evidence Model & Explainability Integration:**
+   - Enriched `ThreatDetector.analyze_url()` with optional `follow_redirects: bool` parameter, returning structured `url_analysis` and `redirect_hops` dictionaries.
+   - Added `discarded_duplicates_count` property to `DetectionEvidence` in `detection_engine/evidence_model.py`.
+   - Updated `ExplanationGenerator` adding dedicated `url_deobfuscation` and `redirect_inspection` nodes within the input analysis subtree.
+5. **Comprehensive Automated Test Suite (`tests/test_url_deobfuscation_and_redirects.py`):**
+   - Added 58 automated unit and integration tests across 3 comprehensive sections covering standard URLs, percent encoding, Unicode/IDN/homoglyphs, userinfo tricks, IP literals, redirect chains, relative locations, redirect loops, deadline/hop limits, SSRF boundaries, DNS rebinding simulations, evidence integration, whitelist safety, explainability score alignment, and full pipeline regression.
+   - Full test suite baseline expanded to 647 passing tests (+58 new tests, 0 failures, 0 errors, 4 third-party warnings).
+
+---
+
 ### 2026-10-12 — Day 23: Week 6 Review & Evidence Fusion Edge-Case Audit (Detection Reliability, Risk Consistency & Regression Hardening)
 
 Conducted a systematic, test-backed audit of the complete evidence-fusion and detection-decision pipeline across contradictory, missing, duplicate, boundary, mitigation, override, and offline failure scenarios. Resolved verified defects without architecture rewrites or contract breakage:
