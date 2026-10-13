@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-13 15:31:15 UTC
+**Generated:** 2026-10-13 15:31:39 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`3438abf`)
+**Current Git Branch:** `main` (`273520e`)
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `3438abf`
-- **Working Tree:** 20 untracked/unstaged changes
+- **HEAD Commit:** `273520e`
+- **Working Tree:** 11 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `273520e` | Aaryan Suman | 2026-10-13 | feat(benchmarks): implement synthetic phishing benchmark dataset schema and loader |
 | `3438abf` | Aaryan Suman | 2026-10-13 | docs(day25): document safe MIME parsing, message heuristics, and 692-test verification |
 | `50e5a60` | Aaryan Suman | 2026-10-13 | test(messages): add deterministic adversarial security test suite for MIME and message analysis |
 | `180f85d` | Aaryan Suman | 2026-10-13 | feat(detection): integrate message rules, threat detector orchestrator, and explainability tree |
@@ -140,7 +141,6 @@
 | `193262a` | Aaryan Suman | 2026-10-13 | test(url): add comprehensive 58-case URL de-obfuscation and SSRF test suite |
 | `31fb828` | Aaryan Suman | 2026-10-13 | feat(url): add bounded URL de-obfuscation and safe redirect analysis |
 | `7790d15` | Aaryan Suman | 2026-10-12 | docs(day23): document evidence fusion audit, test expansion, and roadmap completion |
-| `2fd5e50` | Aaryan Suman | 2026-10-12 | test(detection): add comprehensive evidence fusion edge-case audit suite |
 
 ## Known Issues
 
