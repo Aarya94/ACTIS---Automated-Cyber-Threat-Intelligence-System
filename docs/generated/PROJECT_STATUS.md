@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-13 15:32:43 UTC
+**Generated:** 2026-10-13 15:33:22 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`24cbd1b`)
+**Current Git Branch:** `main` (`d6e0d6d`)
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `24cbd1b`
-- **Working Tree:** 8 untracked/unstaged changes
+- **HEAD Commit:** `d6e0d6d`
+- **Working Tree:** 9 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `d6e0d6d` | Aaryan Suman | 2026-10-13 | feat(benchmarks): implement JSON and Markdown report generation with preserved baseline |
 | `24cbd1b` | Aaryan Suman | 2026-10-13 | fix(explainability): add NodeStatus.LIMITATION for partial message analyses and add benchmark tests |
 | `b78e1e4` | Aaryan Suman | 2026-10-13 | feat(benchmarks): implement canonical pipeline benchmark runner and verdict mapping |
 | `7abcc6f` | Aaryan Suman | 2026-10-13 | feat(benchmarks): implement confusion matrix and detection evaluation metrics engine |
@@ -140,7 +141,6 @@
 | `180f85d` | Aaryan Suman | 2026-10-13 | feat(detection): integrate message rules, threat detector orchestrator, and explainability tree |
 | `1c29b94` | Aaryan Suman | 2026-10-13 | feat(scanners): enhance text analyzer with social engineering heuristics and structured message results |
 | `f0aa40c` | Aaryan Suman | 2026-10-13 | feat(scanners): implement safe MIME parser subsystem and message input contracts |
-| `3dea328` | Aaryan Suman | 2026-10-13 | docs(day24): document URL de-obfuscation, SSRF safeguards, and test expansion |
 
 ## Known Issues
 

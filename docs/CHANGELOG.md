@@ -10,6 +10,60 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 Milestone Scope: Complete core defensive architecture, configuration, logging, database schemas, static PE analysis, URL/message analysis, device scanning, resident Windows service foundation, file watcher pipeline, threat intel integration, scheduled sync, central TI API, grounded AI assistant, security hardening, and release demonstration.
 
+### 2026-10-13 — Day 26: Phishing & Message Analysis Verification Benchmark (Offline Synthetic Corpus, Detection Telemetry, Robustness Evaluation & Bug Fix)
+
+Implemented a deterministic, offline verification benchmark framework evaluating the canonical ACTIS message and URL threat detection pipeline against a versioned, labeled synthetic corpus (140 samples across 9 balanced scenarios):
+1. **Versioned Synthetic Benchmark Dataset Subsystem (`benchmarks/message_analysis/dataset.py`, `tests/fixtures/phishing_benchmark/manifest.json`):**
+   - Built versioned (`v1.0.0`) synthetic benchmark corpus containing 140 carefully curated, labeled samples across 9 distinct attack and legitimate scenarios:
+     - `credential_harvesting` (18): Urgent password resets, session re-authentication prompts, account unlock lures.
+     - `impersonation_social_engineering` (18): IT support, help desk, HR, payroll, system administrator, executive office lures.
+     - `financial_manipulation` (15): Wire transfer requests, tax refund claims, crypto payouts, lottery winnings, inheritance notices.
+     - `deceptive_links_url_obfuscation` (18): HTML anchor display-text mismatches (e.g. displayed `paypal.com` linking to attacker host), Punycode/homoglyph URLs, percent-encoded delimiters, and IP addresses.
+     - `mixed_phishing_indicators` (15): Dangerous attachments (.exe, .bat, .vbs, .ps1, .docm, .iso), security evasion instructions ("disable antivirus", "override protection"), and OTP/2FA code solicitations.
+     - `legitimate_security_account` (18): Standard password change confirmations, official new login notices, MFA enrollment, terms updates.
+     - `benign_financial_business` (18): Routine SaaS invoices with legitimate PDF attachments, sprint planning, meeting agendas, travel expense receipts.
+     - `security_awareness_education` (10): Internal cyber hygiene newsletters discussing phishing patterns and educational articles on display mismatches.
+     - `malformed_resource_limits` (10): Truncated MIME boundaries, excessive parts (>50), excessive URLs (>100), duplicate URLs (50x), empty/whitespace strings, and deeply nested hierarchies.
+   - Implemented schema validator (`validate_dataset_manifest`) enforcing mandatory fields, valid labels (`PHISHING`, `BENIGN`), valid scenario categories, unique ID verification, and deterministic SHA-256 manifest hashing.
+2. **Deterministic Evaluation Metrics Engine (`benchmarks/message_analysis/metrics.py`):**
+   - Implemented binary confusion matrix computation (`ConfusionMatrix`): True Positives, True Negatives, False Positives, False Negatives.
+   - Implemented precision, recall, F1-score, specificity, balanced accuracy, overall accuracy, false positive rate (FPR), and false negative rate (FNR).
+   - Enforced strict handling of zero denominators returning `None` instead of masking errors with 0.0.
+   - Implemented coverage telemetry (`CoverageMetrics`): valid binary predictions, coverage rate, incomplete analyses, invalid inputs, and uncaught exceptions.
+   - Implemented per-rule evaluation telemetry (`PerRuleMetric`): rule firings, phishing hits, benign false-positive contributions, rule precision, recall contribution, and failure sample IDs.
+   - Implemented embedded URL metrics (`URLMetrics`): messages with URLs, extracted counts, unique canonical counts, and URL scenario tracking.
+   - Implemented monotonic latency profiling (`PerformanceMetrics`): mean, median, p95, min, and max execution runtimes.
+3. **Canonical Pipeline Runner & Verdict Mapping (`benchmarks/message_analysis/runner.py`):**
+   - Orchestrated evaluation directly through the canonical production entry point `ThreatDetector.analyze_message()`.
+   - Documented binary classification mapping:
+     - `PHISHING`: `is_threat is True` OR `risk_level in ("HIGH", "CRITICAL")` OR `score >= 60.0`.
+     - `BENIGN`: `is_threat is False` AND `risk_level in ("LOW", "INFORMATIONAL")` AND `analysis_completeness == "COMPLETE"` AND `is_valid is True`.
+     - `ABSTAIN`: Invalid inputs (`is_valid is False`) or partial analyses (`analysis_completeness == "PARTIAL"`).
+   - Enforced strict execution safety: zero external network calls (verified via mock assertions), zero code execution, and safe exception isolation per sample.
+4. **Reproducible Reporting Engine (`benchmarks/message_analysis/report.py`):**
+   - Generates machine-readable `reports/benchmarks/message_analysis/latest.json` and human-readable `latest.md`.
+   - Preserved initial un-tuned baseline results in `baseline.json` and `baseline.md`.
+   - Enforced privacy protections: sensitive payload contents and message bodies are strictly redacted from reports.
+   - Included explicit disclaimers emphasizing that synthetic benchmarks establish baseline measurements and must not be misrepresented as real-world production accuracy.
+5. **Explainability Tree NodeStatus Bug Fix (`detection_engine/explainability_tree.py`):**
+   - Identified and resolved an `AttributeError` when generating explainability trees for messages with resource boundaries: added `LIMITATION = "LIMITATION"` to the `NodeStatus` enum, resolving 2 uncaught exceptions on edge cases (`EDGE_ROB_002` and `EDGE_ROB_003`) and allowing them to produce structured results cleanly.
+6. **Automated Verification & Baseline Results:**
+   - 22 new unit and integration tests in `tests/test_message_analysis_benchmark.py` covering dataset loading, validation errors, metric math, runner isolation, report rendering, determinism, and zero network calls.
+   - Full test suite baseline expanded to 715 passing tests (+23 new tests, 0 failures, 0 errors, 4 third-party warnings).
+   - Baseline benchmark measurement on 140 synthetic samples:
+     - Coverage: 98.6% (138 valid binary evaluations, 2 boundary abstentions).
+     - Recall (Sensitivity): 96.55% (84 / 87 phishing caught).
+     - Precision: 81.55% (84 / 103 predicted phishing).
+     - F1 Score: 88.42%.
+     - Overall Accuracy: 84.06%.
+     - Balanced Accuracy: 79.65%.
+     - False Positive Rate: 37.25% (19 benign messages flagged, primarily driven by character-based URL RF model classifying example.com subdomains).
+     - False Negative Rate: 3.45% (3 phishing messages missed).
+     - Uncaught Exceptions: 0 (reduced from 2 after `NodeStatus.LIMITATION` bug fix).
+     - Median Latency: 256.56 ms.
+
+---
+
 ### 2026-10-13 — Day 25: Safe MIME Parsing & Message Threat Analysis (Bounded MIME Traversal, Social Engineering Heuristics, Safe URL Extraction & Explainability Integration)
 
 Implemented standards-compliant, safe MIME parsing, explainable social-engineering indicators, link display-text mismatch detection, metadata-only attachment policy, and unified integration with ACTIS's existing evidence, detection, risk, and explainability systems while strictly preserving security boundaries:
