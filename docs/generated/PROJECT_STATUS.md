@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-16 18:24:38 UTC
+**Generated:** 2026-10-16 18:25:42 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`b7ce93e`)
+**Current Git Branch:** `main` (`a1dc41c`)
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `b7ce93e`
+- **HEAD Commit:** `a1dc41c`
 - **Working Tree:** 8 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `a1dc41c` | Aaryan Suman | 2026-10-16 | docs(day27): document final validation and benchmark comparison |
 | `b7ce93e` | Aaryan Suman | 2026-10-16 | test(benchmarks): validate day27 detection and latency metrics |
 | `6f81bdc` | Aaryan Suman | 2026-10-16 | test(performance): verify bounded analysis and cache behavior |
 | `786f451` | Aaryan Suman | 2026-10-16 | fix(performance): reduce redundant URL analysis work |
@@ -140,7 +141,6 @@
 | `76d0b2d` | Aaryan Suman | 2026-10-16 | test(detection): protect phishing and benign URL regressions |
 | `a4b9e6c` | Aaryan Suman | 2026-10-16 | fix(detection): prevent duplicate evidence amplification |
 | `5bd2bb1` | Aaryan Suman | 2026-10-16 | test(detection): cover repeated-scan evidence feedback |
-| `83791f0` | Aaryan Suman | 2026-10-16 | fix(ti): preserve trusted indicator state across updates |
 
 ## Known Issues
 

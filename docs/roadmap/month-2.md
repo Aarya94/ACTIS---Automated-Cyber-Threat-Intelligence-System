@@ -158,6 +158,17 @@ Month 2 integrates production Windows Service Control Manager (SCM) deployment a
 - **Files/Components**: `benchmarks/message_analysis/dataset.py`, `benchmarks/message_analysis/metrics.py`, `benchmarks/message_analysis/runner.py`, `benchmarks/message_analysis/report.py`, `tests/fixtures/phishing_benchmark/manifest.json`, `detection_engine/explainability_tree.py`, `tests/test_message_analysis_benchmark.py`, `tests/test_explainability_tree.py`.
 - **Validation**: 715 automated tests passing with 100% success rate (+23 new tests for Day 26, 0 failures, 0 errors, 4 third-party warnings).
 
+### Day 27: Threat Intel Trust, Cache Consistency, Evidence Calibration & Multi-URL Performance (`COMPLETED` — Day 27)
+- **Goal**: Full technical audit, defect reproduction, architectural hardening of threat intelligence persistence, in-memory cache synchronization, repeated-scan scoring loops, multi-URL performance profiling, and benchmark verification.
+- **Delivered**:
+  1. *Indicator Trust & Promotion Model*: Enforced strict ML-to-TI separation. Uncorroborated heuristic rule firings and ML predictions are recorded strictly as `status="SUSPICIOUS"` and cannot auto-escalate to `CONFIRMED`.
+  2. *Status Hierarchy & Provenance Protection*: Deterministic SQLite indicator transition precedence: `CONFIRMED (3) > SUSPICIOUS (2) > CANDIDATE (1)`. Prevents unverified local passes from demoting authoritative intelligence or overwriting external feed provenance.
+  3. *Cache Consistency & Invalidation Matching*: Systematic cache key matching across canonical and redirect inspection variants.
+  4. *Repeated-Scan Feedback Elimination*: Score invariance across consecutive rescans without score degradation or artificial amplification.
+  5. *Multi-URL Performance Optimization*: Eliminated duplicate ML inference via `prediction_to_legacy_dict()`, configured `n_jobs=1` for single-sample inference, and added fast-path feature extraction, slashing 100-URL analysis latency from 26.4s down to 1.31s (11x–19x speedup).
+  6. *Benchmark Recall & Quality*: Improved benchmark recall to 100.0% (87/87 True Positives, 0 False Negatives), 82.08% precision, and 90.16% F1 score across 140 synthetic samples.
+- **Validation**: 760 automated tests passing with 100% success rate (+45 new tests added across Day 27 Parts 1, 2, and 3, 0 failures, 0 errors, 4 third-party warnings) in 26.10s.
+
 ---
 
 ## Week 8: Recursive Device Scanner

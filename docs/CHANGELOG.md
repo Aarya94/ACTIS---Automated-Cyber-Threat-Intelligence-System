@@ -10,9 +10,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 Milestone Scope: Complete core defensive architecture, configuration, logging, database schemas, static PE analysis, URL/message analysis, device scanning, resident Windows service foundation, file watcher pipeline, threat intel integration, scheduled sync, central TI API, grounded AI assistant, security hardening, and release demonstration.
 
-### 2026-10-16 — Day 27 (Part 1 & Part 2): Indicator Trust, Cache Consistency, Evidence Calibration & Verification
+### 2026-10-16 — Day 27 (Complete: Parts 1, 2, & 3): Indicator Trust, Cache Consistency, Evidence Calibration, Multi-URL Performance & Final Delivery
 
-Addressed and resolved architectural defects identified during the Day 27 audit across threat intelligence persistence, in-memory cache synchronization, repeated-scan scoring loops, and evidence aggregation:
+Addressed and resolved architectural defects identified during the Day 27 audit across threat intelligence persistence, in-memory cache synchronization, repeated-scan scoring loops, evidence aggregation, and multi-URL performance:
 1. **Indicator Trust & Promotion Model Hardening (`detection_engine/threat_detector.py`):**
    - Corrected automatic indicator registration in `ThreatDetector.analyze_url()` and `ThreatDetector.scan_file()`: internal uncorroborated heuristic rule firings and ML predictions are persisted strictly as `status="SUSPICIOUS"` rather than auto-escalating to `status="CONFIRMED"`.
    - Preserved authoritative fast-track for confirmed intelligence while preventing feedback loops where local engine predictions override multi-layer scoring on subsequent scans.
@@ -28,9 +28,15 @@ Addressed and resolved architectural defects identified during the Day 27 audit 
    - Added macro-enabled Office extensions (`.docm`, `.xlsm`, `.pptm`, `.dotm`, `.xltm`) to `DANGEROUS_ATTACHMENT_EXTENSIONS`, resolving `PHISH_MIX_012`.
    - Hardened `SafeHTMLURLParser` with `_flush_current_link()` and `close()` override to cleanly capture display text and flag domain mismatches on unclosed anchor tags interrupted by block elements (`<p>`, `<div>`), resolving `EDGE_ROB_009`.
    - Added authority-level percent-encoding deobfuscation (`%40` -> `@`) in `validate_url()` and `deobfuscate_and_analyze_url()`, allowing true destination hostnames to be extracted and triggering userinfo deception heuristics, resolving `PHISH_URL_010`.
-6. **Benchmark & Test Suite Verification:**
-   - Evaluated 140 synthetic benchmark samples: Recall improved from 96.55% to 100.0% (87/87 True Positives, 0 False Negatives), Precision improved to 82.08%, F1 Score reached 0.9016.
-   - Total test suite expanded to 756 tests (+41 tests added in Day 27 across 7 new test files), passing with 0 failures, 0 errors, and 4 third-party deprecation warnings.
+6. **Multi-URL Performance Optimization & Profiling (`detection_engine/model_manager.py`, `detection_engine/threat_detector.py`, `scanners/url_scanner.py`):**
+   - Profiled high-density URL payloads (100 URLs in `EDGE_ROB_003`) with `cProfile`, identifying redundant dual ML inference and joblib single-sample threadpool dispatch churn.
+   - Added `ModelManager.prediction_to_legacy_dict()` and eliminated duplicate model invocation in `ThreatDetector.analyze_url()`, cutting ML inference execution by 50%.
+   - Configured `n_jobs = 1` for loaded scikit-learn models, eliminating threadpool creation overhead for single-sample inference and achieving a 4.3x per-sample ML speedup.
+   - Added fast-path `is_already_normalized=True` to `extract_url_features()`, bypassing redundant RFC 3986 normalization.
+   - Reduced 100-URL message analysis latency from 26.4s / 14.8s down to **1.31s** (**11x – 19x performance improvement**).
+7. **Benchmark & Test Suite Verification:**
+   - Evaluated 140 synthetic benchmark samples: Recall improved from 96.55% to **100.0%** (87/87 True Positives, 0 False Negatives), Precision reached 82.08%, F1 Score reached 0.9016, and total benchmark runtime executed in 3.03s.
+   - Total test suite expanded to **760 tests** (+45 tests added in Day 27 across 8 new test files), passing with 0 failures, 0 errors, and 4 third-party deprecation warnings in 26.10s.
 
 ### 2026-10-13 — Day 26: Phishing & Message Analysis Verification Benchmark (Offline Synthetic Corpus, Detection Telemetry, Robustness Evaluation & Bug Fix)
 
