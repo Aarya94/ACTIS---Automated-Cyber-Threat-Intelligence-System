@@ -18,6 +18,7 @@
 * [Security Boundaries](architecture/security-boundaries.md)
 * [ACTIS Threat Intelligence Integration Architecture](architecture/reference/actis-threat-intelligence-integration.md)
 * [Day 27 Part 1: Audit & Defect Reproduction](architecture/day27-part1-audit-report.md)
+* [Day 27 Part 3: Performance & Final Validation](architecture/day27-part3-performance-and-final-validation.md)
 
 ## ⚙️ Configuration & Contracts
 * [Configuration Guide](configuration.md)
