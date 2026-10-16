@@ -62,17 +62,17 @@ class TestDay27IndicatorTrustAndCacheConsistency:
         # Confirm lookup without suffix returns None
         assert detector._url_cache.get(canonical_key) is None
 
-        # 2. Attempt invalidation using current implementation
+        # 2. Invalidate using fixed implementation
         invalidation_result = detector.invalidate_url(test_url)
 
-        # 3. VERIFY DEFECT: Invalidation returns False because of key mismatch
-        assert invalidation_result is False, (
-            "Expected invalidate_url to return False due to missing __redir_{follow_redirects} suffix"
+        # 3. VERIFY DEFECT FIX: Invalidation returns True and successfully evicts the entry
+        assert invalidation_result is True, (
+            "Expected invalidate_url to return True upon invalidating redirect-aware key variants"
         )
 
-        # 4. Confirm the entry was NOT evicted and remains cached
+        # 4. Confirm the entry was evicted
         cached_entry = detector._url_cache.get(expected_cache_key)
-        assert cached_entry is not None, "Cache entry should still be present due to key mismatch defect"
+        assert cached_entry is None, "Cache entry should be evicted after invalidate_url()"
 
     def test_unverified_heuristic_ml_escalates_to_confirmed_ti(self, isolated_ti_db):
         """

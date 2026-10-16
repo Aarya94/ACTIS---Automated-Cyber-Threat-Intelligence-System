@@ -122,3 +122,88 @@ class TestDay27Part2PersistenceAndCacheConsistency:
         detector.analyze_url(url, follow_redirects=True)
         key_true = f"{norm}__redir_True"
         assert detector._url_cache.get(key_true) is not None
+
+    def test_cache_invalidation_evicts_all_redirect_variants(self):
+        """
+        Validates that ThreatDetector.invalidate_url() correctly invalidates redirect-aware keys.
+        """
+        detector = ThreatDetector()
+        url = "https://eviction-test.example.com/login"
+        norm = normalize_url(url)
+        key_false = f"{norm}__redir_False"
+
+        detector.analyze_url(url, follow_redirects=False)
+        assert detector._url_cache.get(key_false) is not None
+
+        # Call invalidate_url
+        res = detector.invalidate_url(url)
+        assert res is True, "invalidate_url should return True upon evicting cached entry"
+        assert detector._url_cache.get(key_false) is None, "Cache entry must be evicted"
+
+    def test_status_promotion_from_suspicious_to_confirmed_on_authoritative_update(self, isolated_ti_db):
+        """
+        Validates that an existing SUSPICIOUS indicator is properly promoted to CONFIRMED
+        when an authoritative update is registered.
+        """
+        val = "https://promo-target.example.com/auth"
+        norm = normalize_url(val)
+
+        # 1. Initially registered as SUSPICIOUS
+        tdb.register_indicator("url", norm, source="scanner", confidence=0.5, status="SUSPICIOUS")
+        row1 = tdb.lookup_indicator("url", norm)
+        assert row1["status"] == "SUSPICIOUS"
+
+        # 2. Authoritative CERT update
+        tdb.register_indicator("url", norm, source="Authoritative_CERT", confidence=0.99, status="CONFIRMED")
+        row2 = tdb.lookup_indicator("url", norm)
+        assert row2["status"] == "CONFIRMED", f"Expected promotion to 'CONFIRMED', got {row2['status']}"
+
+    def test_confirmed_status_protected_from_downgrade_by_unverified_scan(self, isolated_ti_db):
+        """
+        Validates that an authoritative CONFIRMED indicator is NOT downgraded when an unverified
+        local scan registers SUSPICIOUS.
+        """
+        val = "https://c2-infrastructure.example.com/beacon"
+        norm = normalize_url(val)
+
+        tdb.register_indicator("url", norm, source="VirusTotal", confidence=0.95, status="CONFIRMED")
+        row1 = tdb.lookup_indicator("url", norm)
+        assert row1["status"] == "CONFIRMED"
+
+        # Subsequent local scan reports SUSPICIOUS
+        tdb.register_indicator("url", norm, source="actis_url_scanner", confidence=0.7, status="SUSPICIOUS")
+        row2 = tdb.lookup_indicator("url", norm)
+        assert row2["status"] == "CONFIRMED", "CONFIRMED indicator must not be downgraded by weaker local scan"
+
+    def test_authoritative_provenance_protected_from_local_scanner_overwrite(self, isolated_ti_db):
+        """
+        Validates that authoritative external provenance (e.g. VirusTotal) is preserved when
+        a subsequent local scan observes the same indicator.
+        """
+        val = "https://threat-feed-sample.example.org/dl"
+        norm = normalize_url(val)
+
+        tdb.register_indicator("url", norm, source="VirusTotal", confidence=0.95, status="CONFIRMED")
+        row1 = tdb.lookup_indicator("url", norm)
+        assert row1["source"] == "VirusTotal"
+
+        # Subsequent scan with local scanner
+        tdb.register_indicator("url", norm, source="actis_url_scanner", confidence=0.8)
+        row2 = tdb.lookup_indicator("url", norm)
+        assert row2["source"] == "VirusTotal", f"Expected authoritative source to be preserved, got {row2['source']}"
+
+    def test_explicit_false_positive_resolution_updates_status(self, isolated_ti_db):
+        """
+        Validates that an explicit FALSE_POSITIVE resolution takes precedence and updates status.
+        """
+        val = "https://trusted-partner.example.com/login"
+        norm = normalize_url(val)
+
+        tdb.register_indicator("url", norm, source="VirusTotal", confidence=0.9, status="CONFIRMED")
+        row1 = tdb.lookup_indicator("url", norm)
+        assert row1["status"] == "CONFIRMED"
+
+        # Administrative false-positive resolution
+        tdb.register_indicator("url", norm, source="Security_Analyst", confidence=1.0, status="FALSE_POSITIVE")
+        row2 = tdb.lookup_indicator("url", norm)
+        assert row2["status"] == "FALSE_POSITIVE"

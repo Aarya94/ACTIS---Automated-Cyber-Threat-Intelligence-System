@@ -306,19 +306,49 @@ def register_indicator(
 
     # Check if indicator already exists
     cursor.execute(
-        "SELECT id, confidence, status FROM indicators WHERE indicator_type = ? AND lower(indicator_value) = ?",
+        "SELECT id, confidence, status, source FROM indicators WHERE indicator_type = ? AND lower(indicator_value) = ?",
         (indicator_type.lower(), val_clean)
     )
     existing = cursor.fetchone()
 
     if existing:
-        # Update last seen and adjust confidence
+        # Update last seen and adjust confidence monotonically
         new_conf = min(1.0, max(existing["confidence"], confidence))
+
+        # Status transition precedence:
+        # FALSE_POSITIVE (100) > CONFIRMED/MALICIOUS/ACTIVE (80) > SUSPICIOUS (50) > CANDIDATE/OBSERVED (20)
+        status_rank = {
+            "FALSE_POSITIVE": 100,
+            "RESOLVED": 90,
+            "CONFIRMED": 80,
+            "ACTIVE": 80,
+            "MALICIOUS": 80,
+            "SUSPICIOUS": 50,
+            "CANDIDATE": 30,
+            "OBSERVED": 20,
+            "UNKNOWN": 10
+        }
+        current_status = str(existing["status"] or "SUSPICIOUS").upper()
+        req_status = str(status or "SUSPICIOUS").upper()
+
+        if req_status == "FALSE_POSITIVE" or status_rank.get(req_status, 0) >= status_rank.get(current_status, 0):
+            target_status = req_status
+        else:
+            target_status = current_status
+
+        # Protect authoritative source provenance from being overwritten by unverified local scanner
+        local_sources = {"local_detection", "actis_url_scanner", "actis_detection_engine"}
+        curr_source = existing["source"] if "source" in existing.keys() else "local_detection"
+        if curr_source and curr_source.lower() not in local_sources and source.lower() in local_sources:
+            target_source = curr_source
+        else:
+            target_source = source
+
         cursor.execute("""
         UPDATE indicators
-        SET last_seen = ?, confidence = ?, source = ?
+        SET last_seen = ?, confidence = ?, source = ?, status = ?
         WHERE id = ?
-        """, (now, new_conf, source, existing["id"]))
+        """, (now, new_conf, target_source, target_status, existing["id"]))
         conn.commit()
         ind_id = existing["id"]
     else:

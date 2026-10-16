@@ -55,13 +55,16 @@ class ThreatDetector:
         return self._hash_cache.invalidate(sha256)
 
     def invalidate_url(self, url: str) -> bool:
-        """Invalidates a specific URL from the in-memory scan cache."""
+        """Invalidates a specific URL from the in-memory scan cache across all redirect variants."""
         from scanners.url_scanner import normalize_url
         try:
             norm = normalize_url(url)
         except Exception:
             norm = str(url).strip()
-        return self._url_cache.invalidate(norm)
+        inv_false = self._url_cache.invalidate(f"{norm}__redir_False")
+        inv_true = self._url_cache.invalidate(f"{norm}__redir_True")
+        inv_base = self._url_cache.invalidate(norm)
+        return bool(inv_false or inv_true or inv_base)
 
     def get_cache_stats(self) -> Dict[str, Any]:
         """Returns cache telemetry for both file hash and URL caches."""
