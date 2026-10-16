@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-16 17:25:51 UTC
+**Generated:** 2026-10-16 17:28:15 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`23836d8`)
+**Current Git Branch:** `main` (`8199ec1`)
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `23836d8`
-- **Working Tree:** 1 untracked/unstaged changes
+- **HEAD Commit:** `8199ec1`
+- **Working Tree:** 2 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `8199ec1` | Aaryan Suman | 2026-10-16 | test(detection): cover repeated-scan evidence behavior and multi-URL latency |
 | `23836d8` | Aaryan Suman | 2026-10-16 | test(ti): reproduce untrusted indicator promotion and status transitions |
 | `cbd6cdd` | Aaryan Suman | 2026-10-16 | test(benchmarks): preserve day27 pre-change benchmark baseline |
 | `862c9d9` | Aaryan Suman | 2026-10-16 | test(day27): capture baseline indicator trust and cache invalidation defects |
@@ -140,7 +141,6 @@
 | `24cbd1b` | Aaryan Suman | 2026-10-13 | fix(explainability): add NodeStatus.LIMITATION for partial message analyses and add benchmark tests |
 | `b78e1e4` | Aaryan Suman | 2026-10-13 | feat(benchmarks): implement canonical pipeline benchmark runner and verdict mapping |
 | `7abcc6f` | Aaryan Suman | 2026-10-13 | feat(benchmarks): implement confusion matrix and detection evaluation metrics engine |
-| `273520e` | Aaryan Suman | 2026-10-13 | feat(benchmarks): implement synthetic phishing benchmark dataset schema and loader |
 
 ## Known Issues
 
