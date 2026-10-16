@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-16 19:17:17 UTC
+**Generated:** 2026-10-16 19:19:37 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`93b763a`)
+**Current Git Branch:** `main` (`fce925f`)
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `93b763a`
+- **HEAD Commit:** `fce925f`
 - **Working Tree:** 2 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `fce925f` | Aaryan Suman | 2026-10-17 | test(benchmarks): refresh benchmark verification metrics with verified commit hash |
 | `93b763a` | Aaryan Suman | 2026-10-17 | fix(detection): restrict message threat intelligence elevation to confirmed indicators |
 | `610ef93` | Aaryan Suman | 2026-10-16 | docs(day27): update verified project state and next milestone |
 | `a1dc41c` | Aaryan Suman | 2026-10-16 | docs(day27): document final validation and benchmark comparison |
@@ -140,7 +141,6 @@
 | `3e72a21` | Aaryan Suman | 2026-10-16 | test(performance): reproduce multi-url analysis bottleneck |
 | `ef99f8b` | Aaryan Suman | 2026-10-16 | docs(benchmark): record day 27 part 2 benchmark verification metrics |
 | `fdf80dc` | Aaryan Suman | 2026-10-16 | fix(detection): correct verified evidence-calibration defect |
-| `76d0b2d` | Aaryan Suman | 2026-10-16 | test(detection): protect phishing and benign URL regressions |
 
 ## Known Issues
 

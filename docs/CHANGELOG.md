@@ -15,6 +15,7 @@ Milestone Scope: Complete core defensive architecture, configuration, logging, d
 Addressed and resolved architectural defects identified during the Day 27 audit across threat intelligence persistence, in-memory cache synchronization, repeated-scan scoring loops, evidence aggregation, and multi-URL performance:
 1. **Indicator Trust & Promotion Model Hardening (`detection_engine/threat_detector.py`):**
    - Corrected automatic indicator registration in `ThreatDetector.analyze_url()` and `ThreatDetector.scan_file()`: internal uncorroborated heuristic rule firings and ML predictions are persisted strictly as `status="SUSPICIOUS"` rather than auto-escalating to `status="CONFIRMED"`.
+   - Restricted message-layer threat intelligence evidence ingestion (`ThreatDetector.analyze_message()`) strictly to confirmed indicators (`CONFIRMED` or `MALICIOUS`), preventing unconfirmed local `SUSPICIOUS` observations from falsely escalating to threat intelligence evidence.
    - Preserved authoritative fast-track for confirmed intelligence while preventing feedback loops where local engine predictions override multi-layer scoring on subsequent scans.
 2. **Cache Consistency & Invalidation Key Matching (`detection_engine/threat_detector.py`):**
    - Corrected `ThreatDetector.invalidate_url()` cache key construction: now systematically purges canonical URL cache entries across all redirect inspection variants (`f"{norm}__redir_False"`, `f"{norm}__redir_True"`, and bare normalized URL), ensuring persistent database updates immediately reflect in warm cache lookups.
@@ -35,8 +36,8 @@ Addressed and resolved architectural defects identified during the Day 27 audit 
    - Added fast-path `is_already_normalized=True` to `extract_url_features()`, bypassing redundant RFC 3986 normalization.
    - Reduced 100-URL message analysis latency from 26.4s / 14.8s down to **1.31s** (**11x – 19x performance improvement**).
 7. **Benchmark & Test Suite Verification:**
-   - Evaluated 140 synthetic benchmark samples: Recall improved from 96.55% to **100.0%** (87/87 True Positives, 0 False Negatives), Precision reached 82.08%, F1 Score reached 0.9016, and total benchmark runtime executed in 3.03s.
-   - Total test suite expanded to **760 tests** (+45 tests added in Day 27 across 8 new test files), passing with 0 failures, 0 errors, and 4 third-party deprecation warnings in 26.10s.
+   - Evaluated 140 synthetic benchmark samples: Recall improved from 96.55% to **100.0%** (87/87 True Positives, 0 False Negatives), Precision reached 82.08%, F1 Score reached 0.9016, and total benchmark runtime executed in 3.13s.
+   - Total test suite expanded to **764 tests** (+49 tests added in Day 27 across 9 test files), passing with 0 failures, 0 errors, and 4 third-party deprecation warnings in 27.09s.
 
 ### 2026-10-13 — Day 26: Phishing & Message Analysis Verification Benchmark (Offline Synthetic Corpus, Detection Telemetry, Robustness Evaluation & Bug Fix)
 
