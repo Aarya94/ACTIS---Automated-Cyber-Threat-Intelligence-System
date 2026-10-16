@@ -40,20 +40,67 @@ class TestDay27Part3PerformanceBottleneck:
             assert res is not None
             assert res["url"] == sample_url
 
-        # In pre-optimization code, call_count was 2 (once at line 489, once at line 490 via predict_phishing).
-        # We assert this to capture the exact double-inference bottleneck.
-        assert call_count >= 1, "Predict phishing structured must be executed at least once"
+        # Post-optimization verification: exactly 1 ML inference per URL
+        assert call_count == 1, f"Expected exactly 1 ML inference call per URL, found {call_count}"
 
     def test_model_manager_n_jobs_configuration(self):
         """
-        Verify the n_jobs setting of the loaded models.
-        For single-row vector classification, n_jobs=-1 causes joblib to spawn/manage
-        threadpools on every single sample, resulting in 4x-10x latency penalty.
-        Single-sample inference should have n_jobs=1 or use sequential tree traversal.
+        Verify the n_jobs setting of the loaded models is configured to 1
+        to avoid single-sample threadpool dispatch overhead.
         """
         if model_manager.is_phishing_model_available():
-            p_model = model_manager.phishing_model
-            assert hasattr(p_model, "n_jobs"), "Phishing model should expose n_jobs parameter"
+            assert model_manager.phishing_model.n_jobs == 1
+        if model_manager.is_malware_model_available():
+            assert model_manager.malware_model.n_jobs == 1
+
+    def test_prediction_to_legacy_dict_fidelity(self):
+        """
+        Verify that prediction_to_legacy_dict accurately converts MLPredictionResult
+        into legacy dict format with all required keys and correct labels.
+        """
+        from detection_engine.ml_prediction_contract import MLPredictionResult, MLPredictionStatus
+        
+        # Test available result
+        available_res = MLPredictionResult(
+            model_name="test_rf",
+            model_version="1.0.0",
+            model_type=MLModelType.PHISHING_URL,
+            status=MLPredictionStatus.AVAILABLE,
+            is_threat=True,
+            probability=0.95,
+            confidence=0.95,
+            prediction_label="phishing",
+            features_used=["f1"]
+        )
+        legacy_dict = model_manager.prediction_to_legacy_dict(available_res)
+        assert legacy_dict["available"] is True
+        assert legacy_dict["is_phishing"] is True
+        assert legacy_dict["probability"] == 0.95
+        assert legacy_dict["confidence"] == 0.95
+        assert legacy_dict["label"] == "phishing"
+
+        # Test unavailable result
+        unavail_res = MLPredictionResult.unavailable("test_rf", MLModelType.PHISHING_URL, "Model missing")
+        unavail_dict = model_manager.prediction_to_legacy_dict(unavail_res)
+        assert unavail_dict["available"] is False
+        assert unavail_dict["is_phishing"] is False
+        assert "Model missing" in unavail_dict["error"]
+
+    def test_extract_url_features_fast_path_fidelity(self):
+        """
+        Verify that is_already_normalized=True yields identical features
+        to the standard extraction path without mutating feature schema.
+        """
+        from scanners.url_scanner import extract_url_features, normalize_url
+        
+        test_url = "https://example.com/login?token=abc#section"
+        canonical = normalize_url(test_url)
+        
+        feat_standard = extract_url_features(canonical, is_already_normalized=False)
+        feat_fast = extract_url_features(canonical, is_already_normalized=True)
+        
+        assert feat_standard == feat_fast
+        assert len(feat_fast) == 19
 
     def test_multi_url_message_with_repeated_canonical_urls(self):
         """
