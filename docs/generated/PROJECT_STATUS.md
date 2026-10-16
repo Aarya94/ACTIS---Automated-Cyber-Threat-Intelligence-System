@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-16 19:15:55 UTC
+**Generated:** 2026-10-16 19:17:17 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`610ef93`)
+**Current Git Branch:** `main` (`93b763a`)
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `610ef93`
-- **Working Tree:** 10 untracked/unstaged changes
+- **HEAD Commit:** `93b763a`
+- **Working Tree:** 2 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `93b763a` | Aaryan Suman | 2026-10-17 | fix(detection): restrict message threat intelligence elevation to confirmed indicators |
 | `610ef93` | Aaryan Suman | 2026-10-16 | docs(day27): update verified project state and next milestone |
 | `a1dc41c` | Aaryan Suman | 2026-10-16 | docs(day27): document final validation and benchmark comparison |
 | `b7ce93e` | Aaryan Suman | 2026-10-16 | test(benchmarks): validate day27 detection and latency metrics |
@@ -140,7 +141,6 @@
 | `ef99f8b` | Aaryan Suman | 2026-10-16 | docs(benchmark): record day 27 part 2 benchmark verification metrics |
 | `fdf80dc` | Aaryan Suman | 2026-10-16 | fix(detection): correct verified evidence-calibration defect |
 | `76d0b2d` | Aaryan Suman | 2026-10-16 | test(detection): protect phishing and benign URL regressions |
-| `a4b9e6c` | Aaryan Suman | 2026-10-16 | fix(detection): prevent duplicate evidence amplification |
 
 ## Known Issues
 
