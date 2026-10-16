@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-16 17:48:46 UTC
+**Generated:** 2026-10-16 17:55:27 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`5bd2bb1`)
+**Current Git Branch:** `main` (`a4b9e6c`)
 
 ---
 
@@ -117,20 +117,21 @@
 
 ## Test Status
 
-- **Total Test Files:** `49`
-- **Total Discovered Test Functions:** `720`
+- **Total Test Files:** `50`
+- **Total Discovered Test Functions:** `726`
 - **Coverage Areas:** Configuration validation, SQLite database schema & CRUD, Phishing/Malware model contracts, PE feature extraction, API backend.
 
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `5bd2bb1`
-- **Working Tree:** 4 untracked/unstaged changes
+- **HEAD Commit:** `a4b9e6c`
+- **Working Tree:** 1 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `a4b9e6c` | Aaryan Suman | 2026-10-16 | fix(detection): prevent duplicate evidence amplification |
 | `5bd2bb1` | Aaryan Suman | 2026-10-16 | test(detection): cover repeated-scan evidence feedback |
 | `83791f0` | Aaryan Suman | 2026-10-16 | fix(ti): preserve trusted indicator state across updates |
 | `da2fc2e` | Aaryan Suman | 2026-10-16 | test(ti): verify persistence and cache consistency |
@@ -140,7 +141,6 @@
 | `8199ec1` | Aaryan Suman | 2026-10-16 | test(detection): cover repeated-scan evidence behavior and multi-URL latency |
 | `23836d8` | Aaryan Suman | 2026-10-16 | test(ti): reproduce untrusted indicator promotion and status transitions |
 | `cbd6cdd` | Aaryan Suman | 2026-10-16 | test(benchmarks): preserve day27 pre-change benchmark baseline |
-| `862c9d9` | Aaryan Suman | 2026-10-16 | test(day27): capture baseline indicator trust and cache invalidation defects |
 
 ## Known Issues
 
