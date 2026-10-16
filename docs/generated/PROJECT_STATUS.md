@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-16 17:13:23 UTC
+**Generated:** 2026-10-16 17:19:09 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`67b4f8e`)
+**Current Git Branch:** `main` (`6f009cb`)
 
 ---
 
@@ -117,20 +117,21 @@
 
 ## Test Status
 
-- **Total Test Files:** `42`
-- **Total Discovered Test Functions:** `688`
+- **Total Test Files:** `43`
+- **Total Discovered Test Functions:** `692`
 - **Coverage Areas:** Configuration validation, SQLite database schema & CRUD, Phishing/Malware model contracts, PE feature extraction, API backend.
 
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `67b4f8e`
+- **HEAD Commit:** `6f009cb`
 - **Working Tree:** 1 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `6f009cb` | Aaryan Suman | 2026-10-16 | docs(day27): document repository baseline and detection lifecycle audit |
 | `67b4f8e` | Aaryan Suman | 2026-10-13 | docs(day26): document phishing verification benchmark methodology, metrics, and baseline results |
 | `d6e0d6d` | Aaryan Suman | 2026-10-13 | feat(benchmarks): implement JSON and Markdown report generation with preserved baseline |
 | `24cbd1b` | Aaryan Suman | 2026-10-13 | fix(explainability): add NodeStatus.LIMITATION for partial message analyses and add benchmark tests |
@@ -140,7 +141,6 @@
 | `3438abf` | Aaryan Suman | 2026-10-13 | docs(day25): document safe MIME parsing, message heuristics, and 692-test verification |
 | `50e5a60` | Aaryan Suman | 2026-10-13 | test(messages): add deterministic adversarial security test suite for MIME and message analysis |
 | `180f85d` | Aaryan Suman | 2026-10-13 | feat(detection): integrate message rules, threat detector orchestrator, and explainability tree |
-| `1c29b94` | Aaryan Suman | 2026-10-13 | feat(scanners): enhance text analyzer with social engineering heuristics and structured message results |
 
 ## Known Issues
 

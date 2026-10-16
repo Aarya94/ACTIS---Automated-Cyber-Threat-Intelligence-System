@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-10-16 17:13:23 UTC
+**Generated:** 2026-10-16 17:19:09 UTC
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)
 
 This document inventories all automated test files, test classes, and test functions
@@ -11,8 +11,8 @@ recorded only after confirmed execution.
 
 ## Test Suite Summary
 
-- **Total Test Files:** `42`
-- **Total Discovered Test Cases:** `688`
+- **Total Test Files:** `43`
+- **Total Discovered Test Cases:** `692`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -28,6 +28,7 @@ recorded only after confirmed execution.
 | `tests/test_central_ti_service.py` | 30 tests | `PASSING` |
 | `tests/test_config_loading.py` | 11 tests | `PASSING` |
 | `tests/test_config_validation.py` | 11 tests | `PASSING` |
+| `tests/test_day27_indicator_trust_and_provenance.py` | 4 tests | `PASSING` |
 | `tests/test_detection_engine.py` | 23 tests | `PASSING` |
 | `tests/test_device_scanner.py` | 10 tests | `PASSING` |
 | `tests/test_doc_generator.py` | 20 tests | `PASSING` |
@@ -203,6 +204,14 @@ recorded only after confirmed execution.
 - `test_database_settings_validation()`
 - `test_app_name_validation()`
 - `test_api_request_timeout_validation()`
+
+### `tests/test_day27_indicator_trust_and_provenance.py` (4 tests)
+
+**Class `TestDay27IndicatorTrustAndCacheConsistency`:**
+- `test_cache_invalidation_key_mismatch_reproduction()`
+- `test_unverified_heuristic_ml_escalates_to_confirmed_ti()`
+- `test_escalated_indicator_bypasses_multi_attribute_scoring_on_rescan()`
+- `test_ti_provenance_collapse_in_sqlite_persistence()`
 
 ### `tests/test_detection_engine.py` (23 tests)
 
