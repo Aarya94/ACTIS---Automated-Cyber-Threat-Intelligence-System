@@ -10,6 +10,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 Milestone Scope: Complete core defensive architecture, configuration, logging, database schemas, static PE analysis, URL/message analysis, device scanning, resident Windows service foundation, file watcher pipeline, threat intel integration, scheduled sync, central TI API, grounded AI assistant, security hardening, and release demonstration.
 
+### 2026-10-16 — Day 27 (Part 1 & Part 2): Indicator Trust, Cache Consistency, Evidence Calibration & Verification
+
+Addressed and resolved architectural defects identified during the Day 27 audit across threat intelligence persistence, in-memory cache synchronization, repeated-scan scoring loops, and evidence aggregation:
+1. **Indicator Trust & Promotion Model Hardening (`detection_engine/threat_detector.py`):**
+   - Corrected automatic indicator registration in `ThreatDetector.analyze_url()` and `ThreatDetector.scan_file()`: internal uncorroborated heuristic rule firings and ML predictions are persisted strictly as `status="SUSPICIOUS"` rather than auto-escalating to `status="CONFIRMED"`.
+   - Preserved authoritative fast-track for confirmed intelligence while preventing feedback loops where local engine predictions override multi-layer scoring on subsequent scans.
+2. **Cache Consistency & Invalidation Key Matching (`detection_engine/threat_detector.py`):**
+   - Corrected `ThreatDetector.invalidate_url()` cache key construction: now systematically purges canonical URL cache entries across all redirect inspection variants (`f"{norm}__redir_False"`, `f"{norm}__redir_True"`, and bare normalized URL), ensuring persistent database updates immediately reflect in warm cache lookups.
+3. **Status Hierarchy & Provenance Protection in SQLite (`reports/threat_database.py`):**
+   - Upgraded `register_indicator()` with deterministic status transition precedence: `CONFIRMED (3) > SUSPICIOUS (2) > CANDIDATE (1)`, with administrative `FALSE_POSITIVE (4)` override capability.
+   - Prevented unverified local scanner passes from demoting authoritative intelligence or overwriting external feed provenance (`VirusTotal`, `URLhaus`, `AlienVault`, `CERT-In`).
+4. **Repeated-Scan Feedback Loop Elimination (`detection_engine/risk_engine.py`):**
+   - Resolved mathematical score dilution in `RiskEngine.calculate_risk()`: self-generated internal detections recorded as `SUSPICIOUS` from previous scans are identified and excluded from Layer 1 weighting when primary ML and heuristic layers are actively evaluated.
+   - Preserved exact score invariance across repeated scans (Scan 1: 68.0 HIGH -> Rescan 2: 68.0 HIGH) without score degradation or artificial amplification.
+5. **False-Negative Elimination & Evidence Calibration (`scanners/mime_parser.py`, `scanners/url_scanner.py`):**
+   - Added macro-enabled Office extensions (`.docm`, `.xlsm`, `.pptm`, `.dotm`, `.xltm`) to `DANGEROUS_ATTACHMENT_EXTENSIONS`, resolving `PHISH_MIX_012`.
+   - Hardened `SafeHTMLURLParser` with `_flush_current_link()` and `close()` override to cleanly capture display text and flag domain mismatches on unclosed anchor tags interrupted by block elements (`<p>`, `<div>`), resolving `EDGE_ROB_009`.
+   - Added authority-level percent-encoding deobfuscation (`%40` -> `@`) in `validate_url()` and `deobfuscate_and_analyze_url()`, allowing true destination hostnames to be extracted and triggering userinfo deception heuristics, resolving `PHISH_URL_010`.
+6. **Benchmark & Test Suite Verification:**
+   - Evaluated 140 synthetic benchmark samples: Recall improved from 96.55% to 100.0% (87/87 True Positives, 0 False Negatives), Precision improved to 82.08%, F1 Score reached 0.9016.
+   - Total test suite expanded to 756 tests (+41 tests added in Day 27 across 7 new test files), passing with 0 failures, 0 errors, and 4 third-party deprecation warnings.
+
 ### 2026-10-13 — Day 26: Phishing & Message Analysis Verification Benchmark (Offline Synthetic Corpus, Detection Telemetry, Robustness Evaluation & Bug Fix)
 
 Implemented a deterministic, offline verification benchmark framework evaluating the canonical ACTIS message and URL threat detection pipeline against a versioned, labeled synthetic corpus (140 samples across 9 balanced scenarios):

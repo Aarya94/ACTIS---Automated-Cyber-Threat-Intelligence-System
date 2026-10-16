@@ -4,8 +4,8 @@
 
 ## 1. Executive Summary
 
-- **Execution Timestamp**: `2026-10-13T15:26:52.276440+00:00`
-- **ACTIS Git Commit**: `3438abfda29b8a49580b4efd9bc3a71b1f90cab7`
+- **Execution Timestamp**: `2026-10-16T18:04:18.616706+00:00`
+- **ACTIS Git Commit**: `fdf80dc59577516a74ddefcf7f9eb8adbfe67153`
 - **Python Version**: `3.13.15`
 - **Dataset Version**: `1.0.0`
 - **Dataset SHA-256 Hash**: `baa051b9daf69dd4...`
@@ -17,20 +17,20 @@
 
 | Metric | Value | Interpretation |
 | :--- | :--- | :--- |
-| **Precision** | `0.8155` | Proportion of predicted phishing messages that are truly phishing |
-| **Recall (Sensitivity)** | `0.9655` | Proportion of ground-truth phishing caught by pipeline |
-| **F1 Score** | `0.8842` | Harmonic mean of precision and recall |
+| **Precision** | `0.8208` | Proportion of predicted phishing messages that are truly phishing |
+| **Recall (Sensitivity)** | `1.0000` | Proportion of ground-truth phishing caught by pipeline |
+| **F1 Score** | `0.9016` | Harmonic mean of precision and recall |
 | **Specificity** | `0.6275` | Proportion of benign messages correctly cleared |
-| **Balanced Accuracy** | `0.7965` | Macro-average of recall and specificity |
-| **Overall Accuracy** | `0.8406` | Overall accuracy across valid binary predictions |
+| **Balanced Accuracy** | `0.8137` | Macro-average of recall and specificity |
+| **Overall Accuracy** | `0.8623` | Overall accuracy across valid binary predictions |
 | **False Positive Rate (FPR)** | `0.3725` | Proportion of benign messages incorrectly flagged |
-| **False Negative Rate (FNR)** | `0.0345` | Proportion of phishing messages missed |
+| **False Negative Rate (FNR)** | `0.0000` | Proportion of phishing messages missed |
 
 ## 2. Confusion Matrix
 
 ```
                          Predicted PHISHING     Predicted BENIGN
-Actual PHISHING (Pos):        TP = 84                 FN = 3         
+Actual PHISHING (Pos):        TP = 87                 FN = 0         
 Actual BENIGN   (Neg):        FP = 19                 TN = 32        
 ```
 
@@ -41,15 +41,15 @@ Actual BENIGN   (Neg):        FP = 19                 TN = 32
 
 | Scenario Category | Samples | Evaluated | TP | TN | FP | FN | Accuracy | Mean Latency |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| `benign_financial_business` | 18 | 18 | 0 | 12 | 6 | 0 | 0.667 | 94.3 ms |
-| `credential_harvesting` | 18 | 18 | 18 | 0 | 0 | 0 | 1.000 | 246.4 ms |
-| `deceptive_links_url_obfuscation` | 18 | 18 | 17 | 0 | 0 | 1 | 0.944 | 250.4 ms |
-| `financial_manipulation` | 15 | 15 | 15 | 0 | 0 | 0 | 1.000 | 257.9 ms |
-| `impersonation_social_engineering` | 18 | 18 | 18 | 0 | 0 | 0 | 1.000 | 249.0 ms |
-| `legitimate_security_account` | 18 | 18 | 0 | 12 | 6 | 0 | 0.667 | 78.8 ms |
-| `malformed_resource_limits` | 10 | 8 | 2 | 4 | 1 | 1 | 0.750 | 2465.5 ms |
-| `mixed_phishing_indicators` | 15 | 15 | 14 | 0 | 0 | 1 | 0.933 | 112.5 ms |
-| `security_awareness_education` | 10 | 10 | 0 | 4 | 6 | 0 | 0.400 | 146.4 ms |
+| `benign_financial_business` | 18 | 18 | 0 | 12 | 6 | 0 | 0.667 | 26.4 ms |
+| `credential_harvesting` | 18 | 18 | 18 | 0 | 0 | 0 | 1.000 | 82.8 ms |
+| `deceptive_links_url_obfuscation` | 18 | 18 | 18 | 0 | 0 | 0 | 1.000 | 82.5 ms |
+| `financial_manipulation` | 15 | 15 | 15 | 0 | 0 | 0 | 1.000 | 78.9 ms |
+| `impersonation_social_engineering` | 18 | 18 | 18 | 0 | 0 | 0 | 1.000 | 77.4 ms |
+| `legitimate_security_account` | 18 | 18 | 0 | 12 | 6 | 0 | 0.667 | 26.7 ms |
+| `malformed_resource_limits` | 10 | 8 | 3 | 4 | 1 | 0 | 0.875 | 811.8 ms |
+| `mixed_phishing_indicators` | 15 | 15 | 15 | 0 | 0 | 0 | 1.000 | 38.4 ms |
+| `security_awareness_education` | 10 | 10 | 0 | 4 | 6 | 0 | 0.400 | 49.6 ms |
 
 ## 4. Per-Rule Telemetry & Contribution
 
@@ -59,19 +59,19 @@ Actual BENIGN   (Neg):        FP = 19                 TN = 32
 | `RULE_MSG_CREDENTIAL_HARVEST` | 39 | 39 | 0 | 1.000 | 0.443 |
 | `RULE_MSG_IMPERSONATION` | 28 | 25 | 3 | 0.893 | 0.284 |
 | `RULE_MSG_FINANCIAL_LURE` | 22 | 22 | 0 | 1.000 | 0.250 |
-| `RULE_MSG_DISPLAY_TEXT_MISMATCH` | 17 | 17 | 0 | 1.000 | 0.193 |
+| `RULE_MSG_DISPLAY_TEXT_MISMATCH` | 18 | 18 | 0 | 1.000 | 0.205 |
+| `RULE_MSG_SUSPICIOUS_ATTACHMENT` | 7 | 7 | 0 | 1.000 | 0.080 |
 | `RULE_MSG_SENSITIVE_INFO_PROMPT` | 6 | 5 | 1 | 0.833 | 0.057 |
-| `RULE_MSG_SUSPICIOUS_ATTACHMENT` | 6 | 6 | 0 | 1.000 | 0.068 |
 | `RULE_MSG_SECURITY_EVASION` | 5 | 5 | 0 | 1.000 | 0.057 |
 | `RULE_MSG_MIME_DEFECT_ANOMALY` | 2 | 1 | 1 | 0.500 | 0.011 |
 
 ## 5. URL Analysis Telemetry
 
-- **Messages Containing URLs**: `97`
-- **Total URLs Extracted**: `246`
-- **Unique Canonical URLs**: `197`
-- **URL Threat Findings**: `192`
-- **URL Scenarios Evaluated**: `18` (Correct: `17`, Missed: `1`)
+- **Messages Containing URLs**: `98`
+- **Total URLs Extracted**: `247`
+- **Unique Canonical URLs**: `198`
+- **URL Threat Findings**: `197`
+- **URL Scenarios Evaluated**: `18` (Correct: `18`, Missed: `0`)
 
 ## 6. Robustness, Edge-Case Handling & Performance
 
@@ -83,11 +83,11 @@ Actual BENIGN   (Neg):        FP = 19                 TN = 32
 
 ### Latency Statistics (Monotonic Timer)
 
-- **Mean Latency**: `344.40 ms`
-- **Median Latency**: `234.40 ms`
-- **95th Percentile (p95)**: `294.33 ms`
-- **Max Observed Latency**: `23814.75 ms`
-- **Total Benchmark Wall Time**: `48.22 s`
+- **Mean Latency**: `112.13 ms`
+- **Median Latency**: `77.95 ms`
+- **95th Percentile (p95)**: `85.25 ms`
+- **Max Observed Latency**: `7757.31 ms`
+- **Total Benchmark Wall Time**: `15.70 s`
 
 ## 7. Failure Analysis
 
@@ -96,8 +96,8 @@ Actual BENIGN   (Neg):        FP = 19                 TN = 32
 - **Sample IDs**: `BENIGN_SEC_002`, `BENIGN_SEC_004`, `BENIGN_SEC_005`, `BENIGN_SEC_007`, `BENIGN_SEC_008`, `BENIGN_SEC_015`, `BENIGN_FIN_003`, `BENIGN_FIN_006`, `BENIGN_FIN_007`, `BENIGN_FIN_009`, `BENIGN_FIN_011`, `BENIGN_FIN_018`, `BENIGN_AWR_001`, `BENIGN_AWR_002`, `BENIGN_AWR_005`, `BENIGN_AWR_006`, `BENIGN_AWR_008`, `BENIGN_AWR_010`, `EDGE_ROB_004`
 
 ### False Negatives (Phishing Messages Classified as Benign)
-- **Count**: 3
-- **Sample IDs**: `PHISH_URL_010`, `PHISH_MIX_012`, `EDGE_ROB_009`
+- **Count**: 0
+- *Zero false negatives observed.*
 
 ### Abstentions & Incomplete Analyses
 - **Count**: 2

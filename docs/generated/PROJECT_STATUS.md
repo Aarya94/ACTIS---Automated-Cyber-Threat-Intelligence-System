@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-16 18:02:34 UTC
+**Generated:** 2026-10-16 18:05:29 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`76d0b2d`)
+**Current Git Branch:** `main` (`fdf80dc`)
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `76d0b2d`
-- **Working Tree:** 4 untracked/unstaged changes
+- **HEAD Commit:** `fdf80dc`
+- **Working Tree:** 3 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `fdf80dc` | Aaryan Suman | 2026-10-16 | fix(detection): correct verified evidence-calibration defect |
 | `76d0b2d` | Aaryan Suman | 2026-10-16 | test(detection): protect phishing and benign URL regressions |
 | `a4b9e6c` | Aaryan Suman | 2026-10-16 | fix(detection): prevent duplicate evidence amplification |
 | `5bd2bb1` | Aaryan Suman | 2026-10-16 | test(detection): cover repeated-scan evidence feedback |
@@ -140,7 +141,6 @@
 | `8237d91` | Aaryan Suman | 2026-10-16 | test(ti): cover indicator trust and provenance invariants |
 | `345932f` | Aaryan Suman | 2026-10-16 | docs(day27): record verified findings and implementation handoff |
 | `8199ec1` | Aaryan Suman | 2026-10-16 | test(detection): cover repeated-scan evidence behavior and multi-URL latency |
-| `23836d8` | Aaryan Suman | 2026-10-16 | test(ti): reproduce untrusted indicator promotion and status transitions |
 
 ## Known Issues
 
