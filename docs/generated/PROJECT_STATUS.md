@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-16 18:16:46 UTC
+**Generated:** 2026-10-16 18:20:55 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`ef99f8b`)
+**Current Git Branch:** `main` (`3e72a21`)
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `ef99f8b`
-- **Working Tree:** 7 untracked/unstaged changes
+- **HEAD Commit:** `3e72a21`
+- **Working Tree:** 9 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `3e72a21` | Aaryan Suman | 2026-10-16 | test(performance): reproduce multi-url analysis bottleneck |
 | `ef99f8b` | Aaryan Suman | 2026-10-16 | docs(benchmark): record day 27 part 2 benchmark verification metrics |
 | `fdf80dc` | Aaryan Suman | 2026-10-16 | fix(detection): correct verified evidence-calibration defect |
 | `76d0b2d` | Aaryan Suman | 2026-10-16 | test(detection): protect phishing and benign URL regressions |
@@ -140,7 +141,6 @@
 | `da2fc2e` | Aaryan Suman | 2026-10-16 | test(ti): verify persistence and cache consistency |
 | `2769795` | Aaryan Suman | 2026-10-16 | fix(ti): prevent unauthorized indicator promotion |
 | `8237d91` | Aaryan Suman | 2026-10-16 | test(ti): cover indicator trust and provenance invariants |
-| `345932f` | Aaryan Suman | 2026-10-16 | docs(day27): record verified findings and implementation handoff |
 
 ## Known Issues
 

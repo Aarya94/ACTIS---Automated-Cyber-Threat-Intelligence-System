@@ -613,7 +613,7 @@ PHISHING_URL_FEATURE_NAMES: List[str] = [
 ]
 
 
-def extract_url_features(url: Any) -> List[int]:
+def extract_url_features(url: Any, is_already_normalized: bool = False) -> List[int]:
     """
     Extracts the exact 19 morphological features in schema order
     required by the trained Random Forest phishing classifier.
@@ -622,7 +622,11 @@ def extract_url_features(url: Any) -> List[int]:
     if not url or not isinstance(url, str):
         return [0] * len(PHISHING_URL_FEATURE_NAMES)
 
-    normalized = normalize_url(url)
+    if is_already_normalized:
+        normalized = url
+    else:
+        normalized = normalize_url(url)
+
     if not normalized:
         return [0] * len(PHISHING_URL_FEATURE_NAMES)
 

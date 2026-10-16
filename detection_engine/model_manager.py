@@ -54,6 +54,8 @@ class ModelManager:
         if PHISHING_MODEL_PATH.exists() and PHISHING_METADATA_PATH.exists():
             try:
                 self.phishing_model = joblib.load(PHISHING_MODEL_PATH)
+                if hasattr(self.phishing_model, "n_jobs"):
+                    self.phishing_model.n_jobs = 1
                 with open(PHISHING_METADATA_PATH, "r", encoding="utf-8") as f:
                     self.phishing_metadata = json.load(f)
                 logger.info(
@@ -71,6 +73,8 @@ class ModelManager:
         if MALWARE_MODEL_PATH.exists() and MALWARE_METADATA_PATH.exists():
             try:
                 self.malware_model = joblib.load(MALWARE_MODEL_PATH)
+                if hasattr(self.malware_model, "n_jobs"):
+                    self.malware_model.n_jobs = 1
                 with open(MALWARE_METADATA_PATH, "r", encoding="utf-8") as f:
                     self.malware_metadata = json.load(f)
                 logger.info(
@@ -263,49 +267,45 @@ class ModelManager:
     # Legacy Compatibility Methods
     # --------------------------------------------------------------------------
 
-    def predict_phishing(self, features: Union[List[float], Dict[str, Any]]) -> Dict[str, Any]:
-        """Legacy dict-based phishing prediction."""
-        res = self.predict_phishing_structured(features)
+    def prediction_to_legacy_dict(self, res: MLPredictionResult) -> Dict[str, Any]:
+        """
+        Converts a strongly-typed MLPredictionResult to the legacy dictionary format
+        without re-executing inference.
+        """
+        threat_key = "is_phishing" if res.model_type == MLModelType.PHISHING_URL else "is_malware"
         if res.status != MLPredictionStatus.AVAILABLE:
+            error_msg = res.error_message or (
+                "Phishing ML model not loaded." if res.model_type == MLModelType.PHISHING_URL
+                else "Windows PE Malware ML model not loaded."
+            )
             return {
                 "available": False,
-                "error": res.error_message or "Phishing ML model not loaded.",
-                "is_phishing": False,
+                "error": error_msg,
+                threat_key: False,
                 "probability": 0.0,
                 "confidence": 0.0
             }
+
         return {
             "available": True,
             "model_name": res.model_name,
             "model_version": res.model_version,
-            "is_phishing": res.is_threat,
+            threat_key: res.is_threat,
             "prediction": 1 if res.is_threat else 0,
             "probability": res.probability,
             "confidence": res.confidence,
             "label": res.prediction_label
         }
 
+    def predict_phishing(self, features: Union[List[float], Dict[str, Any]]) -> Dict[str, Any]:
+        """Legacy dict-based phishing prediction."""
+        res = self.predict_phishing_structured(features)
+        return self.prediction_to_legacy_dict(res)
+
     def predict_malware(self, features: Union[List[float], Dict[str, Any]]) -> Dict[str, Any]:
         """Legacy dict-based malware prediction."""
         res = self.predict_malware_structured(features)
-        if res.status != MLPredictionStatus.AVAILABLE:
-            return {
-                "available": False,
-                "error": res.error_message or "Windows PE Malware ML model not loaded.",
-                "is_malware": False,
-                "probability": 0.0,
-                "confidence": 0.0
-            }
-        return {
-            "available": True,
-            "model_name": res.model_name,
-            "model_version": res.model_version,
-            "is_malware": res.is_threat,
-            "prediction": 1 if res.is_threat else 0,
-            "probability": res.probability,
-            "confidence": res.confidence,
-            "label": res.prediction_label
-        }
+        return self.prediction_to_legacy_dict(res)
 
 
 # Global singleton instance

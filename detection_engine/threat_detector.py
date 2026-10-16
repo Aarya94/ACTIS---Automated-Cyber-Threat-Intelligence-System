@@ -483,11 +483,11 @@ class ThreatDetector:
         )
 
         # Step 4: Extract Morphological Features (19 features)
-        features = extract_url_features(canonical_url)
+        features = extract_url_features(canonical_url, is_already_normalized=True)
 
         # Step 5: Machine Learning Inference (both structured & legacy format)
         ml_structured = model_manager.predict_phishing_structured(features)
-        ml_res = model_manager.predict_phishing(features)
+        ml_res = model_manager.prediction_to_legacy_dict(ml_structured)
 
         # Step 6: Heuristic Rule Engine (evaluates both URL string and structured URL analysis)
         heuristic_res = RuleEngine.evaluate_url(canonical_url, analysis_result=url_analysis)
