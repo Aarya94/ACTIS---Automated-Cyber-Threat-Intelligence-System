@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-13 15:33:22 UTC
+**Generated:** 2026-10-16 17:13:23 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`d6e0d6d`)
+**Current Git Branch:** `main` (`67b4f8e`)
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `d6e0d6d`
-- **Working Tree:** 9 untracked/unstaged changes
+- **HEAD Commit:** `67b4f8e`
+- **Working Tree:** 1 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `67b4f8e` | Aaryan Suman | 2026-10-13 | docs(day26): document phishing verification benchmark methodology, metrics, and baseline results |
 | `d6e0d6d` | Aaryan Suman | 2026-10-13 | feat(benchmarks): implement JSON and Markdown report generation with preserved baseline |
 | `24cbd1b` | Aaryan Suman | 2026-10-13 | fix(explainability): add NodeStatus.LIMITATION for partial message analyses and add benchmark tests |
 | `b78e1e4` | Aaryan Suman | 2026-10-13 | feat(benchmarks): implement canonical pipeline benchmark runner and verdict mapping |
@@ -140,7 +141,6 @@
 | `50e5a60` | Aaryan Suman | 2026-10-13 | test(messages): add deterministic adversarial security test suite for MIME and message analysis |
 | `180f85d` | Aaryan Suman | 2026-10-13 | feat(detection): integrate message rules, threat detector orchestrator, and explainability tree |
 | `1c29b94` | Aaryan Suman | 2026-10-13 | feat(scanners): enhance text analyzer with social engineering heuristics and structured message results |
-| `f0aa40c` | Aaryan Suman | 2026-10-13 | feat(scanners): implement safe MIME parser subsystem and message input contracts |
 
 ## Known Issues
 
