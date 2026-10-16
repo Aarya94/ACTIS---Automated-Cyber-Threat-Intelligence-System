@@ -1,0 +1,884 @@
+[
+  {
+    "sample_id": "BENIGN_AWR_001",
+    "ground_truth": "BENIGN",
+    "scenario": "security_awareness_education",
+    "content_preview": "Subject: October Cybersecurity Awareness Month: Spotting Phishing Lures\n\nDear team, phishing attacks frequently use fake urgency, credential harvesting lures, a",
+    "is_mime": false,
+    "extracted_urls": [
+      "https://security-training.example.com"
+    ],
+    "url_count": 1,
+    "attachments_metadata": [],
+    "url_telemetry": [
+      {
+        "url": "https://security-training.example.com",
+        "domain": "security-training.example.com",
+        "score": 60.0,
+        "risk_level": "HIGH",
+        "is_threat": true,
+        "ml_probability": 1.0,
+        "rules_triggered": [],
+        "reasons": [
+          "Machine learning model (actis_phishing_rf) flagged as malicious with 100.0% probability."
+        ]
+      }
+    ],
+    "message_rules_triggered": [],
+    "threat_intel_evidence": 0.0,
+    "message_risk_score": 60.0,
+    "message_risk_level": "HIGH",
+    "is_threat": true,
+    "overall_score": 60.0,
+    "overall_risk_level": "HIGH",
+    "is_suspicious_message": true,
+    "analysis_completeness": "COMPLETE",
+    "is_valid": true,
+    "final_classification": "THREAT",
+    "evaluator_prediction": "PHISHING",
+    "repeated_scan_score": 60.0,
+    "repeated_scan_prediction": "PHISHING",
+    "repeated_scan_invariance": true,
+    "reasons": [
+      "[ANOMALY] High-Risk URL in Message: security-training.example.com: Message contains link 'https://security-training.example.com' with risk score 60.0.",
+      "Active analysis layers evaluated: STATIC_PE."
+    ],
+    "responsible_condition": "Embedded URL score >= 35.0 (propagated via EvidenceSeverity.MEDIUM/HIGH to DetectionDecisionEngine)"
+  },
+  {
+    "sample_id": "BENIGN_AWR_002",
+    "ground_truth": "BENIGN",
+    "scenario": "security_awareness_education",
+    "content_preview": "Subject: Cyber Hygiene Tip #4: Protecting Your One-Time Passwords\n\nNever share your OTP or SMS verification codes over the phone or email. Attackers impersonate",
+    "is_mime": false,
+    "extracted_urls": [
+      "https://awareness.example.com/mfa-hygiene"
+    ],
+    "url_count": 1,
+    "attachments_metadata": [],
+    "url_telemetry": [
+      {
+        "url": "https://awareness.example.com/mfa-hygiene",
+        "domain": "awareness.example.com",
+        "score": 60.0,
+        "risk_level": "HIGH",
+        "is_threat": true,
+        "ml_probability": 1.0,
+        "rules_triggered": [],
+        "reasons": [
+          "Machine learning model (actis_phishing_rf) flagged as malicious with 100.0% probability."
+        ]
+      }
+    ],
+    "message_rules_triggered": [
+      "RULE_MSG_IMPERSONATION",
+      "RULE_MSG_SENSITIVE_INFO_PROMPT"
+    ],
+    "threat_intel_evidence": 0.0,
+    "message_risk_score": 51.4,
+    "message_risk_level": "MEDIUM",
+    "is_threat": true,
+    "overall_score": 72.0,
+    "overall_risk_level": "HIGH",
+    "is_suspicious_message": true,
+    "analysis_completeness": "COMPLETE",
+    "is_valid": true,
+    "final_classification": "THREAT",
+    "evaluator_prediction": "PHISHING",
+    "repeated_scan_score": 51.4,
+    "repeated_scan_prediction": "PHISHING",
+    "repeated_scan_invariance": true,
+    "reasons": [
+      "[ANOMALY] High-Risk URL in Message: awareness.example.com: Message contains link 'https://awareness.example.com/mfa-hygiene' with risk score 60.0.",
+      "[HEURISTIC_RULES] Sensitive Authentication Token Request: Message solicits one-time passwords or security recovery codes (otp).",
+      "[HEURISTIC_RULES] Organizational Impersonation Pattern: Message displays authority or department impersonation language (help desk).",
+      "Active analysis layers evaluated: HEURISTIC_RULES, STATIC_PE."
+    ],
+    "responsible_condition": "Embedded URL score >= 35.0 (propagated via EvidenceSeverity.MEDIUM/HIGH to DetectionDecisionEngine)"
+  },
+  {
+    "sample_id": "BENIGN_AWR_005",
+    "ground_truth": "BENIGN",
+    "scenario": "security_awareness_education",
+    "content_preview": "Subject: Security Lunch & Learn: Mastering Your Enterprise Password Manager\n\nJoin our security engineers this Thursday at noon for a live walkthrough on secure ",
+    "is_mime": false,
+    "extracted_urls": [
+      "https://events.example.com/lunch-and-learn"
+    ],
+    "url_count": 1,
+    "attachments_metadata": [],
+    "url_telemetry": [
+      {
+        "url": "https://events.example.com/lunch-and-learn",
+        "domain": "events.example.com",
+        "score": 60.0,
+        "risk_level": "HIGH",
+        "is_threat": true,
+        "ml_probability": 1.0,
+        "rules_triggered": [],
+        "reasons": [
+          "Machine learning model (actis_phishing_rf) flagged as malicious with 100.0% probability."
+        ]
+      }
+    ],
+    "message_rules_triggered": [],
+    "threat_intel_evidence": 0.0,
+    "message_risk_score": 60.0,
+    "message_risk_level": "HIGH",
+    "is_threat": true,
+    "overall_score": 60.0,
+    "overall_risk_level": "HIGH",
+    "is_suspicious_message": true,
+    "analysis_completeness": "COMPLETE",
+    "is_valid": true,
+    "final_classification": "THREAT",
+    "evaluator_prediction": "PHISHING",
+    "repeated_scan_score": 60.0,
+    "repeated_scan_prediction": "PHISHING",
+    "repeated_scan_invariance": true,
+    "reasons": [
+      "[ANOMALY] High-Risk URL in Message: events.example.com: Message contains link 'https://events.example.com/lunch-and-learn' with risk score 60.0.",
+      "Active analysis layers evaluated: STATIC_PE."
+    ],
+    "responsible_condition": "Embedded URL score >= 35.0 (propagated via EvidenceSeverity.MEDIUM/HIGH to DetectionDecisionEngine)"
+  },
+  {
+    "sample_id": "BENIGN_AWR_006",
+    "ground_truth": "BENIGN",
+    "scenario": "security_awareness_education",
+    "content_preview": "Subject: Travel Security Checklist: Working Safely on Public Networks\n\nWhen traveling for business, always connect through our corporate VPN before accessing co",
+    "is_mime": false,
+    "extracted_urls": [
+      "https://handbook.example.com/travel"
+    ],
+    "url_count": 1,
+    "attachments_metadata": [],
+    "url_telemetry": [
+      {
+        "url": "https://handbook.example.com/travel",
+        "domain": "handbook.example.com",
+        "score": 58.0,
+        "risk_level": "MEDIUM",
+        "is_threat": true,
+        "ml_probability": 0.9673,
+        "rules_triggered": [],
+        "reasons": [
+          "Machine learning model (actis_phishing_rf) flagged as malicious with 96.7% probability."
+        ]
+      }
+    ],
+    "message_rules_triggered": [],
+    "threat_intel_evidence": 0.0,
+    "message_risk_score": 58.0,
+    "message_risk_level": "MEDIUM",
+    "is_threat": true,
+    "overall_score": 58.0,
+    "overall_risk_level": "MEDIUM",
+    "is_suspicious_message": true,
+    "analysis_completeness": "COMPLETE",
+    "is_valid": true,
+    "final_classification": "THREAT",
+    "evaluator_prediction": "PHISHING",
+    "repeated_scan_score": 58.0,
+    "repeated_scan_prediction": "PHISHING",
+    "repeated_scan_invariance": true,
+    "reasons": [
+      "[ANOMALY] Suspicious URL in Message: handbook.example.com: Message contains link 'https://handbook.example.com/travel' with risk score 58.0.",
+      "Active analysis layers evaluated: STATIC_PE."
+    ],
+    "responsible_condition": "Embedded URL score >= 35.0 (propagated via EvidenceSeverity.MEDIUM/HIGH to DetectionDecisionEngine)"
+  },
+  {
+    "sample_id": "BENIGN_AWR_008",
+    "ground_truth": "BENIGN",
+    "scenario": "security_awareness_education",
+    "content_preview": "Subject: Infographic: Top 5 Social Engineering Tactics\n\nSocial engineers rely on urgency, fear, greed, authority, and curiosity. Check out our downloadable info",
+    "is_mime": false,
+    "extracted_urls": [
+      "https://resources.example.com/social-engineering-poster"
+    ],
+    "url_count": 1,
+    "attachments_metadata": [],
+    "url_telemetry": [
+      {
+        "url": "https://resources.example.com/social-engineering-poster",
+        "domain": "resources.example.com",
+        "score": 54.7,
+        "risk_level": "MEDIUM",
+        "is_threat": true,
+        "ml_probability": 0.9114,
+        "rules_triggered": [],
+        "reasons": [
+          "Machine learning model (actis_phishing_rf) flagged as malicious with 91.1% probability."
+        ]
+      }
+    ],
+    "message_rules_triggered": [],
+    "threat_intel_evidence": 0.0,
+    "message_risk_score": 54.7,
+    "message_risk_level": "MEDIUM",
+    "is_threat": true,
+    "overall_score": 54.7,
+    "overall_risk_level": "MEDIUM",
+    "is_suspicious_message": true,
+    "analysis_completeness": "COMPLETE",
+    "is_valid": true,
+    "final_classification": "THREAT",
+    "evaluator_prediction": "PHISHING",
+    "repeated_scan_score": 54.7,
+    "repeated_scan_prediction": "PHISHING",
+    "repeated_scan_invariance": true,
+    "reasons": [
+      "[ANOMALY] Suspicious URL in Message: resources.example.com: Message contains link 'https://resources.example.com/social-engineering-poster' with risk score 54.7.",
+      "Active analysis layers evaluated: STATIC_PE."
+    ],
+    "responsible_condition": "Embedded URL score >= 35.0 (propagated via EvidenceSeverity.MEDIUM/HIGH to DetectionDecisionEngine)"
+  },
+  {
+    "sample_id": "BENIGN_AWR_010",
+    "ground_truth": "BENIGN",
+    "scenario": "security_awareness_education",
+    "content_preview": "Subject: How to Use the 'Report Phishing' Button in Outlook\n\nOur one-click PhishAlarm button automatically submits headers and attachments to the Security Opera",
+    "is_mime": false,
+    "extracted_urls": [
+      "https://wiki.example.com/phish-reporting"
+    ],
+    "url_count": 1,
+    "attachments_metadata": [],
+    "url_telemetry": [
+      {
+        "url": "https://wiki.example.com/phish-reporting",
+        "domain": "wiki.example.com",
+        "score": 60.0,
+        "risk_level": "HIGH",
+        "is_threat": true,
+        "ml_probability": 1.0,
+        "rules_triggered": [],
+        "reasons": [
+          "Machine learning model (actis_phishing_rf) flagged as malicious with 100.0% probability."
+        ]
+      }
+    ],
+    "message_rules_triggered": [],
+    "threat_intel_evidence": 0.0,
+    "message_risk_score": 60.0,
+    "message_risk_level": "HIGH",
+    "is_threat": true,
+    "overall_score": 60.0,
+    "overall_risk_level": "HIGH",
+    "is_suspicious_message": true,
+    "analysis_completeness": "COMPLETE",
+    "is_valid": true,
+    "final_classification": "THREAT",
+    "evaluator_prediction": "PHISHING",
+    "repeated_scan_score": 60.0,
+    "repeated_scan_prediction": "PHISHING",
+    "repeated_scan_invariance": true,
+    "reasons": [
+      "[ANOMALY] High-Risk URL in Message: wiki.example.com: Message contains link 'https://wiki.example.com/phish-reporting' with risk score 60.0.",
+      "Active analysis layers evaluated: STATIC_PE."
+    ],
+    "responsible_condition": "Embedded URL score >= 35.0 (propagated via EvidenceSeverity.MEDIUM/HIGH to DetectionDecisionEngine)"
+  },
+  {
+    "sample_id": "BENIGN_FIN_003",
+    "ground_truth": "BENIGN",
+    "scenario": "benign_financial_business",
+    "content_preview": "Subject: Sprint 42 Planning Notes and Ticket Allocation\n\nHi team, attached are the notes from our Monday retrospective. We committed to 34 story points across t",
+    "is_mime": false,
+    "extracted_urls": [
+      "https://example.com/jira"
+    ],
+    "url_count": 1,
+    "attachments_metadata": [],
+    "url_telemetry": [
+      {
+        "url": "https://example.com/jira",
+        "domain": "example.com",
+        "score": 60.0,
+        "risk_level": "HIGH",
+        "is_threat": true,
+        "ml_probability": 1.0,
+        "rules_triggered": [],
+        "reasons": [
+          "Machine learning model (actis_phishing_rf) flagged as malicious with 100.0% probability."
+        ]
+      }
+    ],
+    "message_rules_triggered": [],
+    "threat_intel_evidence": 0.0,
+    "message_risk_score": 60.0,
+    "message_risk_level": "HIGH",
+    "is_threat": true,
+    "overall_score": 60.0,
+    "overall_risk_level": "HIGH",
+    "is_suspicious_message": true,
+    "analysis_completeness": "COMPLETE",
+    "is_valid": true,
+    "final_classification": "THREAT",
+    "evaluator_prediction": "PHISHING",
+    "repeated_scan_score": 60.0,
+    "repeated_scan_prediction": "PHISHING",
+    "repeated_scan_invariance": true,
+    "reasons": [
+      "[ANOMALY] High-Risk URL in Message: example.com: Message contains link 'https://example.com/jira' with risk score 60.0.",
+      "Active analysis layers evaluated: STATIC_PE."
+    ],
+    "responsible_condition": "Embedded URL score >= 35.0 (propagated via EvidenceSeverity.MEDIUM/HIGH to DetectionDecisionEngine)"
+  },
+  {
+    "sample_id": "BENIGN_FIN_006",
+    "ground_truth": "BENIGN",
+    "scenario": "benign_financial_business",
+    "content_preview": "From: orders@bookseller.example.com\nSubject: Your order #BK-88219 has shipped!\nContent-Type: text/html\n\n<html><body><p>Great news! Your package is in transit vi",
+    "is_mime": true,
+    "extracted_urls": [
+      "https://tracking.example.com/shipment/88219"
+    ],
+    "url_count": 1,
+    "attachments_metadata": [],
+    "url_telemetry": [
+      {
+        "url": "https://tracking.example.com/shipment/88219",
+        "domain": "tracking.example.com",
+        "score": 58.2,
+        "risk_level": "MEDIUM",
+        "is_threat": true,
+        "ml_probability": 0.9699,
+        "rules_triggered": [],
+        "reasons": [
+          "Machine learning model (actis_phishing_rf) flagged as malicious with 97.0% probability."
+        ]
+      }
+    ],
+    "message_rules_triggered": [],
+    "threat_intel_evidence": 0.0,
+    "message_risk_score": 58.2,
+    "message_risk_level": "MEDIUM",
+    "is_threat": true,
+    "overall_score": 58.2,
+    "overall_risk_level": "MEDIUM",
+    "is_suspicious_message": true,
+    "analysis_completeness": "COMPLETE",
+    "is_valid": true,
+    "final_classification": "THREAT",
+    "evaluator_prediction": "PHISHING",
+    "repeated_scan_score": 58.2,
+    "repeated_scan_prediction": "PHISHING",
+    "repeated_scan_invariance": true,
+    "reasons": [
+      "[ANOMALY] Suspicious URL in Message: tracking.example.com: Message contains link 'https://tracking.example.com/shipment/88219' with risk score 58.2.",
+      "Active analysis layers evaluated: STATIC_PE."
+    ],
+    "responsible_condition": "Embedded URL score >= 35.0 (propagated via EvidenceSeverity.MEDIUM/HIGH to DetectionDecisionEngine)"
+  },
+  {
+    "sample_id": "BENIGN_FIN_007",
+    "ground_truth": "BENIGN",
+    "scenario": "benign_financial_business",
+    "content_preview": "Subject: Open Enrollment Begins November 1st\n\nOpen Enrollment is your opportunity to review and change health, dental, and vision coverage for next calendar yea",
+    "is_mime": false,
+    "extracted_urls": [
+      "https://example.com/benefits"
+    ],
+    "url_count": 1,
+    "attachments_metadata": [],
+    "url_telemetry": [
+      {
+        "url": "https://example.com/benefits",
+        "domain": "example.com",
+        "score": 60.0,
+        "risk_level": "HIGH",
+        "is_threat": true,
+        "ml_probability": 1.0,
+        "rules_triggered": [],
+        "reasons": [
+          "Machine learning model (actis_phishing_rf) flagged as malicious with 100.0% probability."
+        ]
+      }
+    ],
+    "message_rules_triggered": [],
+    "threat_intel_evidence": 0.0,
+    "message_risk_score": 60.0,
+    "message_risk_level": "HIGH",
+    "is_threat": true,
+    "overall_score": 60.0,
+    "overall_risk_level": "HIGH",
+    "is_suspicious_message": true,
+    "analysis_completeness": "COMPLETE",
+    "is_valid": true,
+    "final_classification": "THREAT",
+    "evaluator_prediction": "PHISHING",
+    "repeated_scan_score": 60.0,
+    "repeated_scan_prediction": "PHISHING",
+    "repeated_scan_invariance": true,
+    "reasons": [
+      "[ANOMALY] High-Risk URL in Message: example.com: Message contains link 'https://example.com/benefits' with risk score 60.0.",
+      "Active analysis layers evaluated: STATIC_PE."
+    ],
+    "responsible_condition": "Embedded URL score >= 35.0 (propagated via EvidenceSeverity.MEDIUM/HIGH to DetectionDecisionEngine)"
+  },
+  {
+    "sample_id": "BENIGN_FIN_009",
+    "ground_truth": "BENIGN",
+    "scenario": "benign_financial_business",
+    "content_preview": "Subject: Release Announcement: Version 2.4 Deployed to Staging\n\nStaging environment has been upgraded with URL de-obfuscation and safe MIME parsing capabilities",
+    "is_mime": false,
+    "extracted_urls": [
+      "https://example.com/releases/v2.4"
+    ],
+    "url_count": 1,
+    "attachments_metadata": [],
+    "url_telemetry": [
+      {
+        "url": "https://example.com/releases/v2.4",
+        "domain": "example.com",
+        "score": 50.6,
+        "risk_level": "MEDIUM",
+        "is_threat": true,
+        "ml_probability": 0.8441,
+        "rules_triggered": [],
+        "reasons": [
+          "Machine learning model (actis_phishing_rf) flagged as malicious with 84.4% probability."
+        ]
+      }
+    ],
+    "message_rules_triggered": [],
+    "threat_intel_evidence": 0.0,
+    "message_risk_score": 50.6,
+    "message_risk_level": "MEDIUM",
+    "is_threat": true,
+    "overall_score": 50.6,
+    "overall_risk_level": "MEDIUM",
+    "is_suspicious_message": true,
+    "analysis_completeness": "COMPLETE",
+    "is_valid": true,
+    "final_classification": "THREAT",
+    "evaluator_prediction": "PHISHING",
+    "repeated_scan_score": 50.6,
+    "repeated_scan_prediction": "PHISHING",
+    "repeated_scan_invariance": true,
+    "reasons": [
+      "[ANOMALY] Suspicious URL in Message: example.com: Message contains link 'https://example.com/releases/v2.4' with risk score 50.6.",
+      "Active analysis layers evaluated: STATIC_PE."
+    ],
+    "responsible_condition": "Embedded URL score >= 35.0 (propagated via EvidenceSeverity.MEDIUM/HIGH to DetectionDecisionEngine)"
+  },
+  {
+    "sample_id": "BENIGN_FIN_011",
+    "ground_truth": "BENIGN",
+    "scenario": "benign_financial_business",
+    "content_preview": "Subject: How was your support experience yesterday?\n\nWe would appreciate 2 minutes of your time to rate your recent interaction with our help desk: https://feed",
+    "is_mime": false,
+    "extracted_urls": [
+      "https://feedback.example.com/survey/91823"
+    ],
+    "url_count": 1,
+    "attachments_metadata": [],
+    "url_telemetry": [
+      {
+        "url": "https://feedback.example.com/survey/91823",
+        "domain": "feedback.example.com",
+        "score": 55.8,
+        "risk_level": "MEDIUM",
+        "is_threat": true,
+        "ml_probability": 0.9301,
+        "rules_triggered": [],
+        "reasons": [
+          "Machine learning model (actis_phishing_rf) flagged as malicious with 93.0% probability."
+        ]
+      }
+    ],
+    "message_rules_triggered": [
+      "RULE_MSG_IMPERSONATION"
+    ],
+    "threat_intel_evidence": 0.0,
+    "message_risk_score": 35.3,
+    "message_risk_level": "MEDIUM",
+    "is_threat": true,
+    "overall_score": 55.8,
+    "overall_risk_level": "MEDIUM",
+    "is_suspicious_message": true,
+    "analysis_completeness": "COMPLETE",
+    "is_valid": true,
+    "final_classification": "THREAT",
+    "evaluator_prediction": "PHISHING",
+    "repeated_scan_score": 35.3,
+    "repeated_scan_prediction": "PHISHING",
+    "repeated_scan_invariance": true,
+    "reasons": [
+      "[ANOMALY] Suspicious URL in Message: feedback.example.com: Message contains link 'https://feedback.example.com/survey/91823' with risk score 55.8.",
+      "[HEURISTIC_RULES] Organizational Impersonation Pattern: Message displays authority or department impersonation language (help desk).",
+      "Active analysis layers evaluated: HEURISTIC_RULES, STATIC_PE."
+    ],
+    "responsible_condition": "Embedded URL score >= 35.0 (propagated via EvidenceSeverity.MEDIUM/HIGH to DetectionDecisionEngine)"
+  },
+  {
+    "sample_id": "BENIGN_FIN_018",
+    "ground_truth": "BENIGN",
+    "scenario": "benign_financial_business",
+    "content_preview": "Subject: Webinar Recording: Best Practices in Static Threat Detection\n\nThank you for attending our technical webinar. Access the recording and slides at https:/",
+    "is_mime": false,
+    "extracted_urls": [
+      "https://example.com/webinars/threat-detection"
+    ],
+    "url_count": 1,
+    "attachments_metadata": [],
+    "url_telemetry": [
+      {
+        "url": "https://example.com/webinars/threat-detection",
+        "domain": "example.com",
+        "score": 60.0,
+        "risk_level": "HIGH",
+        "is_threat": true,
+        "ml_probability": 1.0,
+        "rules_triggered": [],
+        "reasons": [
+          "Machine learning model (actis_phishing_rf) flagged as malicious with 100.0% probability."
+        ]
+      }
+    ],
+    "message_rules_triggered": [],
+    "threat_intel_evidence": 0.0,
+    "message_risk_score": 60.0,
+    "message_risk_level": "HIGH",
+    "is_threat": true,
+    "overall_score": 60.0,
+    "overall_risk_level": "HIGH",
+    "is_suspicious_message": true,
+    "analysis_completeness": "COMPLETE",
+    "is_valid": true,
+    "final_classification": "THREAT",
+    "evaluator_prediction": "PHISHING",
+    "repeated_scan_score": 60.0,
+    "repeated_scan_prediction": "PHISHING",
+    "repeated_scan_invariance": true,
+    "reasons": [
+      "[ANOMALY] High-Risk URL in Message: example.com: Message contains link 'https://example.com/webinars/threat-detection' with risk score 60.0.",
+      "Active analysis layers evaluated: STATIC_PE."
+    ],
+    "responsible_condition": "Embedded URL score >= 35.0 (propagated via EvidenceSeverity.MEDIUM/HIGH to DetectionDecisionEngine)"
+  },
+  {
+    "sample_id": "BENIGN_SEC_002",
+    "ground_truth": "BENIGN",
+    "scenario": "legitimate_security_account",
+    "content_preview": "From: no-reply@accounts.example.com\nSubject: New login from Chrome on Windows\nContent-Type: text/html\n\n<html><body><p>A new sign-in was observed on your account",
+    "is_mime": true,
+    "extracted_urls": [
+      "https://accounts.example.com/security"
+    ],
+    "url_count": 1,
+    "attachments_metadata": [],
+    "url_telemetry": [
+      {
+        "url": "https://accounts.example.com/security",
+        "domain": "accounts.example.com",
+        "score": 59.2,
+        "risk_level": "MEDIUM",
+        "is_threat": true,
+        "ml_probability": 0.9872,
+        "rules_triggered": [],
+        "reasons": [
+          "Machine learning model (actis_phishing_rf) flagged as malicious with 98.7% probability."
+        ]
+      }
+    ],
+    "message_rules_triggered": [],
+    "threat_intel_evidence": 0.0,
+    "message_risk_score": 59.2,
+    "message_risk_level": "MEDIUM",
+    "is_threat": true,
+    "overall_score": 59.2,
+    "overall_risk_level": "MEDIUM",
+    "is_suspicious_message": true,
+    "analysis_completeness": "COMPLETE",
+    "is_valid": true,
+    "final_classification": "THREAT",
+    "evaluator_prediction": "PHISHING",
+    "repeated_scan_score": 59.2,
+    "repeated_scan_prediction": "PHISHING",
+    "repeated_scan_invariance": true,
+    "reasons": [
+      "[ANOMALY] Suspicious URL in Message: accounts.example.com: Message contains link 'https://accounts.example.com/security' with risk score 59.2.",
+      "Active analysis layers evaluated: STATIC_PE."
+    ],
+    "responsible_condition": "Embedded URL score >= 35.0 (propagated via EvidenceSeverity.MEDIUM/HIGH to DetectionDecisionEngine)"
+  },
+  {
+    "sample_id": "BENIGN_SEC_004",
+    "ground_truth": "BENIGN",
+    "scenario": "legitimate_security_account",
+    "content_preview": "Subject: Notice of Annual Privacy Policy Revisions\n\nDear member,\n\nWe updated our Privacy Policy effective November 1st. You may review the full policy terms at ",
+    "is_mime": false,
+    "extracted_urls": [
+      "https://example.com/privacy-policy"
+    ],
+    "url_count": 1,
+    "attachments_metadata": [],
+    "url_telemetry": [
+      {
+        "url": "https://example.com/privacy-policy",
+        "domain": "example.com",
+        "score": 54.4,
+        "risk_level": "MEDIUM",
+        "is_threat": true,
+        "ml_probability": 0.9064,
+        "rules_triggered": [],
+        "reasons": [
+          "Machine learning model (actis_phishing_rf) flagged as malicious with 90.6% probability."
+        ]
+      }
+    ],
+    "message_rules_triggered": [],
+    "threat_intel_evidence": 0.0,
+    "message_risk_score": 54.4,
+    "message_risk_level": "MEDIUM",
+    "is_threat": true,
+    "overall_score": 54.4,
+    "overall_risk_level": "MEDIUM",
+    "is_suspicious_message": true,
+    "analysis_completeness": "COMPLETE",
+    "is_valid": true,
+    "final_classification": "THREAT",
+    "evaluator_prediction": "PHISHING",
+    "repeated_scan_score": 54.4,
+    "repeated_scan_prediction": "PHISHING",
+    "repeated_scan_invariance": true,
+    "reasons": [
+      "[ANOMALY] Suspicious URL in Message: example.com: Message contains link 'https://example.com/privacy-policy' with risk score 54.4.",
+      "Active analysis layers evaluated: STATIC_PE."
+    ],
+    "responsible_condition": "Embedded URL score >= 35.0 (propagated via EvidenceSeverity.MEDIUM/HIGH to DetectionDecisionEngine)"
+  },
+  {
+    "sample_id": "BENIGN_SEC_005",
+    "ground_truth": "BENIGN",
+    "scenario": "legitimate_security_account",
+    "content_preview": "Subject: Updates to Our Terms of Service\n\nWe are sharing periodic updates to our master subscription agreement. Read the detailed terms at https://example.com/t",
+    "is_mime": false,
+    "extracted_urls": [
+      "https://example.com/terms"
+    ],
+    "url_count": 1,
+    "attachments_metadata": [],
+    "url_telemetry": [
+      {
+        "url": "https://example.com/terms",
+        "domain": "example.com",
+        "score": 60.0,
+        "risk_level": "HIGH",
+        "is_threat": true,
+        "ml_probability": 1.0,
+        "rules_triggered": [],
+        "reasons": [
+          "Machine learning model (actis_phishing_rf) flagged as malicious with 100.0% probability."
+        ]
+      }
+    ],
+    "message_rules_triggered": [],
+    "threat_intel_evidence": 0.0,
+    "message_risk_score": 60.0,
+    "message_risk_level": "HIGH",
+    "is_threat": true,
+    "overall_score": 60.0,
+    "overall_risk_level": "HIGH",
+    "is_suspicious_message": true,
+    "analysis_completeness": "COMPLETE",
+    "is_valid": true,
+    "final_classification": "THREAT",
+    "evaluator_prediction": "PHISHING",
+    "repeated_scan_score": 60.0,
+    "repeated_scan_prediction": "PHISHING",
+    "repeated_scan_invariance": true,
+    "reasons": [
+      "[ANOMALY] High-Risk URL in Message: example.com: Message contains link 'https://example.com/terms' with risk score 60.0.",
+      "Active analysis layers evaluated: STATIC_PE."
+    ],
+    "responsible_condition": "Embedded URL score >= 35.0 (propagated via EvidenceSeverity.MEDIUM/HIGH to DetectionDecisionEngine)"
+  },
+  {
+    "sample_id": "BENIGN_SEC_007",
+    "ground_truth": "BENIGN",
+    "scenario": "legitimate_security_account",
+    "content_preview": "Subject: Scheduled Network Maintenance on Saturday Oct 18\n\nOur infrastructure engineers will perform routine maintenance on Saturday between 02:00 UTC and 04:00",
+    "is_mime": false,
+    "extracted_urls": [
+      "https://status.example.com"
+    ],
+    "url_count": 1,
+    "attachments_metadata": [],
+    "url_telemetry": [
+      {
+        "url": "https://status.example.com",
+        "domain": "status.example.com",
+        "score": 51.9,
+        "risk_level": "MEDIUM",
+        "is_threat": true,
+        "ml_probability": 0.8648,
+        "rules_triggered": [],
+        "reasons": [
+          "Machine learning model (actis_phishing_rf) flagged as malicious with 86.5% probability."
+        ]
+      }
+    ],
+    "message_rules_triggered": [],
+    "threat_intel_evidence": 0.0,
+    "message_risk_score": 51.9,
+    "message_risk_level": "MEDIUM",
+    "is_threat": true,
+    "overall_score": 51.9,
+    "overall_risk_level": "MEDIUM",
+    "is_suspicious_message": true,
+    "analysis_completeness": "COMPLETE",
+    "is_valid": true,
+    "final_classification": "THREAT",
+    "evaluator_prediction": "PHISHING",
+    "repeated_scan_score": 51.9,
+    "repeated_scan_prediction": "PHISHING",
+    "repeated_scan_invariance": true,
+    "reasons": [
+      "[ANOMALY] Suspicious URL in Message: status.example.com: Message contains link 'https://status.example.com' with risk score 51.9.",
+      "Active analysis layers evaluated: STATIC_PE."
+    ],
+    "responsible_condition": "Embedded URL score >= 35.0 (propagated via EvidenceSeverity.MEDIUM/HIGH to DetectionDecisionEngine)"
+  },
+  {
+    "sample_id": "BENIGN_SEC_008",
+    "ground_truth": "BENIGN",
+    "scenario": "legitimate_security_account",
+    "content_preview": "Subject: SAML Signing Certificate Expiring Next Month\n\nNotice for SAML application owners: IdP metadata signing certificate will rotate on Nov 15. Documentation",
+    "is_mime": false,
+    "extracted_urls": [
+      "https://help.example.com/saml-rotation"
+    ],
+    "url_count": 1,
+    "attachments_metadata": [],
+    "url_telemetry": [
+      {
+        "url": "https://help.example.com/saml-rotation",
+        "domain": "help.example.com",
+        "score": 56.1,
+        "risk_level": "MEDIUM",
+        "is_threat": true,
+        "ml_probability": 0.9354,
+        "rules_triggered": [],
+        "reasons": [
+          "Machine learning model (actis_phishing_rf) flagged as malicious with 93.5% probability."
+        ]
+      }
+    ],
+    "message_rules_triggered": [],
+    "threat_intel_evidence": 0.0,
+    "message_risk_score": 56.1,
+    "message_risk_level": "MEDIUM",
+    "is_threat": true,
+    "overall_score": 56.1,
+    "overall_risk_level": "MEDIUM",
+    "is_suspicious_message": true,
+    "analysis_completeness": "COMPLETE",
+    "is_valid": true,
+    "final_classification": "THREAT",
+    "evaluator_prediction": "PHISHING",
+    "repeated_scan_score": 56.1,
+    "repeated_scan_prediction": "PHISHING",
+    "repeated_scan_invariance": true,
+    "reasons": [
+      "[ANOMALY] Suspicious URL in Message: help.example.com: Message contains link 'https://help.example.com/saml-rotation' with risk score 56.1.",
+      "Active analysis layers evaluated: STATIC_PE."
+    ],
+    "responsible_condition": "Embedded URL score >= 35.0 (propagated via EvidenceSeverity.MEDIUM/HIGH to DetectionDecisionEngine)"
+  },
+  {
+    "sample_id": "BENIGN_SEC_015",
+    "ground_truth": "BENIGN",
+    "scenario": "legitimate_security_account",
+    "content_preview": "Subject: New Third-Party Application Connected\n\nYou granted 'Zoom Video Integration' permission to view calendar events. Manage permissions at https://example.c",
+    "is_mime": false,
+    "extracted_urls": [
+      "https://example.com/oauth/manage"
+    ],
+    "url_count": 1,
+    "attachments_metadata": [],
+    "url_telemetry": [
+      {
+        "url": "https://example.com/oauth/manage",
+        "domain": "example.com",
+        "score": 60.0,
+        "risk_level": "HIGH",
+        "is_threat": true,
+        "ml_probability": 1.0,
+        "rules_triggered": [],
+        "reasons": [
+          "Machine learning model (actis_phishing_rf) flagged as malicious with 100.0% probability."
+        ]
+      }
+    ],
+    "message_rules_triggered": [],
+    "threat_intel_evidence": 0.0,
+    "message_risk_score": 60.0,
+    "message_risk_level": "HIGH",
+    "is_threat": true,
+    "overall_score": 60.0,
+    "overall_risk_level": "HIGH",
+    "is_suspicious_message": true,
+    "analysis_completeness": "COMPLETE",
+    "is_valid": true,
+    "final_classification": "THREAT",
+    "evaluator_prediction": "PHISHING",
+    "repeated_scan_score": 60.0,
+    "repeated_scan_prediction": "PHISHING",
+    "repeated_scan_invariance": true,
+    "reasons": [
+      "[ANOMALY] High-Risk URL in Message: example.com: Message contains link 'https://example.com/oauth/manage' with risk score 60.0.",
+      "Active analysis layers evaluated: STATIC_PE."
+    ],
+    "responsible_condition": "Embedded URL score >= 35.0 (propagated via EvidenceSeverity.MEDIUM/HIGH to DetectionDecisionEngine)"
+  },
+  {
+    "sample_id": "EDGE_ROB_004",
+    "ground_truth": "BENIGN",
+    "scenario": "malformed_resource_limits",
+    "content_preview": "Subject: Duplicate Links\n\nhttps://example.com/documentation https://example.com/documentation https://example.com/documentation https://example.com/documentatio",
+    "is_mime": false,
+    "extracted_urls": [
+      "https://example.com/documentation"
+    ],
+    "url_count": 1,
+    "attachments_metadata": [],
+    "url_telemetry": [
+      {
+        "url": "https://example.com/documentation",
+        "domain": "example.com",
+        "score": 60.0,
+        "risk_level": "HIGH",
+        "is_threat": true,
+        "ml_probability": 1.0,
+        "rules_triggered": [],
+        "reasons": [
+          "Machine learning model (actis_phishing_rf) flagged as malicious with 100.0% probability."
+        ]
+      }
+    ],
+    "message_rules_triggered": [],
+    "threat_intel_evidence": 0.0,
+    "message_risk_score": 60.0,
+    "message_risk_level": "HIGH",
+    "is_threat": true,
+    "overall_score": 60.0,
+    "overall_risk_level": "HIGH",
+    "is_suspicious_message": true,
+    "analysis_completeness": "COMPLETE",
+    "is_valid": true,
+    "final_classification": "THREAT",
+    "evaluator_prediction": "PHISHING",
+    "repeated_scan_score": 60.0,
+    "repeated_scan_prediction": "PHISHING",
+    "repeated_scan_invariance": true,
+    "reasons": [
+      "[ANOMALY] High-Risk URL in Message: example.com: Message contains link 'https://example.com/documentation' with risk score 60.0.",
+      "Active analysis layers evaluated: STATIC_PE."
+    ],
+    "responsible_condition": "Embedded URL score >= 35.0 (propagated via EvidenceSeverity.MEDIUM/HIGH to DetectionDecisionEngine)"
+  }
+]

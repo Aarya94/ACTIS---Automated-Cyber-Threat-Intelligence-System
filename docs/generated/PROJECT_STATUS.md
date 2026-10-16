@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-16 20:55:13 UTC
+**Generated:** 2026-10-16 20:56:02 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`36fd0e2`)
+**Current Git Branch:** `main` (`e1744d3`)
 
 ---
 
@@ -124,13 +124,14 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `36fd0e2`
-- **Working Tree:** 4 untracked/unstaged changes
+- **HEAD Commit:** `e1744d3`
+- **Working Tree:** 1 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `e1744d3` | Aaryan Suman | 2026-10-17 | fix(detection): ingest medium-risk URL signals into message decision engine to prevent zero-score threat inconsistency |
 | `36fd0e2` | Aaryan Suman | 2026-10-17 | chore(benchmarks): sync latest benchmark telemetry to commit 5673a34 |
 | `5673a34` | Aaryan Suman | 2026-10-17 | test(benchmarks): refresh message analysis benchmark latest report with verified metrics |
 | `e4b8263` | Aaryan Suman | 2026-10-17 | test(benchmarks): synchronize message analysis benchmark metrics with verified commit cda07b9 |
@@ -140,7 +141,6 @@
 | `610ef93` | Aaryan Suman | 2026-10-16 | docs(day27): update verified project state and next milestone |
 | `a1dc41c` | Aaryan Suman | 2026-10-16 | docs(day27): document final validation and benchmark comparison |
 | `b7ce93e` | Aaryan Suman | 2026-10-16 | test(benchmarks): validate day27 detection and latency metrics |
-| `6f81bdc` | Aaryan Suman | 2026-10-16 | test(performance): verify bounded analysis and cache behavior |
 
 ## Known Issues
 
