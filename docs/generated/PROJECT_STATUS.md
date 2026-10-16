@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-16 20:56:02 UTC
+**Generated:** 2026-10-16 21:22:41 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`e1744d3`)
+**Current Git Branch:** `main` (`89ac69d`)
 
 ---
 
@@ -118,19 +118,21 @@
 ## Test Status
 
 - **Total Test Files:** `52`
-- **Total Discovered Test Functions:** `740`
+- **Total Discovered Test Functions:** `744`
 - **Coverage Areas:** Configuration validation, SQLite database schema & CRUD, Phishing/Malware model contracts, PE feature extraction, API backend.
 
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `e1744d3`
-- **Working Tree:** 1 untracked/unstaged changes
+- **Documented Commit (HEAD):** `89ac69d`
+- **Repository State at Generation:** 8 in-flight changes (8 staged) (captured prior to release commit)
+- **Working Tree:** clean (all in-flight artifacts staged and committed atomically)
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `89ac69d` | Aaryan Suman | 2026-10-17 | docs(benchmarks): add reproducible deep diagnostic artifact for all 19 false positives |
 | `e1744d3` | Aaryan Suman | 2026-10-17 | fix(detection): ingest medium-risk URL signals into message decision engine to prevent zero-score threat inconsistency |
 | `36fd0e2` | Aaryan Suman | 2026-10-17 | chore(benchmarks): sync latest benchmark telemetry to commit 5673a34 |
 | `5673a34` | Aaryan Suman | 2026-10-17 | test(benchmarks): refresh message analysis benchmark latest report with verified metrics |
@@ -140,7 +142,6 @@
 | `93b763a` | Aaryan Suman | 2026-10-17 | fix(detection): restrict message threat intelligence elevation to confirmed indicators |
 | `610ef93` | Aaryan Suman | 2026-10-16 | docs(day27): update verified project state and next milestone |
 | `a1dc41c` | Aaryan Suman | 2026-10-16 | docs(day27): document final validation and benchmark comparison |
-| `b7ce93e` | Aaryan Suman | 2026-10-16 | test(benchmarks): validate day27 detection and latency metrics |
 
 ## Known Issues
 

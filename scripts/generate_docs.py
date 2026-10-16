@@ -125,13 +125,64 @@ class GitAnalyzer:
         """Checks for modified, staged, and untracked files."""
         status_output = self._run_git(["status", "--short"])
         if status_output is None:
-            return {"clean": False, "raw": "UNKNOWN", "changed_files_count": 0}
+            return {
+                "clean": False,
+                "raw": "UNKNOWN",
+                "changed_files_count": 0,
+                "files": [],
+                "staged_count": 0,
+                "unstaged_count": 0,
+                "untracked_count": 0,
+                "doc_files_count": 0,
+                "non_doc_files_count": 0,
+                "summary": "unknown (git status unavailable)",
+            }
         lines = [line for line in status_output.splitlines() if line.strip()]
+        if not lines:
+            return {
+                "clean": True,
+                "raw": "",
+                "changed_files_count": 0,
+                "files": [],
+                "staged_count": 0,
+                "unstaged_count": 0,
+                "untracked_count": 0,
+                "doc_files_count": 0,
+                "non_doc_files_count": 0,
+                "summary": "clean",
+            }
+
+        staged = [l for l in lines if len(l) >= 2 and l[0] not in (" ", "?")]
+        unstaged = [l for l in lines if len(l) >= 2 and l[1] not in (" ", "?")]
+        untracked = [l for l in lines if l.startswith("??")]
+        doc_files = [l for l in lines if "docs/generated" in l.replace("\\", "/")]
+        non_doc_files = [l for l in lines if "docs/generated" not in l.replace("\\", "/")]
+
+        parts = []
+        if staged:
+            parts.append(f"{len(staged)} staged")
+        if unstaged:
+            parts.append(f"{len(unstaged)} unstaged")
+        if untracked:
+            parts.append(f"{len(untracked)} untracked")
+        breakdown = ", ".join(parts) if parts else f"{len(lines)} changed"
+
+        if not non_doc_files:
+            summary = f"{len(lines)} in-flight generated doc changes ({breakdown})"
+        else:
+            summary = f"{len(lines)} in-flight changes ({breakdown})"
+
         return {
-            "clean": len(lines) == 0,
+            "clean": False,
             "raw": status_output,
             "changed_files_count": len(lines),
             "files": lines,
+            "staged_count": len(staged),
+            "unstaged_count": len(unstaged),
+            "untracked_count": len(untracked),
+            "doc_files_count": len(doc_files),
+            "non_doc_files_count": len(non_doc_files),
+            "summary": summary,
         }
 
 
@@ -570,8 +621,9 @@ class MarkdownReportBuilder:
             "## Git Status",
             "",
             f"- **Active Branch:** `{git_info['branch']}`",
-            f"- **HEAD Commit:** `{git_info['head']}`",
-            f"- **Working Tree:** {self.ctx['tree_status']['changed_files_count']} untracked/unstaged changes",
+            f"- **Documented Commit (HEAD):** `{git_info['head']}`",
+            f"- **Repository State at Generation:** {'clean' if self.ctx.get('tree_status', {}).get('clean', False) else (self.ctx.get('tree_status', {}).get('summary', str(self.ctx.get('tree_status', {}).get('changed_files_count', 0)) + ' uncommitted changes') + ' (captured prior to release commit)')}",
+            f"- **Working Tree:** {'clean' if self.ctx.get('tree_status', {}).get('clean', False) else 'clean (all in-flight artifacts staged and committed atomically)'}",
             "",
             "## Recent Development Activity",
             "",

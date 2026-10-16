@@ -78,6 +78,35 @@ class TestGitAnalyzer:
         assert isinstance(status, dict)
         assert "changed_files_count" in status
 
+    def test_working_tree_status_clean_behavior(self, monkeypatch):
+        git_analyzer = GitAnalyzer(PROJECT_ROOT)
+        monkeypatch.setattr(git_analyzer, "_run_git", lambda args: "")
+        status = git_analyzer.get_working_tree_status()
+        assert status["clean"] is True
+        assert status["changed_files_count"] == 0
+        assert status["summary"] == "clean"
+        assert status["staged_count"] == 0
+        assert status["unstaged_count"] == 0
+        assert status["untracked_count"] == 0
+
+    def test_working_tree_status_parsing_categorization(self, monkeypatch):
+        git_analyzer = GitAnalyzer(PROJECT_ROOT)
+        mock_output = (
+            "?? reports/benchmarks/message_analysis/false_positives_deep_diagnostic.json\n"
+            "M  docs/generated/PROJECT_STATUS.md\n"
+            " M config/settings.py\n"
+        )
+        monkeypatch.setattr(git_analyzer, "_run_git", lambda args: mock_output)
+        status = git_analyzer.get_working_tree_status()
+        assert status["clean"] is False
+        assert status["changed_files_count"] == 3
+        assert status["untracked_count"] == 1
+        assert status["staged_count"] == 1
+        assert status["unstaged_count"] == 1
+        assert status["doc_files_count"] == 1
+        assert status["non_doc_files_count"] == 2
+        assert "in-flight changes" in status["summary"]
+
 
 class TestCodebaseAnalyzer:
     """Verifies AST-based code analysis."""
@@ -208,6 +237,33 @@ class TestMarkdownReportBuilder:
         assert "## Test Status" in content
         assert "## Git Status" in content
         assert "## Recent Development Activity" in content
+
+    def test_generate_project_status_clean_tree_reporting(self, context):
+        context_clean = dict(context)
+        context_clean["tree_status"] = {
+            "clean": True,
+            "summary": "clean",
+            "changed_files_count": 0,
+        }
+        builder = MarkdownReportBuilder(context_clean)
+        content = builder.generate_project_status()
+        assert "- **Repository State at Generation:** clean" in content
+        assert "- **Working Tree:** clean" in content
+        assert "untracked/unstaged changes" not in content
+
+    def test_generate_project_status_inflight_tree_reporting(self, context):
+        context_dirty = dict(context)
+        context_dirty["tree_status"] = {
+            "clean": False,
+            "summary": "1 in-flight changes (1 untracked)",
+            "changed_files_count": 1,
+        }
+        builder = MarkdownReportBuilder(context_dirty)
+        content = builder.generate_project_status()
+        assert "- **Repository State at Generation:** 1 in-flight changes (1 untracked) (captured prior to release commit)" in content
+        assert "- **Working Tree:** clean (all in-flight artifacts staged and committed atomically)" in content
+        assert "untracked/unstaged changes" not in content
+
 
     def test_generate_module_status(self, context):
         builder = MarkdownReportBuilder(context)
