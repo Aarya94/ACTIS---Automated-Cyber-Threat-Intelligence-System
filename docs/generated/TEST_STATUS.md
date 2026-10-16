@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-10-16 17:38:16 UTC
+**Generated:** 2026-10-16 17:40:47 UTC
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)
 
 This document inventories all automated test files, test classes, and test functions
@@ -11,8 +11,8 @@ recorded only after confirmed execution.
 
 ## Test Suite Summary
 
-- **Total Test Files:** `48`
-- **Total Discovered Test Cases:** `716`
+- **Total Test Files:** `49`
+- **Total Discovered Test Cases:** `719`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -32,6 +32,7 @@ recorded only after confirmed execution.
 | `tests/test_day27_indicator_trust_and_provenance.py` | 4 tests | `PASSING` |
 | `tests/test_day27_part2_indicator_trust.py` | 5 tests | `PASSING` |
 | `tests/test_day27_part2_persistence_cache.py` | 9 tests | `PASSING` |
+| `tests/test_day27_part2_repeated_scans.py` | 3 tests | `PASSING` |
 | `tests/test_day27_repeated_scan_and_multi_url.py` | 3 tests | `PASSING` |
 | `tests/test_day27_ti_status_transitions.py` | 4 tests | `PASSING` |
 | `tests/test_detection_engine.py` | 23 tests | `PASSING` |
@@ -246,6 +247,13 @@ recorded only after confirmed execution.
 - `test_confirmed_status_protected_from_downgrade_by_unverified_scan()`
 - `test_authoritative_provenance_protected_from_local_scanner_overwrite()`
 - `test_explicit_false_positive_resolution_updates_status()`
+
+### `tests/test_day27_part2_repeated_scans.py` (3 tests)
+
+**Class `TestDay27Part2RepeatedScansAndEvidence`:**
+- `test_external_independent_intelligence_still_contributes()`
+- `test_cache_hit_does_not_fabricate_new_evidence()`
+- `test_repeated_identical_observations_do_not_duplicate_rule_signals()`
 
 ### `tests/test_day27_repeated_scan_and_multi_url.py` (3 tests)
 
