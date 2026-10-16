@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-16 17:22:38 UTC
+**Generated:** 2026-10-16 17:25:51 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`cbd6cdd`)
+**Current Git Branch:** `main` (`23836d8`)
 
 ---
 
@@ -117,20 +117,21 @@
 
 ## Test Status
 
-- **Total Test Files:** `45`
-- **Total Discovered Test Functions:** `699`
+- **Total Test Files:** `46`
+- **Total Discovered Test Functions:** `702`
 - **Coverage Areas:** Configuration validation, SQLite database schema & CRUD, Phishing/Malware model contracts, PE feature extraction, API backend.
 
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `cbd6cdd`
+- **HEAD Commit:** `23836d8`
 - **Working Tree:** 1 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `23836d8` | Aaryan Suman | 2026-10-16 | test(ti): reproduce untrusted indicator promotion and status transitions |
 | `cbd6cdd` | Aaryan Suman | 2026-10-16 | test(benchmarks): preserve day27 pre-change benchmark baseline |
 | `862c9d9` | Aaryan Suman | 2026-10-16 | test(day27): capture baseline indicator trust and cache invalidation defects |
 | `6f009cb` | Aaryan Suman | 2026-10-16 | docs(day27): document repository baseline and detection lifecycle audit |
@@ -140,7 +141,6 @@
 | `b78e1e4` | Aaryan Suman | 2026-10-13 | feat(benchmarks): implement canonical pipeline benchmark runner and verdict mapping |
 | `7abcc6f` | Aaryan Suman | 2026-10-13 | feat(benchmarks): implement confusion matrix and detection evaluation metrics engine |
 | `273520e` | Aaryan Suman | 2026-10-13 | feat(benchmarks): implement synthetic phishing benchmark dataset schema and loader |
-| `3438abf` | Aaryan Suman | 2026-10-13 | docs(day25): document safe MIME parsing, message heuristics, and 692-test verification |
 
 ## Known Issues
 

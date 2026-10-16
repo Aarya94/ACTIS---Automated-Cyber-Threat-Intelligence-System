@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-10-16 17:22:38 UTC
+**Generated:** 2026-10-16 17:25:51 UTC
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)
 
 This document inventories all automated test files, test classes, and test functions
@@ -11,8 +11,8 @@ recorded only after confirmed execution.
 
 ## Test Suite Summary
 
-- **Total Test Files:** `45`
-- **Total Discovered Test Cases:** `699`
+- **Total Test Files:** `46`
+- **Total Discovered Test Cases:** `702`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -30,6 +30,7 @@ recorded only after confirmed execution.
 | `tests/test_config_validation.py` | 11 tests | `PASSING` |
 | `tests/test_day27_benchmark_baseline.py` | 3 tests | `PASSING` |
 | `tests/test_day27_indicator_trust_and_provenance.py` | 4 tests | `PASSING` |
+| `tests/test_day27_repeated_scan_and_multi_url.py` | 3 tests | `PASSING` |
 | `tests/test_day27_ti_status_transitions.py` | 4 tests | `PASSING` |
 | `tests/test_detection_engine.py` | 23 tests | `PASSING` |
 | `tests/test_device_scanner.py` | 10 tests | `PASSING` |
@@ -221,6 +222,13 @@ recorded only after confirmed execution.
 - `test_unverified_heuristic_ml_escalates_to_confirmed_ti()`
 - `test_escalated_indicator_bypasses_multi_attribute_scoring_on_rescan()`
 - `test_ti_provenance_collapse_in_sqlite_persistence()`
+
+### `tests/test_day27_repeated_scan_and_multi_url.py` (3 tests)
+
+**Class `TestDay27RepeatedScansAndAnalysisDefects`:**
+- `test_repeated_scan_score_dilution_feedback_loop()`
+- `test_multi_url_analysis_unbounded_by_mime_deadline()`
+- `test_reproduce_benchmark_false_negative_edge_cases()`
 
 ### `tests/test_day27_ti_status_transitions.py` (4 tests)
 
