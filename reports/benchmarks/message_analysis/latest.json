@@ -2,9 +2,9 @@
   "metadata": {
     "dataset_version": "1.0.0",
     "dataset_hash": "baa051b9daf69dd49e5a715bf07879d440d97244e7d10723993382f65b1eea85",
-    "git_commit": "fdf80dc59577516a74ddefcf7f9eb8adbfe67153",
+    "git_commit": "6f81bdc121b3908349099a32e42f1dd25c4ecbe4",
     "python_version": "3.13.15",
-    "timestamp_iso": "2026-10-16T18:04:18.616706+00:00"
+    "timestamp_iso": "2026-10-16T18:22:14.186491+00:00"
   },
   "confusion_matrix": {
     "true_positives": 87,
@@ -147,7 +147,7 @@
       "accuracy": 0.6666666666666666,
       "precision": 0.0,
       "recall": null,
-      "mean_runtime_ms": 26.37
+      "mean_runtime_ms": 5.78
     },
     "credential_harvesting": {
       "total_samples": 18,
@@ -160,7 +160,7 @@
       "accuracy": 1.0,
       "precision": 1.0,
       "recall": 1.0,
-      "mean_runtime_ms": 82.82
+      "mean_runtime_ms": 17.54
     },
     "deceptive_links_url_obfuscation": {
       "total_samples": 18,
@@ -173,7 +173,7 @@
       "accuracy": 1.0,
       "precision": 1.0,
       "recall": 1.0,
-      "mean_runtime_ms": 82.53
+      "mean_runtime_ms": 18.92
     },
     "financial_manipulation": {
       "total_samples": 15,
@@ -186,7 +186,7 @@
       "accuracy": 1.0,
       "precision": 1.0,
       "recall": 1.0,
-      "mean_runtime_ms": 78.88
+      "mean_runtime_ms": 16.25
     },
     "impersonation_social_engineering": {
       "total_samples": 18,
@@ -199,7 +199,7 @@
       "accuracy": 1.0,
       "precision": 1.0,
       "recall": 1.0,
-      "mean_runtime_ms": 77.39
+      "mean_runtime_ms": 14.97
     },
     "legitimate_security_account": {
       "total_samples": 18,
@@ -212,7 +212,7 @@
       "accuracy": 0.6666666666666666,
       "precision": 0.0,
       "recall": null,
-      "mean_runtime_ms": 26.73
+      "mean_runtime_ms": 6.0
     },
     "malformed_resource_limits": {
       "total_samples": 10,
@@ -225,7 +225,7 @@
       "accuracy": 0.875,
       "precision": 0.75,
       "recall": 1.0,
-      "mean_runtime_ms": 811.81
+      "mean_runtime_ms": 141.43
     },
     "mixed_phishing_indicators": {
       "total_samples": 15,
@@ -238,7 +238,7 @@
       "accuracy": 1.0,
       "precision": 1.0,
       "recall": 1.0,
-      "mean_runtime_ms": 38.43
+      "mean_runtime_ms": 9.62
     },
     "security_awareness_education": {
       "total_samples": 10,
@@ -251,7 +251,7 @@
       "accuracy": 0.4,
       "precision": 0.0,
       "recall": null,
-      "mean_runtime_ms": 49.56
+      "mean_runtime_ms": 9.46
     }
   },
   "url_metrics": {
@@ -265,15 +265,15 @@
   },
   "performance_metrics": {
     "sample_count": 140,
-    "total_runtime_seconds": 15.6985,
-    "mean_seconds": 0.112132,
-    "median_seconds": 0.077945,
-    "p95_seconds": 0.085246,
-    "min_seconds": 0.000173,
-    "max_seconds": 7.757308,
-    "mean_ms": 112.13,
-    "median_ms": 77.95,
-    "p95_ms": 85.25
+    "total_runtime_seconds": 3.0348,
+    "mean_seconds": 0.021677,
+    "median_seconds": 0.015665,
+    "p95_seconds": 0.019145,
+    "min_seconds": 0.00021,
+    "max_seconds": 1.309714,
+    "mean_ms": 21.68,
+    "median_ms": 15.66,
+    "p95_ms": 19.15
   },
   "robustness_summary": {
     "total_edge_cases": 10,

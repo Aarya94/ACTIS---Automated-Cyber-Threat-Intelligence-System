@@ -80,3 +80,27 @@ def test_day27_prechange_baseline_matches_historical():
     assert cov["total_samples"] == 140
     assert cov["valid_binary_predictions"] == 138
     assert cov["abstentions"] == 2
+
+
+def test_day27_final_benchmark_metrics_validation():
+    """Validates that Day 27 final benchmark metrics improve recall and latency without regression."""
+    latest_path = REPORTS_DIR / "latest.json"
+    assert latest_path.exists(), f"Latest benchmark missing at {latest_path}"
+    with open(latest_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    cm = data["confusion_matrix"]
+    assert cm["true_positives"] == 87, f"Expected 87 TP, found {cm['true_positives']}"
+    assert cm["true_negatives"] == 32, f"Expected 32 TN, found {cm['true_negatives']}"
+    assert cm["false_positives"] == 19, f"Expected 19 FP, found {cm['false_positives']}"
+    assert cm["false_negatives"] == 0, f"Expected 0 FN, found {cm['false_negatives']}"
+
+    m = data["classification_metrics"]
+    assert m["recall"] == 1.0, f"Expected 100% recall, got {m['recall']}"
+    assert m["precision"] >= 0.82
+    assert m["f1_score"] >= 0.90
+    assert m["accuracy"] >= 0.86
+
+    # Verify maximum latency is under 5.0s (measured at ~1.31s vs historical 26.4s)
+    perf = data.get("performance_metrics", {})
+    assert perf.get("max_seconds", 999.0) < 5.0, f"Max latency exceeded 5.0s: {perf.get('max_seconds')}"

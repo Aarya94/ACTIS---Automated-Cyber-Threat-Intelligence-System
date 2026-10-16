@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-10-16 18:21:56 UTC
+**Generated:** 2026-10-16 18:23:25 UTC
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)
 
 This document inventories all automated test files, test classes, and test functions
@@ -12,7 +12,7 @@ recorded only after confirmed execution.
 ## Test Suite Summary
 
 - **Total Test Files:** `51`
-- **Total Discovered Test Cases:** `735`
+- **Total Discovered Test Cases:** `736`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -28,7 +28,7 @@ recorded only after confirmed execution.
 | `tests/test_central_ti_service.py` | 30 tests | `PASSING` |
 | `tests/test_config_loading.py` | 11 tests | `PASSING` |
 | `tests/test_config_validation.py` | 11 tests | `PASSING` |
-| `tests/test_day27_benchmark_baseline.py` | 3 tests | `PASSING` |
+| `tests/test_day27_benchmark_baseline.py` | 4 tests | `PASSING` |
 | `tests/test_day27_indicator_trust_and_provenance.py` | 4 tests | `PASSING` |
 | `tests/test_day27_part2_detection_regressions.py` | 9 tests | `PASSING` |
 | `tests/test_day27_part2_indicator_trust.py` | 5 tests | `PASSING` |
@@ -213,12 +213,13 @@ recorded only after confirmed execution.
 - `test_app_name_validation()`
 - `test_api_request_timeout_validation()`
 
-### `tests/test_day27_benchmark_baseline.py` (3 tests)
+### `tests/test_day27_benchmark_baseline.py` (4 tests)
 
 **Standalone Test Functions:**
 - `test_manifest_sha256_hash_integrity()`
 - `test_historical_day26_baseline_preserved()`
 - `test_day27_prechange_baseline_matches_historical()`
+- `test_day27_final_benchmark_metrics_validation()`
 
 ### `tests/test_day27_indicator_trust_and_provenance.py` (4 tests)
 
