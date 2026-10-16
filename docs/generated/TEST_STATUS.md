@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-10-16 17:21:36 UTC
+**Generated:** 2026-10-16 17:22:38 UTC
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)
 
 This document inventories all automated test files, test classes, and test functions
@@ -11,8 +11,8 @@ recorded only after confirmed execution.
 
 ## Test Suite Summary
 
-- **Total Test Files:** `44`
-- **Total Discovered Test Cases:** `695`
+- **Total Test Files:** `45`
+- **Total Discovered Test Cases:** `699`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -30,6 +30,7 @@ recorded only after confirmed execution.
 | `tests/test_config_validation.py` | 11 tests | `PASSING` |
 | `tests/test_day27_benchmark_baseline.py` | 3 tests | `PASSING` |
 | `tests/test_day27_indicator_trust_and_provenance.py` | 4 tests | `PASSING` |
+| `tests/test_day27_ti_status_transitions.py` | 4 tests | `PASSING` |
 | `tests/test_detection_engine.py` | 23 tests | `PASSING` |
 | `tests/test_device_scanner.py` | 10 tests | `PASSING` |
 | `tests/test_doc_generator.py` | 20 tests | `PASSING` |
@@ -220,6 +221,14 @@ recorded only after confirmed execution.
 - `test_unverified_heuristic_ml_escalates_to_confirmed_ti()`
 - `test_escalated_indicator_bypasses_multi_attribute_scoring_on_rescan()`
 - `test_ti_provenance_collapse_in_sqlite_persistence()`
+
+### `tests/test_day27_ti_status_transitions.py` (4 tests)
+
+**Class `TestDay27TIStatusTransitionsAndProvenance`:**
+- `test_status_rigidly_retained_on_existing_indicator_update()`
+- `test_authoritative_provenance_overwritten_by_subsequent_scans()`
+- `test_register_indicator_idempotency_and_uniqueness()`
+- `test_persistence_triggered_invalidation_fails_due_to_cache_key_defect()`
 
 ### `tests/test_detection_engine.py` (23 tests)
 
