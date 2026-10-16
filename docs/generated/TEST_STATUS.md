@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-10-16 21:22:41 UTC
+**Generated:** 2026-10-16 21:24:46 UTC
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)
 
 This document inventories all automated test files, test classes, and test functions
@@ -12,7 +12,7 @@ recorded only after confirmed execution.
 ## Test Suite Summary
 
 - **Total Test Files:** `52`
-- **Total Discovered Test Cases:** `744`
+- **Total Discovered Test Cases:** `745`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -40,7 +40,7 @@ recorded only after confirmed execution.
 | `tests/test_day27_ti_status_transitions.py` | 4 tests | `PASSING` |
 | `tests/test_detection_engine.py` | 23 tests | `PASSING` |
 | `tests/test_device_scanner.py` | 10 tests | `PASSING` |
-| `tests/test_doc_generator.py` | 24 tests | `PASSING` |
+| `tests/test_doc_generator.py` | 25 tests | `PASSING` |
 | `tests/test_evidence_fusion_audit.py` | 22 tests | `PASSING` |
 | `tests/test_explainability_tree.py` | 24 tests | `PASSING` |
 | `tests/test_file_pipeline_hardening.py` | 17 tests | `PASSING` |
@@ -353,7 +353,7 @@ recorded only after confirmed execution.
 - `test_streaming_fingerprint_changed_during_hash()`
 - `test_scan_cooperative_cancellation()`
 
-### `tests/test_doc_generator.py` (24 tests)
+### `tests/test_doc_generator.py` (25 tests)
 
 **Class `TestRepoInspector`:**
 - `test_audit_directories()`
@@ -388,6 +388,7 @@ recorded only after confirmed execution.
 - `test_generate_project_status()`
 - `test_generate_project_status_clean_tree_reporting()`
 - `test_generate_project_status_inflight_tree_reporting()`
+- `test_generate_project_status_doc_only_inflight_reporting()`
 - `test_generate_module_status()`
 - `test_generate_ml_reference()`
 - `test_generate_database_reference()`

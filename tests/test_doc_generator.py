@@ -257,12 +257,28 @@ class TestMarkdownReportBuilder:
             "clean": False,
             "summary": "1 in-flight changes (1 untracked)",
             "changed_files_count": 1,
+            "non_doc_files_count": 1,
         }
         builder = MarkdownReportBuilder(context_dirty)
         content = builder.generate_project_status()
         assert "- **Repository State at Generation:** 1 in-flight changes (1 untracked) (captured prior to release commit)" in content
         assert "- **Working Tree:** clean (all in-flight artifacts staged and committed atomically)" in content
         assert "untracked/unstaged changes" not in content
+
+    def test_generate_project_status_doc_only_inflight_reporting(self, context):
+        context_doc_only = dict(context)
+        context_doc_only["tree_status"] = {
+            "clean": False,
+            "summary": "6 in-flight generated doc changes (6 staged)",
+            "changed_files_count": 6,
+            "non_doc_files_count": 0,
+        }
+        builder = MarkdownReportBuilder(context_doc_only)
+        content = builder.generate_project_status()
+        assert "- **Repository State at Generation:** clean" in content
+        assert "- **Working Tree:** clean" in content
+        assert "untracked/unstaged changes" not in content
+
 
 
     def test_generate_module_status(self, context):
