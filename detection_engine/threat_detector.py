@@ -199,7 +199,9 @@ class ThreatDetector:
                     indicator_value=sha256,
                     source="actis_file_scanner",
                     confidence=round(risk_res["score"] / 100.0, 2),
-                    status="SUSPICIOUS" if risk_res["risk_level"] != "CRITICAL" else "CONFIRMED",
+                    # Trust Invariant (Day 27 Part 2): Internal heuristic/ML detections are unverified alerts
+                    # and must NEVER be auto-promoted to CONFIRMED without authoritative review.
+                    status="SUSPICIOUS",
                     threat_type="Malware",
                     threat_name=path.name
                 )
@@ -526,6 +528,7 @@ class ThreatDetector:
                     indicator_type="url",
                     indicator_value=canonical_url,
                     source="actis_url_scanner",
+                    confidence=round(risk_res["score"] / 100.0, 2),
                     # Defect Fix (Day 27 Part 2): Internal heuristic/ML detections are unverified alerts
                     # and must NEVER be auto-promoted to CONFIRMED without authoritative review.
                     status="SUSPICIOUS",

@@ -78,10 +78,10 @@ class TestDay27RepeatedScansAndAnalysisDefects:
 
         res2 = detector2.analyze_url(test_url)
 
-        # 3. VERIFY DEFECT: Score dropped by 8.4 points and risk level flipped from HIGH to MEDIUM
-        assert res2["score"] == 59.6, f"Expected score dilution to 59.6, got {res2['score']}"
-        assert res2["risk_level"] == "MEDIUM", f"Expected downgraded risk level 'MEDIUM', got {res2['risk_level']}"
-        assert res2["score"] < res1["score"], "Repeated scan should demonstrate downward score dilution defect"
+        # 3. VERIFY DEFECT RESOLUTION: Repeated scan maintains identical score and risk level (68.0 HIGH)
+        assert res2["score"] == 68.0, f"Expected stable score 68.0, got {res2['score']}"
+        assert res2["risk_level"] == "HIGH", f"Expected stable risk level 'HIGH', got {res2['risk_level']}"
+        assert res2["score"] == res1["score"], "Repeated scan without new evidence must preserve score stability"
 
     def test_multi_url_analysis_unbounded_by_mime_deadline(self):
         """

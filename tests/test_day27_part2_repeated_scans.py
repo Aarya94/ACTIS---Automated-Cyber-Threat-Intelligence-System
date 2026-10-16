@@ -97,3 +97,35 @@ class TestDay27Part2RepeatedScansAndEvidence:
         assert res_a["heuristic_score"] == res_b["heuristic_score"]
         assert sorted(res_a["rules_triggered"]) == sorted(res_b["rules_triggered"])
         assert len(res_a["rules_triggered"]) == len(set(res_a["rules_triggered"]))
+
+    def test_repeated_scan_score_stability_and_invariance(self, isolated_ti_db):
+        """
+        Validates that rescanning a target across isolated detector instances
+        (where in-memory cache is empty but threat database holds the prior suspicious entry)
+        preserves identical composite risk score and risk level without feedback-loop dilution.
+        """
+        url = "http://wellsfargo-security.biz/update"
+
+        # Scan 1: Cold database and cache
+        detector1 = ThreatDetector()
+        res1 = detector1.analyze_url(url)
+        assert res1["score"] == 68.0
+        assert res1["risk_level"] == "HIGH"
+        assert res1["is_threat"] is True
+
+        # Verify indicator was recorded as SUSPICIOUS with source="actis_url_scanner"
+        ind = tdb.lookup_indicator("url", url)
+        assert ind["found"] is True
+        assert ind["status"] == "SUSPICIOUS"
+        assert ind["source"] == "actis_url_scanner"
+
+        # Scan 2: Fresh instance (cache miss, DB hit)
+        detector2 = ThreatDetector()
+        assert detector2._url_cache.size == 0
+        res2 = detector2.analyze_url(url)
+
+        # Invariant: Score and risk level must remain strictly identical
+        assert res2["score"] == res1["score"] == 68.0
+        assert res2["risk_level"] == res1["risk_level"] == "HIGH"
+        assert res2["is_threat"] == res1["is_threat"] is True
+

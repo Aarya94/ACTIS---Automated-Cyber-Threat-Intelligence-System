@@ -312,20 +312,32 @@ class RiskEngine:
         ext_score = 0.0
 
         # Layer 1: Local Threat Intelligence Database
+        is_self_generated = False
+        intel_confidence = 1.0
         if known_intel and known_intel.get("found", False):
             intel_status = known_intel.get("status", "").upper()
-            confidence = float(known_intel.get("confidence", 1.0))
-            
+            intel_confidence = float(known_intel.get("confidence", 1.0))
+            intel_source = str(known_intel.get("source", "")).strip().lower()
+
+            # Trust Invariant: Internal heuristic/ML detections recorded as SUSPICIOUS
+            # (e.g. from actis_url_scanner or local heuristics) are uncorroborated alerts
+            # derived from prior runs of the same local engine. They must NOT be treated as
+            # independent external threat intelligence when primary ML/heuristic evidence is present,
+            # which would dilute or artificially amplify the primary assessment.
+            if intel_source in ("actis_url_scanner", "actis_file_scanner", "local_detection", "actis_detection_engine") and intel_status == "SUSPICIOUS":
+                is_self_generated = True
+
             if intel_status in ["CONFIRMED", "MALICIOUS"]:
                 is_known_malicious = True
-                known_score = 100.0 * confidence
+                known_score = 100.0 * intel_confidence
                 reasons.append(
                     f"Identified in local threat intelligence database as CONFIRMED threat: "
-                    f"'{known_intel.get('threat_type', 'Malicious')}' (Confidence: {int(confidence*100)}%)."
+                    f"'{known_intel.get('threat_type', 'Malicious')}' (Confidence: {int(intel_confidence*100)}%)."
                 )
             elif intel_status == "SUSPICIOUS":
-                known_score = 70.0 * confidence
-                reasons.append(f"Recorded in threat database as SUSPICIOUS indicator (Confidence: {int(confidence*100)}%).")
+                if not is_self_generated:
+                    known_score = 70.0 * intel_confidence
+                    reasons.append(f"Recorded in threat database as SUSPICIOUS indicator (Confidence: {int(intel_confidence*100)}%).")
             elif intel_status == "FALSE_POSITIVE":
                 known_score = -50.0
                 reasons.append("Indicator is flagged as a verified FALSE POSITIVE in threat database.")
@@ -374,8 +386,16 @@ class RiskEngine:
             final_score = max(90.0, known_score)
         else:
             active_weights = {}
+            has_primary_evidence = bool(
+                (ml_result and ml_result.get("available")) or heuristic_result
+            )
             if known_intel and known_intel.get("found"):
-                active_weights["known"] = WEIGHT_KNOWN_INTEL
+                if not (is_self_generated and has_primary_evidence):
+                    active_weights["known"] = WEIGHT_KNOWN_INTEL
+                    if is_self_generated and not has_primary_evidence:
+                        known_score = 70.0 * intel_confidence
+                        reasons.append(f"Recorded in threat database as SUSPICIOUS indicator (Confidence: {int(intel_confidence*100)}%).")
+
             if ml_result and ml_result.get("available"):
                 active_weights["ml"] = WEIGHT_ML_PROBABILITY
             if heuristic_result:
