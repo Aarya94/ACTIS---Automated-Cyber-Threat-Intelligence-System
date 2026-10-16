@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-10-16 17:55:27 UTC
+**Generated:** 2026-10-16 18:02:34 UTC
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)
 
 This document inventories all automated test files, test classes, and test functions
@@ -12,7 +12,7 @@ recorded only after confirmed execution.
 ## Test Suite Summary
 
 - **Total Test Files:** `50`
-- **Total Discovered Test Cases:** `726`
+- **Total Discovered Test Cases:** `729`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -30,7 +30,7 @@ recorded only after confirmed execution.
 | `tests/test_config_validation.py` | 11 tests | `PASSING` |
 | `tests/test_day27_benchmark_baseline.py` | 3 tests | `PASSING` |
 | `tests/test_day27_indicator_trust_and_provenance.py` | 4 tests | `PASSING` |
-| `tests/test_day27_part2_detection_regressions.py` | 6 tests | `PASSING` |
+| `tests/test_day27_part2_detection_regressions.py` | 9 tests | `PASSING` |
 | `tests/test_day27_part2_indicator_trust.py` | 5 tests | `PASSING` |
 | `tests/test_day27_part2_persistence_cache.py` | 9 tests | `PASSING` |
 | `tests/test_day27_part2_repeated_scans.py` | 4 tests | `PASSING` |
@@ -227,7 +227,7 @@ recorded only after confirmed execution.
 - `test_escalated_indicator_bypasses_multi_attribute_scoring_on_rescan()`
 - `test_ti_provenance_collapse_in_sqlite_persistence()`
 
-### `tests/test_day27_part2_detection_regressions.py` (6 tests)
+### `tests/test_day27_part2_detection_regressions.py` (9 tests)
 
 **Class `TestDay27Part2DetectionRegressions`:**
 - `test_benign_url_query_percent40_not_flagged_as_userinfo_deception()`
@@ -236,6 +236,9 @@ recorded only after confirmed execution.
 - `test_benchmark_benign_samples_remain_unflagged()`
 - `test_standard_dangerous_attachment_extensions_preserved()`
 - `test_explicit_userinfo_deception_remains_detectable()`
+- `test_macro_attachment_extensions_recognized_as_dangerous()`
+- `test_unclosed_html_anchor_flushes_and_detects_display_mismatch()`
+- `test_percent_encoded_userinfo_delimiter_deobfuscation()`
 
 ### `tests/test_day27_part2_indicator_trust.py` (5 tests)
 

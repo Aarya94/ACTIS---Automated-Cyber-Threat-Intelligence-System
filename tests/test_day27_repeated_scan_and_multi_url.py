@@ -118,15 +118,15 @@ class TestDay27RepeatedScansAndAnalysisDefects:
         # MIME parser limit was not reached because MIME parsing is fast; URL scanning has no limit
         assert res.analysis_completeness == "COMPLETE"
 
-    def test_reproduce_benchmark_false_negative_edge_cases(self):
+    def test_reproduce_benchmark_false_negative_edge_cases(self, isolated_ti_db):
         """
-        Reproduces the 3 historical false negatives from the Day 26 synthetic benchmark corpus:
+        Validates the resolution of the 3 historical false negatives from the Day 26 synthetic benchmark corpus:
         1. PHISH_URL_010: Percent-encoded @ userinfo (https://legit-service.example.org%40evil-host.example.com/login)
-           fails to trigger phishing threshold because lack of urgency text leaves score at 30.0 (LOW).
-        2. PHISH_MIX_012: Invoice.docm macro-enabled attachment gets only 20.0 (LOW) because .docm is
-           missing from DANGEROUS_ATTACHMENT_EXTENSIONS in scanners/mime_parser.py.
+           is deobfuscated and triggers high-severity userinfo deception rules.
+        2. PHISH_MIX_012: Invoice.docm macro-enabled attachment is flagged because .docm is
+           included in DANGEROUS_ATTACHMENT_EXTENSIONS in scanners/mime_parser.py.
         3. EDGE_ROB_009: Malformed unclosed HTML anchor (<a href="https://attacker.example.com">...<p>)
-           scores 0.0 (INFORMATIONAL) because unclosed tag prevents display text mismatch detection.
+           correctly flushes display text and triggers RULE_MSG_DISPLAY_TEXT_MISMATCH.
         """
         assert DEFAULT_MANIFEST_PATH.exists()
         with open(DEFAULT_MANIFEST_PATH, "r", encoding="utf-8") as f:
@@ -139,26 +139,21 @@ class TestDay27RepeatedScansAndAnalysisDefects:
         s_url010 = sample_map["PHISH_URL_010"]
         assert s_url010["label"] == "PHISHING"
         r_url010 = detector.analyze_message(s_url010["content"])
-        assert r_url010["score"] == 30.0
-        assert r_url010["risk_level"] == "LOW"
-        assert r_url010["is_threat"] is False
+        assert r_url010["is_threat"] is True
+        assert r_url010["risk_level"] in ("HIGH", "CRITICAL")
 
         # 2. PHISH_MIX_012: Macro-enabled docm invoice
         s_mix012 = sample_map["PHISH_MIX_012"]
         assert s_mix012["label"] == "PHISHING"
-        # Confirm .docm is NOT in DANGEROUS_ATTACHMENT_EXTENSIONS
-        assert ".docm" not in DANGEROUS_ATTACHMENT_EXTENSIONS, (
-            "Verified root cause: .docm is omitted from DANGEROUS_ATTACHMENT_EXTENSIONS"
-        )
+        assert ".docm" in DANGEROUS_ATTACHMENT_EXTENSIONS
         r_mix012 = detector.analyze_message(s_mix012["content"])
-        assert r_mix012["score"] == 20.0
-        assert r_mix012["risk_level"] == "LOW"
-        assert r_mix012["is_threat"] is False
+        assert r_mix012["is_threat"] is True
+        assert r_mix012["risk_level"] in ("HIGH", "CRITICAL")
 
         # 3. EDGE_ROB_009: Malformed unclosed HTML anchor
         s_rob009 = sample_map["EDGE_ROB_009"]
         assert s_rob009["label"] == "PHISHING"
         r_rob009 = detector.analyze_message(s_rob009["content"])
-        assert r_rob009["score"] == 0.0
-        assert r_rob009["risk_level"] == "INFORMATIONAL"
-        assert r_rob009["is_threat"] is False
+        assert r_rob009["is_threat"] is True
+        assert r_rob009["risk_level"] in ("HIGH", "CRITICAL")
+        assert any("Display-text mismatch" in r or "Link Display Text" in r for r in r_rob009["reasons"])

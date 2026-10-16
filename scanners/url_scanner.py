@@ -149,6 +149,27 @@ def validate_url(url: Any) -> Tuple[bool, Optional[str]]:
             return False, "Unsupported URL scheme. Only HTTP and HTTPS are permitted."
         candidate = "http://" + candidate
 
+    # Deobfuscate percent-encoded '@' (%40) in authority portion
+    # RFC 3986 allows userinfo to be delimited by '@'. Phishing URLs frequently percent-encode
+    # '%40' in the authority to bypass naive domain parsers.
+    if "%40" in candidate.lower():
+        scheme_sep = candidate.find("://")
+        if scheme_sep != -1:
+            auth_start = scheme_sep + 3
+            auth_end = candidate.find("/", auth_start)
+            if auth_end == -1:
+                auth_end = len(candidate)
+            q_idx = candidate.find("?", auth_start)
+            if q_idx != -1 and q_idx < auth_end:
+                auth_end = q_idx
+            frag_idx = candidate.find("#", auth_start)
+            if frag_idx != -1 and frag_idx < auth_end:
+                auth_end = frag_idx
+            authority = candidate[auth_start:auth_end]
+            if "%40" in authority.lower():
+                normalized_auth = re.sub(r"%40", "@", authority, flags=re.IGNORECASE)
+                candidate = candidate[:auth_start] + normalized_auth + candidate[auth_end:]
+
     try:
         parsed = urlparse(candidate)
         port = parsed.port
@@ -320,6 +341,25 @@ def deobfuscate_and_analyze_url(
             suspicious_encoding_findings.append(
                 f"URL contains percent-encoded delimiter '{enc_token}' representing '{char_val}'"
             )
+
+    # 4b. Deobfuscate percent-encoded '@' (%40) in authority portion
+    if "%40" in clean.lower():
+        scheme_sep = clean.find("://")
+        auth_start = scheme_sep + 3 if scheme_sep != -1 else 0
+        auth_end = clean.find("/", auth_start)
+        if auth_end == -1:
+            auth_end = len(clean)
+        q_idx = clean.find("?", auth_start)
+        if q_idx != -1 and q_idx < auth_end:
+            auth_end = q_idx
+        frag_idx = clean.find("#", auth_start)
+        if frag_idx != -1 and frag_idx < auth_end:
+            auth_end = frag_idx
+        authority = clean[auth_start:auth_end]
+        if "%40" in authority.lower():
+            normalized_auth = re.sub(r"%40", "@", authority, flags=re.IGNORECASE)
+            clean = clean[:auth_start] + normalized_auth + clean[auth_end:]
+            normalization_warnings.append(f"Deobfuscated percent-encoded '@' in authority: '{authority}' -> '{normalized_auth}'")
 
     # 5. Syntactic validation
     is_valid, val_err = validate_url(clean)

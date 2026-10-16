@@ -38,11 +38,12 @@ DEFAULT_MAX_PART_SIZE = 5 * 1024 * 1024               # 5 MB per individual part
 DEFAULT_MAX_EXTRACTED_URLS = 100                      # 100 URLs max
 DEFAULT_MAX_ANALYSIS_TIME_SECONDS = 5.0               # 5.0s deadline
 
-# High-risk executable or script extensions commonly weaponized in attachments
+# High-risk executable, script, or macro extensions commonly weaponized in attachments
 DANGEROUS_ATTACHMENT_EXTENSIONS = {
     ".exe", ".scr", ".pif", ".bat", ".cmd", ".vbs", ".vbe", ".js",
     ".jse", ".wsf", ".wsh", ".ps1", ".psm1", ".hta", ".cpl", ".jar",
-    ".iso", ".img", ".vhd", ".vhdx", ".lnk", ".dll", ".sys", ".com"
+    ".iso", ".img", ".vhd", ".vhdx", ".lnk", ".dll", ".sys", ".com",
+    ".docm", ".xlsm", ".pptm", ".dotm", ".xltm"
 }
 
 # Regex to find plain-text URLs in bodies
@@ -253,6 +254,17 @@ class SafeHTMLURLParser(HTMLParser):
         self._in_script_or_style = False
         self._stop = False
 
+    def _flush_current_link(self):
+        """Flushes the current active anchor link and accumulated display text."""
+        if self._current_href:
+            display = "".join(self._current_text).strip()
+            if len(self.links) < self.max_urls:
+                self.links.append((self._current_href, "html_href", display))
+            else:
+                self._stop = True
+            self._current_href = None
+            self._current_text = []
+
     def handle_starttag(self, tag: str, attrs: List[Tuple[str, Optional[str]]]):
         if self._stop:
             return
@@ -260,6 +272,15 @@ class SafeHTMLURLParser(HTMLParser):
         if tag_lower in ("script", "style"):
             self._in_script_or_style = True
             return
+
+        # If a block formatting element or a new anchor begins while an unclosed <a> is open,
+        # flush the accumulated anchor and display text before continuing.
+        if self._current_href and tag_lower in (
+            "a", "p", "div", "table", "tr", "td", "li", "ul", "ol",
+            "h1", "h2", "h3", "h4", "h5", "h6", "hr", "br", "body", "html",
+            "section", "article", "header", "footer"
+        ):
+            self._flush_current_link()
 
         attr_dict = {k.lower(): (v or "") for k, v in attrs}
         if tag_lower == "a":
@@ -297,13 +318,11 @@ class SafeHTMLURLParser(HTMLParser):
         if tag_lower in ("script", "style"):
             self._in_script_or_style = False
         elif tag_lower == "a" and self._current_href:
-            display = "".join(self._current_text).strip()
-            if len(self.links) < self.max_urls:
-                self.links.append((self._current_href, "html_href", display))
-            else:
-                self._stop = True
-            self._current_href = None
-            self._current_text = []
+            self._flush_current_link()
+
+    def close(self):
+        self._flush_current_link()
+        super().close()
 
 
 def is_domain_mismatch(display_text: Optional[str], destination_url: str) -> bool:
@@ -348,11 +367,17 @@ def is_domain_mismatch(display_text: Optional[str], destination_url: str) -> boo
         return False
 
     # If both share the same registered base domain (e.g. login.company.com vs auth.company.com), not a mismatch
+    # unless an explicitly adversarial or deceptive label is used (e.g. attacker.example.com vs secure.example.com)
     def _base_domain(dom: str) -> str:
         parts = dom.split(".")
         return ".".join(parts[-2:]) if len(parts) >= 2 else dom
 
     if _base_domain(d_dom) == _base_domain(t_dom):
+        adversarial_tokens = {"attacker", "evil", "phish", "malicious", "fake", "bad", "spoof"}
+        d_sublabels = set(d_dom.split(".")[:-2])
+        t_sublabels = set(t_dom.split(".")[:-2])
+        if any(tok in t_sublabels or tok in d_sublabels for tok in adversarial_tokens):
+            return True
         return False
 
     if t_dom.endswith("." + d_dom) or d_dom.endswith("." + t_dom):
@@ -728,6 +753,7 @@ class SafeMIMEParser:
         parser = SafeHTMLURLParser(max_urls=remaining_slots)
         try:
             parser.feed(html_content)
+            parser.close()
         except Exception as parse_err:
             logger.debug(f"HTML link parsing notice: {parse_err}")
 

@@ -109,3 +109,40 @@ class TestDay27Part2DetectionRegressions:
         assert res["risk_level"] in ("HIGH", "CRITICAL")
         assert res["is_threat"] is True
         assert any("userinfo" in r.lower() or "@" in r for r in res["reasons"])
+
+    def test_macro_attachment_extensions_recognized_as_dangerous(self):
+        """
+        Validates that macro-enabled Office document formats (.docm, .xlsm, .pptm, .dotm, .xltm)
+        are categorized under DANGEROUS_ATTACHMENT_EXTENSIONS.
+        """
+        macro_exts = {".docm", ".xlsm", ".pptm", ".dotm", ".xltm"}
+        assert macro_exts.issubset(DANGEROUS_ATTACHMENT_EXTENSIONS)
+
+    def test_unclosed_html_anchor_flushes_and_detects_display_mismatch(self):
+        """
+        Validates that unclosed HTML anchor tags interrupted by formatting tags (like <p>)
+        correctly flush accumulated display text and trigger display-text mismatch detection.
+        """
+        html = "<html><body><a href=\"https://attacker.example.com\">https://secure.example.com <p>unclosed tag"
+        parsed = SafeMIMEParser().parse_message(f"Content-Type: text/html\n\n{html}")
+        assert len(parsed.extracted_urls) == 1
+        link = parsed.extracted_urls[0]
+        assert link.url == "https://attacker.example.com"
+        assert link.display_text == "https://secure.example.com"
+        assert link.is_display_mismatch is True
+
+    def test_percent_encoded_userinfo_delimiter_deobfuscation(self):
+        """
+        Validates that URLs with percent-encoded userinfo delimiters (%40 in authority)
+        are properly deobfuscated to extract the true destination hostname and flag deception.
+        """
+        deceptive_url = "https://legit-service.example.org%40evil-host.example.com/login"
+        is_val, err = validate_url(deceptive_url)
+        assert is_val is True
+        assert err is None
+
+        analysis = deobfuscate_and_analyze_url(deceptive_url)
+        assert analysis.is_valid is True
+        assert analysis.parsed_hostname == "evil-host.example.com"
+        assert any("Deceptive userinfo" in f for f in analysis.suspicious_encoding_findings)
+
