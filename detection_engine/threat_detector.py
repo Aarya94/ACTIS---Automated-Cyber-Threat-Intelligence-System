@@ -327,13 +327,22 @@ class ThreatDetector:
                         indicator_type=IndicatorType.URL
                     )
 
-            if u_threat and u_score >= 60.0:
-                sev = EvidenceSeverity.CRITICAL if u_score >= 80.0 else EvidenceSeverity.HIGH
+            if u_threat and u_score >= 35.0:
+                if u_score >= 80.0:
+                    sev = EvidenceSeverity.CRITICAL
+                    name = f"Critical-Risk URL in Message: {u_domain}"
+                elif u_score >= 60.0:
+                    sev = EvidenceSeverity.HIGH
+                    name = f"High-Risk URL in Message: {u_domain}"
+                else:
+                    sev = EvidenceSeverity.MEDIUM
+                    name = f"Suspicious URL in Message: {u_domain}"
+
                 static_signals.append(
                     EvidenceSignal(
                         source=EvidenceSource.ANOMALY,
                         signal_id=f"MSG_URL_RISK_{u_canonical}",
-                        name=f"High-Risk URL in Message: {u_domain}",
+                        name=name,
                         description=f"Message contains link '{u_canonical}' with risk score {u_score:.1f}.",
                         severity=sev,
                         score_contribution=min(100.0, u_score),

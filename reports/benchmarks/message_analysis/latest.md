@@ -4,8 +4,8 @@
 
 ## 1. Executive Summary
 
-- **Execution Timestamp**: `2026-10-16T20:22:52.001363+00:00`
-- **ACTIS Git Commit**: `5673a344d5ce8c873956ea06be52e6532d8d5904`
+- **Execution Timestamp**: `2026-10-16T20:53:16.008965+00:00`
+- **ACTIS Git Commit**: `36fd0e2aec08d1fa429d7aeba9c6e2811f5a6a3c`
 - **Python Version**: `3.13.15`
 - **Dataset Version**: `1.0.0`
 - **Dataset SHA-256 Hash**: `baa051b9daf69dd4...`
@@ -41,15 +41,15 @@ Actual BENIGN   (Neg):        FP = 19                 TN = 32
 
 | Scenario Category | Samples | Evaluated | TP | TN | FP | FN | Accuracy | Mean Latency |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| `benign_financial_business` | 18 | 18 | 0 | 12 | 6 | 0 | 0.667 | 20.6 ms |
-| `credential_harvesting` | 18 | 18 | 18 | 0 | 0 | 0 | 1.000 | 55.6 ms |
-| `deceptive_links_url_obfuscation` | 18 | 18 | 18 | 0 | 0 | 0 | 1.000 | 56.6 ms |
-| `financial_manipulation` | 15 | 15 | 15 | 0 | 0 | 0 | 1.000 | 56.3 ms |
-| `impersonation_social_engineering` | 18 | 18 | 18 | 0 | 0 | 0 | 1.000 | 51.1 ms |
-| `legitimate_security_account` | 18 | 18 | 0 | 12 | 6 | 0 | 0.667 | 19.2 ms |
-| `malformed_resource_limits` | 10 | 8 | 3 | 4 | 1 | 0 | 0.875 | 495.9 ms |
-| `mixed_phishing_indicators` | 15 | 15 | 15 | 0 | 0 | 0 | 1.000 | 32.1 ms |
-| `security_awareness_education` | 10 | 10 | 0 | 4 | 6 | 0 | 0.400 | 41.4 ms |
+| `benign_financial_business` | 18 | 18 | 0 | 12 | 6 | 0 | 0.667 | 6.0 ms |
+| `credential_harvesting` | 18 | 18 | 18 | 0 | 0 | 0 | 1.000 | 19.5 ms |
+| `deceptive_links_url_obfuscation` | 18 | 18 | 18 | 0 | 0 | 0 | 1.000 | 17.6 ms |
+| `financial_manipulation` | 15 | 15 | 15 | 0 | 0 | 0 | 1.000 | 20.2 ms |
+| `impersonation_social_engineering` | 18 | 18 | 18 | 0 | 0 | 0 | 1.000 | 17.7 ms |
+| `legitimate_security_account` | 18 | 18 | 0 | 12 | 6 | 0 | 0.667 | 5.6 ms |
+| `malformed_resource_limits` | 10 | 8 | 3 | 4 | 1 | 0 | 0.875 | 167.2 ms |
+| `mixed_phishing_indicators` | 15 | 15 | 15 | 0 | 0 | 0 | 1.000 | 9.9 ms |
+| `security_awareness_education` | 10 | 10 | 0 | 4 | 6 | 0 | 0.400 | 11.1 ms |
 
 ## 4. Per-Rule Telemetry & Contribution
 
@@ -83,11 +83,11 @@ Actual BENIGN   (Neg):        FP = 19                 TN = 32
 
 ### Latency Statistics (Monotonic Timer)
 
-- **Mean Latency**: `73.95 ms`
-- **Median Latency**: `51.19 ms`
-- **95th Percentile (p95)**: `67.26 ms`
-- **Max Observed Latency**: `4581.57 ms`
-- **Total Benchmark Wall Time**: `10.35 s`
+- **Mean Latency**: `24.51 ms`
+- **Median Latency**: `16.50 ms`
+- **95th Percentile (p95)**: `22.32 ms`
+- **Max Observed Latency**: `1564.07 ms`
+- **Total Benchmark Wall Time**: `3.43 s`
 
 ## 7. Failure Analysis
 
