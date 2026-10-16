@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-16 17:32:21 UTC
+**Generated:** 2026-10-16 17:33:49 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`345932f`)
+**Current Git Branch:** `main` (`8237d91`)
 
 ---
 
@@ -118,19 +118,20 @@
 ## Test Status
 
 - **Total Test Files:** `47`
-- **Total Discovered Test Functions:** `706`
+- **Total Discovered Test Functions:** `707`
 - **Coverage Areas:** Configuration validation, SQLite database schema & CRUD, Phishing/Malware model contracts, PE feature extraction, API backend.
 
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `345932f`
-- **Working Tree:** 1 untracked/unstaged changes
+- **HEAD Commit:** `8237d91`
+- **Working Tree:** 3 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `8237d91` | Aaryan Suman | 2026-10-16 | test(ti): cover indicator trust and provenance invariants |
 | `345932f` | Aaryan Suman | 2026-10-16 | docs(day27): record verified findings and implementation handoff |
 | `8199ec1` | Aaryan Suman | 2026-10-16 | test(detection): cover repeated-scan evidence behavior and multi-URL latency |
 | `23836d8` | Aaryan Suman | 2026-10-16 | test(ti): reproduce untrusted indicator promotion and status transitions |
@@ -140,7 +141,6 @@
 | `67b4f8e` | Aaryan Suman | 2026-10-13 | docs(day26): document phishing verification benchmark methodology, metrics, and baseline results |
 | `d6e0d6d` | Aaryan Suman | 2026-10-13 | feat(benchmarks): implement JSON and Markdown report generation with preserved baseline |
 | `24cbd1b` | Aaryan Suman | 2026-10-13 | fix(explainability): add NodeStatus.LIMITATION for partial message analyses and add benchmark tests |
-| `b78e1e4` | Aaryan Suman | 2026-10-13 | feat(benchmarks): implement canonical pipeline benchmark runner and verdict mapping |
 
 ## Known Issues
 

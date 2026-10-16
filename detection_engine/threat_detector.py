@@ -523,8 +523,9 @@ class ThreatDetector:
                     indicator_type="url",
                     indicator_value=canonical_url,
                     source="actis_url_scanner",
-                    confidence=round(risk_res["score"] / 100.0, 2),
-                    status="SUSPICIOUS" if risk_res["risk_level"] != "CRITICAL" else "CONFIRMED",
+                    # Defect Fix (Day 27 Part 2): Internal heuristic/ML detections are unverified alerts
+                    # and must NEVER be auto-promoted to CONFIRMED without authoritative review.
+                    status="SUSPICIOUS",
                     threat_type="Phishing",
                     threat_name=domain
                 )

@@ -43,6 +43,34 @@ def isolated_ti_db():
 class TestDay27Part2IndicatorTrustInvariants:
     """Invariant tests ensuring unverified predictions cannot escalate to authoritative TI."""
 
+    def test_unverified_engine_detection_registers_as_suspicious_not_confirmed(self, isolated_ti_db):
+        """
+        Trust Principle:
+        ML predictions and heuristic scores are internal evidence, not external proof.
+        Even when a URL triggers a high risk score (>= 80), it must only be persisted
+        as 'SUSPICIOUS' with source='actis_url_scanner'.
+        Under no circumstances should the detection engine auto-assign status='CONFIRMED'.
+        """
+        detector = ThreatDetector()
+        high_risk_url = "http://198.51.100.10:8080/login/verify/account/update/secure/banking/signin/webscr?token=xyz"
+        norm_url = normalize_url(high_risk_url)
+
+        # Confirm indicator absent initially
+        pre_ind = tdb.lookup_indicator("url", norm_url)
+        assert pre_ind["found"] is False
+
+        # Run detection
+        res = detector.analyze_url(high_risk_url)
+        assert res["is_threat"] is True
+
+        # Verify persisted status in database is SUSPICIOUS, never CONFIRMED
+        post_ind = tdb.lookup_indicator("url", norm_url)
+        assert post_ind["found"] is True
+        assert post_ind["status"] == "SUSPICIOUS", (
+            f"Expected status 'SUSPICIOUS' for unverified engine detection, got '{post_ind['status']}'"
+        )
+        assert post_ind["source"] == "actis_url_scanner"
+
     def test_suspicious_indicator_does_not_trigger_fast_track_critical_override(self, isolated_ti_db):
         """
         Trust Principle:

@@ -1,6 +1,6 @@
 # ACTIS Test Status & Verification Inventory
 
-**Generated:** 2026-10-16 17:32:21 UTC
+**Generated:** 2026-10-16 17:33:49 UTC
 **Source of Truth:** AST Test Discovery & Pytest Runner (`scripts/generate_docs.py`)
 
 This document inventories all automated test files, test classes, and test functions
@@ -12,7 +12,7 @@ recorded only after confirmed execution.
 ## Test Suite Summary
 
 - **Total Test Files:** `47`
-- **Total Discovered Test Cases:** `706`
+- **Total Discovered Test Cases:** `707`
 - **Test Framework:** `pytest` 8.x with `unittest` compatibility
 - **Execution Command:** `pytest tests/ -v`
 
@@ -30,7 +30,7 @@ recorded only after confirmed execution.
 | `tests/test_config_validation.py` | 11 tests | `PASSING` |
 | `tests/test_day27_benchmark_baseline.py` | 3 tests | `PASSING` |
 | `tests/test_day27_indicator_trust_and_provenance.py` | 4 tests | `PASSING` |
-| `tests/test_day27_part2_indicator_trust.py` | 4 tests | `PASSING` |
+| `tests/test_day27_part2_indicator_trust.py` | 5 tests | `PASSING` |
 | `tests/test_day27_repeated_scan_and_multi_url.py` | 3 tests | `PASSING` |
 | `tests/test_day27_ti_status_transitions.py` | 4 tests | `PASSING` |
 | `tests/test_detection_engine.py` | 23 tests | `PASSING` |
@@ -224,9 +224,10 @@ recorded only after confirmed execution.
 - `test_escalated_indicator_bypasses_multi_attribute_scoring_on_rescan()`
 - `test_ti_provenance_collapse_in_sqlite_persistence()`
 
-### `tests/test_day27_part2_indicator_trust.py` (4 tests)
+### `tests/test_day27_part2_indicator_trust.py` (5 tests)
 
 **Class `TestDay27Part2IndicatorTrustInvariants`:**
+- `test_unverified_engine_detection_registers_as_suspicious_not_confirmed()`
 - `test_suspicious_indicator_does_not_trigger_fast_track_critical_override()`
 - `test_confirmed_authoritative_intelligence_retains_fast_track()`
 - `test_missing_or_unavailable_intelligence_does_not_imply_benign()`

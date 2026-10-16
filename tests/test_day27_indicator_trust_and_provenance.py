@@ -106,33 +106,31 @@ class TestDay27IndicatorTrustAndCacheConsistency:
         post_ind = tdb.lookup_indicator("url", norm_url)
         assert post_ind["found"] is True
         
-        # VERIFY DEFECT: Indicator was promoted to CONFIRMED based solely on internal engine score
-        assert post_ind["status"] == "CONFIRMED", (
-            f"Expected status 'CONFIRMED' reflecting ML/heuristic auto-registration defect, got {post_ind['status']}"
+        # VERIFY DEFECT FIX: Indicator is registered as SUSPICIOUS, NOT promoted to CONFIRMED
+        assert post_ind["status"] == "SUSPICIOUS", (
+            f"Expected status 'SUSPICIOUS' reflecting unverified engine alert, got {post_ind['status']}"
         )
         assert post_ind["source"] == "actis_url_scanner"
-        assert post_ind["confidence"] == 1.0
 
     def test_escalated_indicator_bypasses_multi_attribute_scoring_on_rescan(self, isolated_ti_db):
         """
-        Defect Reproduction:
-        Demonstrates that once an indicator is escalated to status='CONFIRMED' in SQLite by an initial
-        scan, subsequent scans (even from a fresh ThreatDetector instance or after cache expiry)
-        retrieve this indicator via ThreatLookup.lookup_url() as is_known_malicious=True.
-        
-        In RiskEngine.calculate_risk(), is_known_malicious=True triggers an immediate fast-track override:
-            if known_intel.get('is_known_malicious', False):
-                return {'risk_score': 100.0, 'risk_level': 'CRITICAL', ...}
-                
-        This permanently bypasses multi-attribute risk calculation, locking the indicator into CRITICAL.
+        Validates that authoritative intelligence with status='CONFIRMED' (e.g. from an authoritative provider)
+        retrieves is_known_malicious=True and triggers the fast-track override, whereas
+        engine-generated detections remain 'SUSPICIOUS'.
         """
-        # Step 1: Pre-populate or auto-register via first scan
-        detector1 = ThreatDetector()
+        # Step 1: Pre-populate authoritative intelligence in database
         test_url = "http://198.51.100.10:8080/login/verify/account/update/secure/banking/signin/webscr?token=xyz"
         norm_url = normalize_url(test_url)
 
-        res1 = detector1.analyze_url(test_url)
-        assert res1["risk_level"] == "CRITICAL"
+        tdb.register_indicator(
+            indicator_type="url",
+            indicator_value=norm_url,
+            source="Authoritative_CERT",
+            confidence=1.0,
+            status="CONFIRMED",
+            threat_type="Phishing",
+            threat_name="Authoritative Confirmed Phish"
+        )
 
         # Verify indicator exists in DB as CONFIRMED
         ind = tdb.lookup_indicator("url", norm_url)
@@ -153,7 +151,7 @@ class TestDay27IndicatorTrustAndCacheConsistency:
         # Scan with fresh detector
         res2 = detector2.analyze_url(test_url)
 
-        # VERIFY: Fast-track bypass locked the result to 100.0 CRITICAL
+        # VERIFY: Fast-track bypass for authoritative CONFIRMED threat
         assert res2["score"] == 100.0
         assert res2["risk_level"] == "CRITICAL"
         assert res2["is_threat"] is True
