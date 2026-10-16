@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-16 17:33:49 UTC
+**Generated:** 2026-10-16 17:35:11 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`8237d91`)
+**Current Git Branch:** `main` (`2769795`)
 
 ---
 
@@ -117,20 +117,21 @@
 
 ## Test Status
 
-- **Total Test Files:** `47`
-- **Total Discovered Test Functions:** `707`
+- **Total Test Files:** `48`
+- **Total Discovered Test Functions:** `711`
 - **Coverage Areas:** Configuration validation, SQLite database schema & CRUD, Phishing/Malware model contracts, PE feature extraction, API backend.
 
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `8237d91`
-- **Working Tree:** 3 untracked/unstaged changes
+- **HEAD Commit:** `2769795`
+- **Working Tree:** 1 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `2769795` | Aaryan Suman | 2026-10-16 | fix(ti): prevent unauthorized indicator promotion |
 | `8237d91` | Aaryan Suman | 2026-10-16 | test(ti): cover indicator trust and provenance invariants |
 | `345932f` | Aaryan Suman | 2026-10-16 | docs(day27): record verified findings and implementation handoff |
 | `8199ec1` | Aaryan Suman | 2026-10-16 | test(detection): cover repeated-scan evidence behavior and multi-URL latency |
@@ -140,7 +141,6 @@
 | `6f009cb` | Aaryan Suman | 2026-10-16 | docs(day27): document repository baseline and detection lifecycle audit |
 | `67b4f8e` | Aaryan Suman | 2026-10-13 | docs(day26): document phishing verification benchmark methodology, metrics, and baseline results |
 | `d6e0d6d` | Aaryan Suman | 2026-10-13 | feat(benchmarks): implement JSON and Markdown report generation with preserved baseline |
-| `24cbd1b` | Aaryan Suman | 2026-10-13 | fix(explainability): add NodeStatus.LIMITATION for partial message analyses and add benchmark tests |
 
 ## Known Issues
 
