@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-16 21:24:46 UTC
+**Generated:** 2026-10-16 21:25:20 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`82d5294`)
+**Current Git Branch:** `main` (`48c4f65`)
 
 ---
 
@@ -124,14 +124,15 @@
 ## Git Status
 
 - **Active Branch:** `main`
-- **Documented Commit (HEAD):** `82d5294`
-- **Repository State at Generation:** 8 in-flight changes (8 staged) (captured prior to release commit)
-- **Working Tree:** clean (all in-flight artifacts staged and committed atomically)
+- **Documented Commit (HEAD):** `48c4f65`
+- **Repository State at Generation:** clean
+- **Working Tree:** clean
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `48c4f65` | Aaryan Suman | 2026-10-17 | fix(docs): recognize doc-only in-flight changes as clean repository source state |
 | `82d5294` | Aaryan Suman | 2026-10-17 | fix(docs): refine generator git status reporting to eliminate in-flight working tree discrepancy |
 | `89ac69d` | Aaryan Suman | 2026-10-17 | docs(benchmarks): add reproducible deep diagnostic artifact for all 19 false positives |
 | `e1744d3` | Aaryan Suman | 2026-10-17 | fix(detection): ingest medium-risk URL signals into message decision engine to prevent zero-score threat inconsistency |
@@ -141,7 +142,6 @@
 | `cda07b9` | Aaryan Suman | 2026-10-17 | docs(day27): update verified test count and threat intel elevation rule |
 | `fce925f` | Aaryan Suman | 2026-10-17 | test(benchmarks): refresh benchmark verification metrics with verified commit hash |
 | `93b763a` | Aaryan Suman | 2026-10-17 | fix(detection): restrict message threat intelligence elevation to confirmed indicators |
-| `610ef93` | Aaryan Suman | 2026-10-16 | docs(day27): update verified project state and next milestone |
 
 ## Known Issues
 
