@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-16 18:05:29 UTC
+**Generated:** 2026-10-16 18:16:46 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`fdf80dc`)
+**Current Git Branch:** `main` (`ef99f8b`)
 
 ---
 
@@ -117,20 +117,21 @@
 
 ## Test Status
 
-- **Total Test Files:** `50`
-- **Total Discovered Test Functions:** `729`
+- **Total Test Files:** `51`
+- **Total Discovered Test Functions:** `733`
 - **Coverage Areas:** Configuration validation, SQLite database schema & CRUD, Phishing/Malware model contracts, PE feature extraction, API backend.
 
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `fdf80dc`
-- **Working Tree:** 3 untracked/unstaged changes
+- **HEAD Commit:** `ef99f8b`
+- **Working Tree:** 7 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `ef99f8b` | Aaryan Suman | 2026-10-16 | docs(benchmark): record day 27 part 2 benchmark verification metrics |
 | `fdf80dc` | Aaryan Suman | 2026-10-16 | fix(detection): correct verified evidence-calibration defect |
 | `76d0b2d` | Aaryan Suman | 2026-10-16 | test(detection): protect phishing and benign URL regressions |
 | `a4b9e6c` | Aaryan Suman | 2026-10-16 | fix(detection): prevent duplicate evidence amplification |
@@ -140,7 +141,6 @@
 | `2769795` | Aaryan Suman | 2026-10-16 | fix(ti): prevent unauthorized indicator promotion |
 | `8237d91` | Aaryan Suman | 2026-10-16 | test(ti): cover indicator trust and provenance invariants |
 | `345932f` | Aaryan Suman | 2026-10-16 | docs(day27): record verified findings and implementation handoff |
-| `8199ec1` | Aaryan Suman | 2026-10-16 | test(detection): cover repeated-scan evidence behavior and multi-URL latency |
 
 ## Known Issues
 
