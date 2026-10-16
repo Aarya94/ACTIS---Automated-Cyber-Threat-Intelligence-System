@@ -316,7 +316,10 @@ class ThreatDetector:
             # Check if URL matched CONFIRMED threat intelligence
             u_ti = u_res.get("threat_intel", {})
             local_status = str(u_ti.get("local_intel", {}).get("status", "")).upper()
-            if u_ti.get("is_known_threat") or local_status in ("CONFIRMED", "MALICIOUS"):
+            is_confirmed_ti = local_status in ("CONFIRMED", "MALICIOUS") or bool(
+                u_ti.get("primary_evidence") and u_ti["primary_evidence"].is_confirmed_threat
+            )
+            if is_confirmed_ti:
                 if ti_evidence is None:
                     ti_evidence = ThreatIntelEvidence.from_local_intel(
                         intel=u_ti.get("local_intel"),

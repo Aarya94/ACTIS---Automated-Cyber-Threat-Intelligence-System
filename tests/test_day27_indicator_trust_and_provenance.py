@@ -186,3 +186,29 @@ class TestDay27IndicatorTrustAndCacheConsistency:
         # Schema does not maintain model_name, model_version, or verification_authority
         assert "model_name" not in ind
         assert "model_version" not in ind
+
+    def test_unconfirmed_suspicious_url_does_not_elevate_to_message_ti(self, isolated_ti_db):
+        """
+        Verifies that an embedded URL with unconfirmed SUSPICIOUS status in local DB
+        is NOT elevated into threat_intel evidence at the message fusion layer.
+        """
+        suspicious_url = "https://benign-service.example.com/status"
+        tdb.register_indicator(
+            indicator_type="url",
+            indicator_value=suspicious_url,
+            source="actis_url_scanner",
+            confidence=0.55,
+            status="SUSPICIOUS",
+            threat_type="Phishing",
+            threat_name="URL_Phishing_Heuristic"
+        )
+
+        detector = ThreatDetector()
+        msg = f"Subject: System Notification\n\nPlease check status at {suspicious_url}."
+        res = detector.analyze_message(msg)
+
+        # Confirm that message reasons do NOT claim a THREAT_INTELLIGENCE finding
+        # because the indicator is unconfirmed SUSPICIOUS
+        ti_reasons = [r for r in res.get("reasons", []) if "[THREAT_INTELLIGENCE]" in r]
+        assert len(ti_reasons) == 0, f"Expected 0 TI reasons for unconfirmed indicator, got: {ti_reasons}"
+

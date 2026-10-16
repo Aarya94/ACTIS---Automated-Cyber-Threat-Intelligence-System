@@ -1,8 +1,8 @@
 # ACTIS Project Status
 
-**Generated:** 2026-10-16 18:25:42 UTC
+**Generated:** 2026-10-16 19:15:55 UTC
 **Current Milestone:** `v0.1.0 — Foundation`
-**Current Git Branch:** `main` (`a1dc41c`)
+**Current Git Branch:** `main` (`610ef93`)
 
 ---
 
@@ -118,19 +118,20 @@
 ## Test Status
 
 - **Total Test Files:** `51`
-- **Total Discovered Test Functions:** `736`
+- **Total Discovered Test Functions:** `737`
 - **Coverage Areas:** Configuration validation, SQLite database schema & CRUD, Phishing/Malware model contracts, PE feature extraction, API backend.
 
 ## Git Status
 
 - **Active Branch:** `main`
-- **HEAD Commit:** `a1dc41c`
-- **Working Tree:** 8 untracked/unstaged changes
+- **HEAD Commit:** `610ef93`
+- **Working Tree:** 10 untracked/unstaged changes
 
 ## Recent Development Activity
 
 | Commit | Author | Date | Summary |
 |---|---|---|---|
+| `610ef93` | Aaryan Suman | 2026-10-16 | docs(day27): update verified project state and next milestone |
 | `a1dc41c` | Aaryan Suman | 2026-10-16 | docs(day27): document final validation and benchmark comparison |
 | `b7ce93e` | Aaryan Suman | 2026-10-16 | test(benchmarks): validate day27 detection and latency metrics |
 | `6f81bdc` | Aaryan Suman | 2026-10-16 | test(performance): verify bounded analysis and cache behavior |
@@ -140,7 +141,6 @@
 | `fdf80dc` | Aaryan Suman | 2026-10-16 | fix(detection): correct verified evidence-calibration defect |
 | `76d0b2d` | Aaryan Suman | 2026-10-16 | test(detection): protect phishing and benign URL regressions |
 | `a4b9e6c` | Aaryan Suman | 2026-10-16 | fix(detection): prevent duplicate evidence amplification |
-| `5bd2bb1` | Aaryan Suman | 2026-10-16 | test(detection): cover repeated-scan evidence feedback |
 
 ## Known Issues
 
